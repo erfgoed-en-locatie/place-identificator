@@ -8,16 +8,14 @@
 // homepage
 $app->get('/', 'Pid\Demo\Controller\\Home::page');
 
-// simple test route
-$app->get('/test/{id}', function ($id) use ($app) {
-
-    return $app['twig']->render('home.html.twig', array('gekozen' => $id));
-})
-    ->bind('test')
-    ->value('id', null) // default
+// simple route
+$app->get('/dummy/{id}', function ($id) use ($app) {
+    return $app['twig']->render('home.html.twig', array('id' => $id));
+})->value('id', null) // default
     ->assert('id', '\d+')
 ;
 
+// a complete set of routes
 $app->mount('/datasets', new \Pid\Mapper\Provider\DataSetProvider());
 
 // Error route

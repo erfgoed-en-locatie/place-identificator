@@ -30,7 +30,7 @@
                             <td>{{ set.user }}</td>
                             <td>{{ set.createdOn|date('d-m-Y') }}</td>
                             <td>
-                                {% if set.status == 1 %}
+                                {% if set.status == 2 %}
                                     {% set statClass = 'label-success' %}
                                 {% else %}
                                     {% set statClass = 'label-primary' %}

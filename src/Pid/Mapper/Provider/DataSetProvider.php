@@ -2,6 +2,7 @@
 
 namespace Pid\Mapper\Provider;
 
+use Pid\Mapper\Model\Dataset;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 
@@ -18,17 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
 class DataSetProvider implements ControllerProviderInterface
 {
 
-    /** @var string The path this Provider was bound to in the routes file */
-    private $path = '/datasets';
-    
     public function connect(Application $app)
     {
         $controllers = $app['controllers_factory'];
 
-        // custom routes
         $controllers->get('/active', array(new self(), 'showActive'))->bind('datasets-active');
+        $controllers->get('/upload', array(new self(), 'uploadForm'))->bind('datasets-upload-form');
+        $controllers->post('/upload', array(new self(), 'handleUpload'))->bind('datasets-upload');
 
-        // REST
         $controllers->get('/', array(new self(), 'showAll'))->bind('datasets-all');
         $controllers->post('/', array(new self(), 'handleForm'))->bind('datasets-create');
 
@@ -61,6 +59,27 @@ class DataSetProvider implements ControllerProviderInterface
         return $app['twig']->render('datasets/list.html.twig', array('datasets' => $datasets));
     }
 
+    /**
+     * List only active datasets
+     *
+     * @param Application $app
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function showActive(Application $app)
+    {
+        /** @var \Doctrine\DBAL\Connection $db */
+        $db = $app['db'];
+
+        $stmt = $db->prepare("SELECT * FROM datasets where status != :status");
+        $stmt->execute(array('status' => Dataset::STATUS_FINISHED));
+        $datasets = $stmt->fetchAll(
+            \PDO::FETCH_CLASS,
+            '\Pid\Mapper\Model\Dataset'
+        );
+
+        return $app['twig']->render('datasets/list.html.twig', array('datasets' => $datasets));
+    }
+
 
     /**
      * Show all the details for one dataset
@@ -82,6 +101,17 @@ class DataSetProvider implements ControllerProviderInterface
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }
         return $app['twig']->render('datasets/details.html.twig', array('dataset' => $dataset));
+    }
+
+    /**
+     * Checks if the user is logged in and is allowed to upload a dataset
+     *
+     * @param Application $app
+     * @return string
+     */
+    public function uploadForm(Application $app)
+    {
+        return 'Hier komt het upload formulier ... ALS iemnad is ingelogd en niet al 100 sets heeft geupload? ';
     }
 
     public function deleteSet(Application $app, $id)

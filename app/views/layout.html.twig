@@ -55,26 +55,26 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Home</a></li>
-
+                <li class="active"><a href="/">Dashboard</a></li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Things <span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Examples <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="/test">First test</a></li>
-                        <li><a href="/test/2">Second valid test</a></li>
+                        <li><a href="/dummy">Dummy page</a></li>
+                        <li><a href="/dummy/2">Dummy with parameter</a></li>
                         <li class="divider"></li>
                         <li class="dropdown-header">Error</li>
-                        <li><a href="/test/w">Wrong input</a></li>
+                        <li><a href="/dummy/w">Dummy with invalid param</a></li>
                     </ul>
                 </li>
-                <li><a href="/datasets/" title="Lijstje met datasets">Datasets</a></li>
+
+                <li><a href="/datasets/upload">Upload a set</a></li>
+                <li><a href="/datasets/" title="Lijstje met datasets">Mijn datasets</a></li>
 
             </ul>
-            {#<ul class="nav navbar-nav navbar-right">
-                <li><a href="../navbar/">Default</a></li>
-                <li><a href="../navbar-static-top/">Static top</a></li>
-                <li class="active"><a href="./">Fixed top <span class="sr-only">(current)</span></a></li>
-            </ul>#}
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Admin spul?</a></li>
+                <li><a href="#">Inloggen etc</a></li>
+            </ul>
         </div>
     </div>
 </nav>
