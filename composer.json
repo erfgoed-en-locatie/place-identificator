@@ -1,0 +1,29 @@
+{
+    "require": {
+        "silex/silex": "~1.2",
+
+        "doctrine/dbal": "~2.2",
+        "guzzlehttp/guzzle": "~5.1",
+        "swiftmailer/swiftmailer": "5.*",
+        "twig/twig": ">=1.8,<2.0-dev",
+        "symfony/twig-bridge": "~2.3",
+        "monolog/monolog": ">=1.0.0"
+    },
+
+    "scripts": {
+        "post-install-cmd": "Pid\\Silex\\Composer::install",
+        "post-update-cmd": "Pid\\Silex\\Composer::update"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "Pid": "src"
+        }
+    },
+    "petra_maybe_use_later": {
+        "symfony/form": "~2.3",
+        "symfony/validator": "~2.3",
+        "symfony/config": "~2.3",
+        "symfony/translation": "~2.3"
+    }
+}
