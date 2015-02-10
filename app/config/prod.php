@@ -69,6 +69,11 @@ $app['security.firewalls'] = array(
     'register' => array(
         'pattern' => '^/user/register$',
     ),
+    'forgot_password' => array(
+        'pattern' => '^/user/forgot-password$',
+    ),
+
+    // everything else is secured
     'secured_area' => array(
         'pattern' => '^.*$',
         'anonymous' => false,
