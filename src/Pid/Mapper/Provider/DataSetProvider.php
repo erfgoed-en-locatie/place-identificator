@@ -111,7 +111,8 @@ class DataSetProvider implements ControllerProviderInterface
      */
     public function uploadForm(Application $app)
     {
-        return 'Hier komt het upload formulier ... ALS iemnad is ingelogd en niet al 100 sets heeft geupload? ';
+        //return 'Hier komt het upload formulier ... ALS iemnad is ingelogd en niet al 100 sets heeft geupload? ';
+        return $app['twig']->render('datasets/uploadform.html.twig', array());
     }
 
     public function deleteSet(Application $app, $id)
