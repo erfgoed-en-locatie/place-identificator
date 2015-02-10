@@ -7,6 +7,7 @@ use Silex\Application;
 use Silex\ControllerProviderInterface;
 
 use Silex\Provider\FormServiceProvider;
+use SimpleUser\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -39,7 +40,7 @@ class DataSetProvider implements ControllerProviderInterface
     }
 
     /**
-     * List all datasets
+     * List all datasets for the logged in user
      *
      * @param Application $app
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -49,8 +50,11 @@ class DataSetProvider implements ControllerProviderInterface
         /** @var \Doctrine\DBAL\Connection $db */
         $db = $app['db'];
 
-        $stmt = $db->prepare("SELECT * FROM datasets");
-        $stmt->execute();
+        /** @var User $user */
+        $user = $app['user'];
+
+        $stmt = $db->prepare("SELECT * FROM datasets WHERE user_id = :user_id");
+        $stmt->execute(array('user_id' => $user->getId()));
         $datasets = $stmt->fetchAll(
             \PDO::FETCH_CLASS,
             '\Pid\Mapper\Model\Dataset'
