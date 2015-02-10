@@ -74,6 +74,9 @@
 
             <ul class="nav navbar-nav navbar-right">
             {% if app.user %}
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li><a href="{{ path('user.list') }}">List users</a></li>
+                {% endif %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         Hello, {{ app.user.displayName }}!
