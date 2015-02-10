@@ -1,0 +1,25 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+
+            <h2>Dataset Uploaden</h2>
+
+            <p>Upload een csv-bestand met de te standaardiseren plaatsnamen. In het csvbestand mogen ook contextverschaffende velden opgenomen zijn - bijvoorbeeld voor provincie of land. Het csv-bestand mag maximaal 2MB groot zijn.</p>
+
+            <p>In een volgende scherm kunt u aangeven welk velden wat bevatten</p>
+
+            <form action="" method="post">
+
+                <input class="form-control" type="file" name="csvfile" /> 
+
+                <input class="btn btn-primary" type="submit" value="bestand uploaden">
+
+            </form>
+
+        </div>
+    </div>
+
+
+{% endblock %}
