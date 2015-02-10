@@ -2,12 +2,13 @@
     "require": {
         "silex/silex": "~1.2",
 
-        "doctrine/dbal": "~2.2",
+        "doctrine/dbal": "~2.4",
         "guzzlehttp/guzzle": "~5.1",
         "swiftmailer/swiftmailer": "5.*",
         "twig/twig": ">=1.8,<2.0-dev",
         "symfony/twig-bridge": "~2.3",
-        "monolog/monolog": ">=1.0.0"
+        "monolog/monolog": ">=1.0.0",
+        "jasongrimes/silex-simpleuser": "~2.0"
     },
 
     "scripts": {

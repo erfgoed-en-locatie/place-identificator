@@ -16,12 +16,18 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 // DOCTRINE DBAL
 $app->register(new Silex\Provider\DoctrineServiceProvider());
 
-// MYSQLi for Menno?
-//$app->register(new Pid\Silex\Provider\MySQLiServiceProvider());
-
 // SWIFT MAILER
 $app->register(new Silex\Provider\SwiftmailerServiceProvider());
 
+// needed for SimpleUser
+$app->register(new Silex\Provider\SecurityServiceProvider());
+$app->register(new Silex\Provider\RememberMeServiceProvider());
+$app->register(new Silex\Provider\SessionServiceProvider());
+$app->register(new Silex\Provider\ServiceControllerServiceProvider());
+$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
+// SimpleUser
+$simpleUserProvider = new SimpleUser\UserServiceProvider();
+$app->register($simpleUserProvider);
 
 // CACHE
 $app->register(new Silex\Provider\HttpCacheServiceProvider());

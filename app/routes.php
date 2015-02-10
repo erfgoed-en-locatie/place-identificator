@@ -18,6 +18,9 @@ $app->get('/dummy/{id}', function ($id) use ($app) {
 // a complete set of routes
 $app->mount('/datasets', new \Pid\Mapper\Provider\DataSetProvider());
 
+// Mount the user controller routes:
+$app->mount('/user', $simpleUserProvider);
+
 // Error route
 $app->error(function (\Exception $e, $code) use ($app) {
     switch ($code) {
