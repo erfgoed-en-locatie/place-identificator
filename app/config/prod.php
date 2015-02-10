@@ -13,16 +13,18 @@ $app['user.options'] = array(
     // Specify custom view templates here.
     'templates' => array(
         'layout' => 'layout.html.twig',
-        'register' => '@user/register.twig',
-        'register-confirmation-sent' => '@user/register-confirmation-sent.twig',
-        'login' => '@user/login.twig',
-        'login-confirmation-needed' => '@user/login-confirmation-needed.twig',
-        'forgot-password' => '@user/forgot-password.twig',
-        'reset-password' => '@user/reset-password.twig',
-        'view' => '@user/view.twig',
-        'edit' => '@user/edit.twig',
-        'list' => '@user/list.twig',
+        'register' => 'simple-user/register.twig',
+        'register-confirmation-sent' => 'simple-user/register-confirmation-sent.twig',
+        'login' => 'simple-user/login.twig',
+        'login-confirmation-needed' => 'simple-user/login-confirmation-needed.twig',
+        'forgot-password' => 'simple-user/forgot-password.twig',
+        'reset-password' => 'simple-user/reset-password.twig',
+        'view' => 'simple-user/view.twig',
+        'edit' => 'simple-user/edit.twig',
+        'list' => 'simple-user/list.twig',
+        //'list' => '@user/list.twig',
     ),
+
 
     // Configure the user mailer for sending password reset and email confirmation messages.
     'mailer' => array(
