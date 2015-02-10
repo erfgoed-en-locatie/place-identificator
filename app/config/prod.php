@@ -72,7 +72,9 @@ $app['security.firewalls'] = array(
     'forgot_password' => array(
         'pattern' => '^/user/forgot-password$',
     ),
-
+    'homepage' => array(
+        'pattern' => '^/$',
+    ),
     // everything else is secured
     'secured_area' => array(
         'pattern' => '^.*$',
