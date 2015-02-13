@@ -14,3 +14,6 @@ Technische zaken die van belang zijn tijdens de ontwikkeling
 - Database spul werkt nu met *Doctrine DBAL* - http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/
 - *Silex* docs: http://silex.sensiolabs.org/documentation
 - *Twig template* docs: http://twig.sensiolabs.org
+
+- Mooi voorbeeld van hoe makkelijk de queries kunnen met DBAL:
+    http://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal/
