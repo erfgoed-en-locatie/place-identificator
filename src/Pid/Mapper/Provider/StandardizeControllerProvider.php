@@ -25,11 +25,9 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
     {
         $controllers = $app['controllers_factory'];
 
-        $controllers->get('/test/{datasetId}', array(new self(), 'testAction'))->bind('standardize-test');
-        $controllers->get('/run/{datasetId}', array(new self(), 'standardizeAction'))->bind('standardize');
+        $controllers->get('/test/{datasetId}', array(new self(), 'testAction'))->bind('standardize-test')->assert('datasetId', '\d+');
+        $controllers->get('/run/{datasetId}', array(new self(), 'standardizeAction'))->bind('standardize')->assert('datasetId', '\d+');
 
-        $controllers->get('/mapcsv', array(new self(), 'mapCsv'))->bind('dataset-mapcsv');
-        $controllers->post('/mapcsv', array(new self(), 'handleCsvMapping'))->bind('datasets-create');
 
 
         return $controllers;

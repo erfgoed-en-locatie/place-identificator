@@ -25,9 +25,8 @@ class ImportControllerProvider implements ControllerProviderInterface {
         $controllers->get('/upload', array(new self(), 'uploadForm'))->bind('dataset-upload-form');
         $controllers->post('/upload', array(new self(), 'handleUpload'))->bind('dataset-upload');
 
-        $controllers->get('/mapcsv', array(new self(), 'mapCsv'))->bind('dataset-mapcsv');
-        $controllers->post('/mapcsv', array(new self(), 'handleCsvMapping'))->bind('datasets-create');
-
+        $controllers->get('/mapcsv', array(new self(), 'mapCsv'))->bind('import-mapcsv');
+        $controllers->post('/mapcsv', array(new self(), 'handleCsvMapping'))->bind('import-handle-csv');
 
         return $controllers;
     }

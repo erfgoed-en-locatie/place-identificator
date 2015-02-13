@@ -30,7 +30,7 @@ class DataSetProvider implements ControllerProviderInterface
         $controllers->post('/', array(new self(), 'handleForm'))->bind('datasets-create');
 
         // voorbeeldje met optionele parameter
-        $controllers->get('/{id}', array(new self(), 'showDataset'))->bind('datasets-show')->value('id', null);
+        $controllers->get('/{id}', array(new self(), 'showDataset'))->bind('datasets-show')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/edit', array(new self(), 'showForm'))->bind('datasets-edit')->value('id', null);
         $controllers->get('/{id}/delete', array(new self(), 'deleteSet'))->bind('datasets-delete')->value('id', null);
 
