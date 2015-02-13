@@ -17,3 +17,8 @@ Technische zaken die van belang zijn tijdens de ontwikkeling
 
 - Mooi voorbeeld van hoe makkelijk de queries kunnen met DBAL:
     http://www.thedevfiles.com/2014/08/simplifying-database-interactions-with-doctrine-dbal/
+    
+    Hier wordt dat als volgt:
+    $app['db']->insert('users', array('name' => 'Bob', 'email' => 'bob@example.com'));
+
+    $app['db']->update('users', array('name' => 'Petra'), array('id' => 1));
