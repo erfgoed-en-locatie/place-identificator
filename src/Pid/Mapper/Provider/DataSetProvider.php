@@ -25,8 +25,6 @@ class DataSetProvider implements ControllerProviderInterface
         $controllers = $app['controllers_factory'];
 
         $controllers->get('/active', array(new self(), 'showActive'))->bind('datasets-active');
-        $controllers->get('/upload', array(new self(), 'uploadForm'))->bind('datasets-upload-form');
-        $controllers->post('/upload', array(new self(), 'handleUpload'))->bind('datasets-upload');
 
         $controllers->get('/', array(new self(), 'showAll'))->bind('datasets-all');
         $controllers->post('/', array(new self(), 'handleForm'))->bind('datasets-create');
@@ -53,11 +51,14 @@ class DataSetProvider implements ControllerProviderInterface
         /** @var User $user */
         $user = $app['user'];
 
-        $stmt = $db->prepare("SELECT * FROM datasets WHERE user_id = :user_id");
+        $stmt = $db->prepare("
+            SELECT d.*, u.email
+            FROM datasets d
+            INNER JOIN users u ON u.id = d.user_id
+            WHERE user_id = :user_id");
         $stmt->execute(array('user_id' => $user->getId()));
         $datasets = $stmt->fetchAll(
-            \PDO::FETCH_CLASS,
-            '\Pid\Mapper\Model\Dataset'
+            \PDO::FETCH_ASSOC
         );
 
         return $app['twig']->render('datasets/list.html.twig', array('datasets' => $datasets));
@@ -74,13 +75,13 @@ class DataSetProvider implements ControllerProviderInterface
         /** @var \Doctrine\DBAL\Connection $db */
         $db = $app['db'];
 
-        $stmt = $db->prepare("SELECT * FROM datasets where status != :status");
+        $stmt = $db->prepare("
+          SELECT d.*, u.email
+          FROM datasets d
+          LEFT JOIN user u ON u.id = d.user_id
+          where status != :status");
         $stmt->execute(array('status' => Dataset::STATUS_FINISHED));
-        $datasets = $stmt->fetchAll(
-            \PDO::FETCH_CLASS,
-            '\Pid\Mapper\Model\Dataset'
-        );
-
+        $datasets = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return $app['twig']->render('datasets/list.html.twig', array('datasets' => $datasets));
     }
 
@@ -96,10 +97,7 @@ class DataSetProvider implements ControllerProviderInterface
         $stmt = $app['db']->prepare("SELECT * FROM datasets where id = :id");
         $stmt->execute(array('id' => $id));
 
-        $dataset = $stmt->fetch(
-            \PDO::FETCH_CLASS | \PDO::FETCH_CLASSTYPE,
-            '\Pid\Mapper\Model\Dataset'
-        );
+        $dataset = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
