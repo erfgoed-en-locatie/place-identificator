@@ -2,9 +2,71 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-12">
-        {{ dummy }}
-        </div>
+    <div class="col-md-6">
+        <h2>Velden benoemen</h2>
+
+        <form action="{{ path('datasets-create') }}" method="post">
+
+            <input type="hidden" value="{{ dummy }}" name="datasetId" /> 
+
+            
+
+        	<label>Welk veld bevat de te standaardiseren plaatsnaam? (verplicht)</label>
+            <select class="form-control" name="originalNameField">
+            	<option value="">selecteer een veld</option>
+            </select>
+
+            <label>Is er een veld met uw kenmerk of id dat in het eindresultaat terug moet komen</label>
+            <select class="form-control" name="originalNameField">
+            	<option value="">selecteer een veld</option>
+            </select>
+
+	        <input class="btn btn-primary" type="submit" value="verder">
+
+
+
+        	<p>Eventueel kunt u hieronder nog aangeven of uw bestand contextuele informatie biedt die de zoekresultaten verder kunnen filteren</p>
+
+        	<fieldset><legend>contextuele informatie</legend>
+
+        		
+
+				<label>Provincie</label>
+	            <select class="form-control" name="originalNameField">
+	            	<option value="">selecteer een veld</option>
+	            </select>
+
+	            <label>Land</label>
+	            <select class="form-control" name="originalNameField">
+	            	<option value="">selecteer een veld</option>
+	            </select>
+
+	            <label>Lattitude / breedtegraad</label>
+	            <select class="form-control" name="originalNameField">
+	            	<option value="">selecteer een veld</option>
+	            </select>
+
+	            <label>Longitude / lengtegraad</label>
+	            <select class="form-control" name="originalNameField">
+	            	<option value="">selecteer een veld</option>
+	            </select>
+
+        	</fieldset>
+
+
+            
+
+        </form>
     </div>
+    <div class="col-md-6">
+        
+        <h2>Uitleg</h2>
+
+        <p>Blijkbaar is het uploaden van het csv-bestand goed gegaan en kan de gebruiker ons nu gaan vertellen in welk veld de te standaardiseren plaatsnamen staan en in welke velden eventuele context gegeven wordt.</p>
+
+        <p>
+        </p>
+    </div>
+</div>
 
 {% endblock %}
