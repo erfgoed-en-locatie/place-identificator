@@ -20,7 +20,8 @@ upload csv
     - context velden : lat, lon: eventueel later :om mee te kunnen vergelijken, om evt te kunne bepalen of een gevonden treffer erbij in de buurt ligt
 - metadata over de set: periode doen we dit per record.
 
-- na de mapping moet het systeem de dataset valideren: bv op uniciteit van de plaatsnamen, als er provincies in staan of het de juiste benameingen (of afkortingen zijn) (lijstje met iso-codes standaarden opnemen oid??)
+- na de mapping moet het systeem de dataset valideren: bv op uniciteit van de plaatsnamen, 
+als er provincies in staan of het de juiste benameingen (of afkortingen zijn) (lijstje met iso-codes standaarden opnemen oid??)
  
 ### Scherm 3
 - context aangeven waarin je wilt dat de geocoder zoekt: geonames, of 1800 - 1900, of alleen provincie Friesland etc 

@@ -17,6 +17,7 @@ $app->get('/dummy/{id}', function ($id) use ($app) {
 
 // a complete set of routes
 $app->mount('/datasets', new \Pid\Mapper\Provider\DataSetProvider());
+$app->mount('/import', new \Pid\Mapper\Provider\ImportControllerProvider());
 
 // Mount the user controller routes:
 $app->mount('/user', $simpleUserProvider);
