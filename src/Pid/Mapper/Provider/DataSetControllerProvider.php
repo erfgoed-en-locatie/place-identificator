@@ -12,12 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class DataSetProvider
+ * Class DataSetControllerProvider
  * List datasets (for a certain user)
  *
  * @package Pid\Demo
  */
-class DataSetProvider implements ControllerProviderInterface
+class DataSetControllerProvider implements ControllerProviderInterface
 {
 
     public function connect(Application $app)
