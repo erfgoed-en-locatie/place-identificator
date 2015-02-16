@@ -82,6 +82,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
           where status != :status");
         $stmt->execute(array('status' => Dataset::STATUS_FINISHED));
         $datasets = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
         return $app['twig']->render('datasets/list.html.twig', array('datasets' => $datasets));
     }
 
@@ -106,9 +107,35 @@ class DataSetControllerProvider implements ControllerProviderInterface
     }
 
 
-
+    /**
+     * Delete a dataset and all it's data
+     *
+     * @param Application $app
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function deleteSet(Application $app, $id)
     {
-        return 'En hier gaan we dan dataset nummertje ' . $id . ' deleten...';
+        /** @var \Doctrine\DBAL\Connection $db */
+        $db = $app['db'];
+        $stmt = $db->executeQuery('SELECT * FROM datasets WHERE id = :id AND user_id = :userId', array(
+            'id'        => (int) $id,
+            'userId'    => (int) $app['user']->getId()
+        ));
+        $dataset = $stmt->fetch();
+
+        if (!$dataset) {
+            $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
+
+        $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
+
+        unlink($file);
+        $db->delete('datasets', array('id' => $id, 'user_id' => $app['user']->getId()));
+
+        $app['session']->getFlashBag()->set('alert', 'De dataset is verwijderd!');
+
+        return $app->redirect($app['url_generator']->generate('datasets-all'));
     }
 }

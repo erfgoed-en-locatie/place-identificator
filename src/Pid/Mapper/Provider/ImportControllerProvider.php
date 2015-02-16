@@ -92,6 +92,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
      *
      * @param Application $app
      * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function handleUpload(Application $app, Request $request)
     {
@@ -106,6 +107,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
             $data = $form->getData();
             $date = new \DateTime('now');
 
+            // todo hernoem het bestand?
             $app['db']->insert('datasets', array(
                 'name'      => $data['name'],
                 'filename'  => $filename,
@@ -117,6 +119,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
 
             return $app->redirect($app['url_generator']->generate('import-mapcsv'));
         }
+
         // of toon errors:
         return $app['twig']->render('import/uploadform.html.twig', array(
             'form' => $form->createView()
