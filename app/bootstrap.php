@@ -29,6 +29,12 @@ $app->register(new Silex\Provider\UrlGeneratorServiceProvider());
 $simpleUserProvider = new SimpleUser\UserServiceProvider();
 $app->register($simpleUserProvider);
 
+
+// SYMFONY FORM THING
+$app->register(new Silex\Provider\ValidatorServiceProvider());
+$app->register(new Silex\Provider\FormServiceProvider());
+$app->register(new Silex\Provider\TranslationServiceProvider());
+
 // CACHE
 $app->register(new Silex\Provider\HttpCacheServiceProvider());
 

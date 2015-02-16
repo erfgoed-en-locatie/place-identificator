@@ -10,13 +10,14 @@
 
             <p>In een volgende scherm kunt u aangeven welk velden wat bevatten</p>
 
-            <form action="{{ path('dataset-upload') }}" method="post">
+            {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
 
-                <input class="form-control" type="file" name="csvfile" /> 
-
-                <input class="btn btn-primary" type="submit" value="bestand uploaden">
-
-            </form>
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="col-sm-offset-2 form-actions">
+                <button type="submit" class="btn btn-primary">bestand uploaden</button>
+            </div>
+            {{ form_end(form) }}
 
         </div>
     </div>

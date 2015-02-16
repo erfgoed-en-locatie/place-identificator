@@ -3,6 +3,7 @@
 
 namespace Pid\Mapper\Provider;
 
+use Pid\Mapper\Model\Dataset;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 
@@ -10,6 +11,7 @@ use Silex\Provider\FormServiceProvider;
 use SimpleUser\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class ImportControllerProvider
@@ -32,6 +34,46 @@ class ImportControllerProvider implements ControllerProviderInterface {
     }
 
     /**
+     * Form for csv file uploads
+     *
+     * @param Application $app
+     * @return mixed
+     */
+    private function getForm(Application $app) {
+        $form = $app['form.factory']
+            ->createBuilder('form')
+
+            ->add('name', 'text', array(
+                'label'         => 'Geef uw dataset een herkenbare naam',
+                'required'  => true,
+                'constraints' =>  array(
+                    new Assert\NotBlank(),
+                    new Assert\Regex(array(
+                        'pattern'     => '/^[a-z0-9-\s]+$/i',
+                        'htmlPattern' => '^[a-z0-9-\s]+$',
+                        'match'   => true,
+                        'message' => 'Voer alleen letters of cijfers in',
+                    )),
+                    new Assert\Length(array('min' => 1, 'max' => 123))
+                )
+            ))
+            ->add('csvFile', 'file', array(
+                'label'     => 'Kies een csv-bestand op uw computer',
+                'required'  => true,
+                'constraints' =>  array(
+                    new Assert\NotBlank(),
+                    new Assert\File(array(
+                        'maxSize'       => '4096k',
+                        'mimeTypes'     => array('text/csv', 'text/plain'),
+                    )),
+                    new Assert\Type('file')
+                )
+            ))
+            ->getForm()
+        ;
+        return $form;
+    }
+    /**
      * Checks if the user is logged in and is allowed to upload a dataset
      *
      * @param Application $app
@@ -39,8 +81,11 @@ class ImportControllerProvider implements ControllerProviderInterface {
      */
     public function uploadForm(Application $app)
     {
-        //return 'Hier komt het upload formulier ... ALS iemnad is ingelogd en niet al 100 sets heeft geupload? ';
-        return $app['twig']->render('import/uploadform.html.twig', array());
+        $form = $this->getForm($app);
+
+        return $app['twig']->render('import/uploadform.html.twig', array(
+            'form' => $form->createView()
+        ));
     }
 
     /**
@@ -50,7 +95,32 @@ class ImportControllerProvider implements ControllerProviderInterface {
      */
     public function handleUpload(Application $app, Request $request)
     {
-        $app->redirect('dataset-upload-form');
+        $form = $this->getForm($app);
+        $form->bind($request);
+        if ($form->isValid()) {
+            $files = $request->files->get($form->getName());
+
+            $filename = $files['csvFile']->getClientOriginalName();
+            $files['csvFile']->move($app['upload_dir'], $filename);
+
+            $data = $form->getData();
+            $date = new \DateTime('now');
+
+            $app['db']->insert('datasets', array(
+                'name'      => $data['name'],
+                'filename'  => $filename,
+                'created_on' => $date->format('Y-m-d H:i:s'),
+                'status'    => Dataset::STATUS_NEW,
+                'user_id'   => (int) $app['user']->getId()
+            ));
+            $app['session']->getFlashBag()->set('alert', 'Het bestand is opgeslagen!');
+
+            $app->redirect('import-mapcsv');
+        }
+        // of toon errors:
+        return $app['twig']->render('import/uploadform.html.twig', array(
+            'form' => $form->createView()
+        ));
     }
 
     /**

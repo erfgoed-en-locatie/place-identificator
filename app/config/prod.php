@@ -2,9 +2,10 @@
 
 // SITE
 $app['sitename'] = 'PiD - Place Identificator';
+$app['upload_dir'] = __DIR__ . '/../storage/uploads';
 
 // Locale
-$app['locale'] = 'en';
+$app['locale'] = 'nl';
 $app['session.default_locale'] = $app['locale'];
 
 // SIMPLE USER
@@ -113,8 +114,8 @@ $app['swiftmailer.options'] = array(
 );
 
 
-// CACHES
 $app['cache.path'] = __DIR__ . '/../storage/cache';
+// CACHES
 // Http cache
 $app['http_cache.cache_dir'] = $app['cache.path'] . '/http';
 // Twig cache
