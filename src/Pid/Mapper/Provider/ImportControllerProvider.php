@@ -115,7 +115,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
             ));
             $app['session']->getFlashBag()->set('alert', 'Het bestand is opgeslagen!');
 
-            $app->redirect('import-mapcsv');
+            return $app->redirect($app['url_generator']->generate('import-mapcsv'));
         }
         // of toon errors:
         return $app['twig']->render('import/uploadform.html.twig', array(
