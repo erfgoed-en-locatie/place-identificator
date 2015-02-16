@@ -40,7 +40,7 @@
                             <td>
                                 <a href="/datasets/{{ set.id }}" class="btn btn-xs btn-success" title="View"><i class="fa fa-search-plus"></i> </a>
                                 {#<a href="/datasets/{{ set.id }}/edit" title="Edit" class="btn btn-xs btn-warning"><i class="fa fa-pencil"></i> </a>#}
-                                <a href="/datasets/{{ set.id }}/delete" title="Delete" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i> </a>
+                                <a href="/datasets/{{ set.id }}/delete" title="Delete" class="btn btn-xs btn-danger delete"><i class="fa fa-trash"></i> </a>
                             </td>
                         </tr>
 
@@ -52,5 +52,18 @@
         </div>
     </div>
 
+<script type="text/javascript">
+    jQuery(function () {
+
+        $('.delete').on('click', function(e) {
+            if(confirm('De dataset en alle gemapte namen worden verwijderd...')){
+                // The user pressed OK
+            } else {
+                e.preventDefault();
+            }
+        });
+
+    });
+</script>
 
 {% endblock %}
