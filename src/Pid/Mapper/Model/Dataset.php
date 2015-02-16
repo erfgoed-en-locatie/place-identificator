@@ -9,19 +9,21 @@ namespace Pid\Mapper\Model;
  */
 class Dataset implements \JsonSerializable {
 
-    const STATUS_NEW        = 1;
-    const STATUS_UNMAPPED   = 2;
-    const STATUS_MAPPED     = 3;
-    const STATUS_FINISHED   = 99;
+    const STATUS_NEW            = 1;
+    const STATUS_FIELDS_MAPPED  = 2;
+    const STATUS_BEING_MAPPED   = 3;
+    const STATUS_MAPPED         = 9;
+    const STATUS_FINISHED       = 99;
 
     /**
      * @var array
      */
     protected $statusOptions = array(
-        self::STATUS_NEW         => 'nieuw',
-        self::STATUS_MAPPED      => 'gemapped',
-        self::STATUS_UNMAPPED    => 'nog niet gemapped',
-        self::STATUS_FINISHED    => 'afgerond'
+        self::STATUS_NEW            => 'nieuw',
+        self::STATUS_FIELDS_MAPPED  => 'velden benoemd',
+        self::STATUS_BEING_MAPPED   => 'mapping begonnen',
+        self::STATUS_MAPPED         => 'mapping afgerond',
+        self::STATUS_FINISHED       => 'klaar'
     );
 
     private $id;

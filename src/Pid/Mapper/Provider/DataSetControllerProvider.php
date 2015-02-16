@@ -3,6 +3,7 @@
 namespace Pid\Mapper\Provider;
 
 use Pid\Mapper\Model\Dataset;
+use Pid\Mapper\Service\DatasetService;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 
@@ -29,7 +30,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $controllers->get('/', array(new self(), 'showAll'))->bind('datasets-all');
 
         $controllers->get('/{id}', array(new self(), 'showDataset'))->bind('datasets-show')->value('id', null)->assert('id', '\d+');
-        $controllers->get('/{id}/delete', array(new self(), 'deleteSet'))->bind('dataset-delete')->value('id', null);
+        $controllers->get('/{id}/delete', array(new self(), 'deleteSet'))->bind('dataset-delete')->value('id', null)->assert('id', '\d+');
 
         return $controllers;
     }
@@ -92,11 +93,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function showDataset(Application $app, $id)
     {
-        $stmt = $app['db']->prepare("SELECT * FROM datasets where id = :id");
-        $stmt->execute(array('id' => $id));
-
-        $dataset = $stmt->fetch(\PDO::FETCH_ASSOC);
-
+        $dataset = $app['dataset_service']->fetchDataset($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }
@@ -113,13 +110,8 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function deleteSet(Application $app, $id)
     {
-        /** @var \Doctrine\DBAL\Connection $db */
-        $db = $app['db'];
-        $stmt = $db->executeQuery('SELECT * FROM datasets WHERE id = :id AND user_id = :userId', array(
-            'id'        => (int) $id,
-            'userId'    => (int) $app['user']->getId()
-        ));
-        $dataset = $stmt->fetch();
+        /** @var DatasetSErvice $dataset */
+        $dataset = $app['dataset_service']->fetchDataset($id);
 
         if (!$dataset) {
             $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
@@ -129,7 +121,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
 
         unlink($file);
-        $db->delete('datasets', array('id' => $id, 'user_id' => $app['user']->getId()));
+        $app['db']->delete('datasets', array('id' => $id, 'user_id' => $app['user']->getId()));
 
         $app['session']->getFlashBag()->set('alert', 'De dataset is verwijderd!');
 

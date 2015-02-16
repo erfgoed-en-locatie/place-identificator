@@ -12,7 +12,8 @@
         "symfony/validator": "~2.3",
         "symfony/config": "~2.3",
         "symfony/translation": "~2.3",
-        "jasongrimes/silex-simpleuser": "~2.0"
+        "jasongrimes/silex-simpleuser": "~2.0",
+        "league/csv": "~6.3"
     },
 
     "scripts": {

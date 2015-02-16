@@ -27,8 +27,8 @@ class ImportControllerProvider implements ControllerProviderInterface {
         $controllers->get('/upload', array(new self(), 'uploadForm'))->bind('dataset-upload-form');
         $controllers->post('/upload', array(new self(), 'handleUpload'))->bind('dataset-upload');
 
-        $controllers->get('/mapcsv', array(new self(), 'mapCsv'))->bind('import-mapcsv');
-        $controllers->post('/mapcsv', array(new self(), 'handleCsvMapping'))->bind('import-handle-csv');
+        $controllers->get('/mapcsv/{id}', array(new self(), 'mapCsv'))->bind('import-mapcsv')->assert('id', '\d+');
+        $controllers->post('/mapcsv/{id}', array(new self(), 'handleCsvMapping'))->bind('import-handle-csv')->assert('id', '\d+');
 
         return $controllers;
     }
@@ -39,7 +39,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
      * @param Application $app
      * @return mixed
      */
-    private function getForm(Application $app) {
+    private function getUploadForm(Application $app) {
         $form = $app['form.factory']
             ->createBuilder('form')
 
@@ -73,6 +73,8 @@ class ImportControllerProvider implements ControllerProviderInterface {
         ;
         return $form;
     }
+
+
     /**
      * Checks if the user is logged in and is allowed to upload a dataset
      *
@@ -81,7 +83,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
      */
     public function uploadForm(Application $app)
     {
-        $form = $this->getForm($app);
+        $form = $this->getUploadForm($app);
 
         return $app['twig']->render('import/uploadform.html.twig', array(
             'form' => $form->createView()
@@ -96,7 +98,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
      */
     public function handleUpload(Application $app, Request $request)
     {
-        $form = $this->getForm($app);
+        $form = $this->getUploadForm($app);
         $form->bind($request);
         if ($form->isValid()) {
             $files = $request->files->get($form->getName());
@@ -108,16 +110,23 @@ class ImportControllerProvider implements ControllerProviderInterface {
             $date = new \DateTime('now');
 
             // todo hernoem het bestand?
-            $app['db']->insert('datasets', array(
+            /** @var \Doctrine\DBAL\Connection $db */
+            $db = $app['db'];
+            $db->insert('datasets', array(
                 'name'      => $data['name'],
                 'filename'  => $filename,
                 'created_on' => $date->format('Y-m-d H:i:s'),
                 'status'    => Dataset::STATUS_NEW,
                 'user_id'   => (int) $app['user']->getId()
             ));
-            $app['session']->getFlashBag()->set('alert', 'Het bestand is opgeslagen!');
+            $datasetId = $db->lastInsertId();
+            if (!$datasetId) {
+                $app['session']->getFlashBag()->set('error', 'Sorry er is iets fout gegaan met opslaan.');
+            } else {
+                $app['session']->getFlashBag()->set('alert', 'Het bestand is opgeslagen!');
+            }
 
-            return $app->redirect($app['url_generator']->generate('import-mapcsv'));
+            return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $datasetId)));
         }
 
         // of toon errors:
@@ -126,13 +135,76 @@ class ImportControllerProvider implements ControllerProviderInterface {
         ));
     }
 
+
+    private function getFIeldMapForm(Application $app, $fieldChoices) {
+        $form = $app['form.factory']
+            ->createBuilder('form')
+
+            ->add('placename', 'choice', array(
+                'label'         => 'Welk veld bevat de te standaardiseren plaatsnaam? (verplicht)',
+                'choices'   => $fieldChoices,
+                'empty_value' => 'selecteer een veld',
+                'required'  => true,
+                'constraints' =>  array(
+                    new Assert\NotBlank(),
+                    new Assert\Length(array('min' => 1, 'max' => 123))
+                )
+            ))
+            ->add('identifier', 'choice', array(
+                'label'         => 'Is er een veld met uw kenmerk of id dat in het eindresultaat terug moet komen?',
+                'required'  => false,
+                'choices'   => $fieldChoices,
+                'empty_value' => 'selecteer een veld',
+                'constraints' =>  array(
+                    new Assert\NotBlank(),
+                    new Assert\Length(array('min' => 1, 'max' => 123))
+                )
+            ))
+
+            // todo add a fieldset
+            ->add('province', 'text', array(
+                'label'         => 'Is er een veld met uw kenmerk of id dat in het eindresultaat terug moet komen?',
+                'required'  => false,
+                'constraints' =>  array(
+                    new Assert\Length(array('min' => 1, 'max' => 123))
+                )
+            ))
+            ->add('country', 'text', array(
+                'label'         => 'Is er een veld met uw kenmerk of id dat in het eindresultaat terug moet komen?',
+                'required'  => false,
+                'constraints' =>  array(
+                    new Assert\Length(array('min' => 1, 'max' => 123))
+                )
+            ))
+            ->getForm()
+        ;
+        return $form;
+    }
+
     /**
-     * Takes the csv and shows the user the fields that were found so he can map
+     * Takes the csv and shows the user the fields that were found so he can map them
+     *
      * @param Application $app
+     * @param integer $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function  mapCsv(Application $app)
+    public function  mapCsv(Application $app, $id)
     {
-        return $app['twig']->render('import/field-mapper.twig', array('dummy' => 'iets'));
+        $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
+        if (!$dataset) {
+            $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
+
+        // attempt to make sense of the csv file
+        $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
+
+        $csv = \League\Csv\Reader::createFromPath($file);
+        $columnNames = $csv->fetchOne();
+
+        return $app['twig']->render('import/field-mapper.twig', array(
+            'columnNames' => $columnNames
+        ));
     }
 
     /**
@@ -144,6 +216,9 @@ class ImportControllerProvider implements ControllerProviderInterface {
      */
     public function handleCsvMapping(Application $app, Request $request)
     {
+        /** @var \Doctrine\DBAL\Connection $db */
+        $db = $app['db'];
+
         $request->get('naam van het veld');
     }
 

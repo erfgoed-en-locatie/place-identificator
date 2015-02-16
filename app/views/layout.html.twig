@@ -96,10 +96,15 @@
 </nav>
 
 <div class="container">
-
     {% if app.session.flashbag.has('alert') %}
         {% for flashMessage in app.session.flashbag.get('alert') %}
             <div class="alert alert-info">{{ flashMessage }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if app.session.flashbag.has('error') %}
+        {% for flashMessage in app.session.flashbag.get('error') %}
+            <div class="alert alert-danger">{{ flashMessage }}</div>
         {% endfor %}
     {% endif %}
 

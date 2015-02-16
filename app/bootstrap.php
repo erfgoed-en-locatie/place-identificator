@@ -4,6 +4,11 @@
  *
  */
 
+// CUSTOM servive
+$app['dataset_service'] = $app->share(function ($app) {
+    return new \Pid\Mapper\Service\DatasetService($app['db']);
+});
+
 // TWIG
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.options' => array(

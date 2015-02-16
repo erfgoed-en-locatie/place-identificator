@@ -88,6 +88,10 @@ users
     - id, email, code of ww of zoiets
 
 
+Statussen van een Dataset:
+Een dataset doorloopt een aantal verschillende stadia: van nieuw => velden gemapped => being mapped => mapping done 
+Velden benoemen kun je niet meer aanpassen als dat al een keer gedaan is
+
 
 # Vragen / todo lijst
 - [] Slim oorspronkelijke namen in de bron oplossen? Stel de bron bevat "Voorschoten bij de Hage"? (Zoeken op deel van het woord in de bron?)
