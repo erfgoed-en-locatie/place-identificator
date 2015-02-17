@@ -59,7 +59,7 @@ class DatasetService {
 
     public function getPlaceColumnForDataset($id)
     {
-        $stmt = $this->db->executeQuery('SELECT placename FROM field_mapping WHERE id = :id', array(
+        $stmt = $this->db->executeQuery('SELECT placename FROM field_mapping WHERE dataset_id = :id', array(
             'id' => (int)$id
         ));
         return $stmt->fetchColumn(0);

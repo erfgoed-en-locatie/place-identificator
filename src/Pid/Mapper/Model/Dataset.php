@@ -89,7 +89,6 @@ class Dataset implements \JsonSerializable {
      */
     public function getUser()
     {
-        // todo return the real user object
         return $this->user_id;
     }
 

@@ -59,6 +59,13 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         // todo, iets met eerste rij buiten beschouwing laten
         $rows = $csv->setOffset(0)->setLimit(self::NUMBER_TO_TEST)->fetchAll();
 
+        $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
+
+        foreach ($rows as &$row) {
+            $placename = $row[$placeColumn];
+            $row['response'] = 'call API with ' . $placename;
+        }
+
         var_dump($rows); die;
         return $app['twig']->render('standardize/test-result.twig', array('dataset' => $dataset));
     }

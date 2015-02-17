@@ -242,6 +242,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 $data = $form->getData();
 
                 // save the mapping
+                $data['dataset_id'] = $id;
                 if ($app['dataset_service']->storeFieldMapping($data)) { // ok
                     $app['session']->getFlashBag()->set('alert', 'De mapping is bewaard.');
                     //return $app->redirect($app['url_generator']->generate('dataset-showmapping', array('id' => $id)));
