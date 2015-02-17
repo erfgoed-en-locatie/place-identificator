@@ -4,6 +4,7 @@
 /app/storage/cache/*
 /app/storage/doctrine/*
 /app/storage/log/*
+/app/storage/uploads/*
 /vendor/
 composer.phar
 
