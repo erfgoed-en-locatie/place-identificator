@@ -4,6 +4,7 @@
 namespace Pid\Mapper\Provider;
 
 use Pid\Mapper\Model\Dataset;
+use Pid\Mapper\Service\DatasetService;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 
@@ -27,8 +28,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
         $controllers->get('/upload', array(new self(), 'uploadForm'))->bind('dataset-upload-form');
         $controllers->post('/upload', array(new self(), 'handleUpload'))->bind('dataset-upload');
 
-        $controllers->get('/mapcsv/{id}', array(new self(), 'mapCsv'))->bind('import-mapcsv')->assert('id', '\d+');
-        $controllers->post('/mapcsv/{id}', array(new self(), 'handleCsvMapping'))->bind('import-handle-csv')->assert('id', '\d+');
+        $controllers->match('/mapcsv/{id}', array(new self(), 'mapCsv'))->bind('import-mapcsv')->assert('id', '\d+')->method('GET|POST');
 
         return $controllers;
     }
@@ -73,7 +73,6 @@ class ImportControllerProvider implements ControllerProviderInterface {
         ;
         return $form;
     }
-
 
     /**
      * Checks if the user is logged in and is allowed to upload a dataset
@@ -135,8 +134,14 @@ class ImportControllerProvider implements ControllerProviderInterface {
         ));
     }
 
-
-    private function getFIeldMapForm(Application $app, $fieldChoices) {
+    /**
+     * Create the form form the field mapping
+     *
+     * @param Application $app
+     * @param $fieldChoices
+     * @return mixed
+     */
+    private function getFieldMapForm(Application $app, $fieldChoices) {
         $form = $app['form.factory']
             ->createBuilder('form')
 
@@ -161,21 +166,43 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 )
             ))
 
-            // todo add a fieldset
-            ->add('province', 'text', array(
-                'label'         => 'Is er een veld met uw kenmerk of id dat in het eindresultaat terug moet komen?',
+            ->add('province', 'choice', array(
+                'label'         => 'Provincie',
                 'required'  => false,
+                'choices'   => $fieldChoices,
+                'empty_value' => 'selecteer een veld',
                 'constraints' =>  array(
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
-            ->add('country', 'text', array(
-                'label'         => 'Is er een veld met uw kenmerk of id dat in het eindresultaat terug moet komen?',
+            ->add('country', 'choice', array(
+                'label'         => 'Land',
                 'required'  => false,
+                'choices'   => $fieldChoices,
+                'empty_value' => 'selecteer een veld',
                 'constraints' =>  array(
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
+            ->add('lat', 'choice', array(
+                'label'         => 'Lattitude / breedtegraad',
+                'required'  => false,
+                'choices'   => $fieldChoices,
+                'empty_value' => 'selecteer een veld',
+                'constraints' =>  array(
+                    new Assert\Length(array('min' => 1, 'max' => 123))
+                )
+            ))
+            ->add('lon', 'choice', array(
+                'label'         => 'Longitude / lengtegraad',
+                'required'  => false,
+                'choices'   => $fieldChoices,
+                'empty_value' => 'selecteer een veld',
+                'constraints' =>  array(
+                    new Assert\Length(array('min' => 1, 'max' => 123))
+                )
+            ))
+
             ->getForm()
         ;
         return $form;
@@ -184,11 +211,15 @@ class ImportControllerProvider implements ControllerProviderInterface {
     /**
      * Takes the csv and shows the user the fields that were found so he can map them
      *
+     * Also handles the mapping form and validates it and stores the data in the database
+     * Sends user to test or standardize depending on params
+     *
      * @param Application $app
      * @param integer $id
+     * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function  mapCsv(Application $app, $id)
+    public function  mapCsv(Application $app,  Request $request, $id)
     {
         $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
         if (!$dataset) {
@@ -202,24 +233,31 @@ class ImportControllerProvider implements ControllerProviderInterface {
         $csv = \League\Csv\Reader::createFromPath($file);
         $columnNames = $csv->fetchOne();
 
+        $form = $this->getFieldMapForm($app, $columnNames);
+
+        // if the form was posted
+        if ($request->getMethod() == 'POST') {
+            $form->bind($request);
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                // save the mapping
+                if ($app['dataset_service']->storeFieldMapping($data)) { // ok
+                    $app['session']->getFlashBag()->set('alert', 'De mapping is bewaard.');
+                    //return $app->redirect($app['url_generator']->generate('dataset-showmapping', array('id' => $id)));
+                    return $app->redirect($app['url_generator']->generate('standardize-test', array('id' => $id)));
+                } else {
+                    $app['session']->getFlashBag()->set('error', 'Sorry maar de velden konden niet bewaard worden.');
+                    return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
+                }
+            }
+        }
+
+        // form or form errors
         return $app['twig']->render('import/field-mapper.twig', array(
-            'columnNames' => $columnNames
+            'columnNames' => $columnNames,
+            'form'  => $form->createView()
         ));
-    }
-
-    /**
-     * Handles the mapping form and validates it and stores the data in the database
-     * Sens user to test or standardize depending on params
-     *
-     * @param Application $app
-     * @param Request $request
-     */
-    public function handleCsvMapping(Application $app, Request $request)
-    {
-        /** @var \Doctrine\DBAL\Connection $db */
-        $db = $app['db'];
-
-        $request->get('naam van het veld');
     }
 
 }

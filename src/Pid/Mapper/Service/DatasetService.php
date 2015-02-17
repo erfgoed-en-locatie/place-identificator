@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Pid\Mapper\Service;
 
 
@@ -23,6 +22,7 @@ class DatasetService {
 
     /**
      * Fetch a dataset by id and optionally also check on User
+     *
      * @param $id
      * @param null $userId
      * @return mixed
@@ -41,6 +41,28 @@ class DatasetService {
             ));
         }
         return $stmt->fetch();
+    }
+
+    /**
+     * Save the provided mapping
+     *
+     * @param array $data
+     * @return int
+     */
+    public function storeFieldMapping($data)
+    {
+        $date = new \DateTime('now');
+        $data['created_on'] = $date->format('Y-m-d H:i:s');
+
+        return $this->db->insert('field_mapping', $data);
+    }
+
+    public function getPlaceColumnForDataset($id)
+    {
+        $stmt = $this->db->executeQuery('SELECT placename FROM field_mapping WHERE id = :id', array(
+            'id' => (int)$id
+        ));
+        return $stmt->fetchColumn(0);
     }
 
 }

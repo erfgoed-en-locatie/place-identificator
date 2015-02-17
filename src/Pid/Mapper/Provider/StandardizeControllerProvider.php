@@ -25,8 +25,8 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
     {
         $controllers = $app['controllers_factory'];
 
-        $controllers->get('/test/{datasetId}', array(new self(), 'testAction'))->bind('standardize-test')->assert('datasetId', '\d+');
-        $controllers->get('/run/{datasetId}', array(new self(), 'standardizeAction'))->bind('standardize')->assert('datasetId', '\d+');
+        $controllers->get('/test/{id}', array(new self(), 'testAction'))->bind('standardize-test')->assert('id', '\d+');
+        $controllers->get('/run/{id}', array(new self(), 'standardizeAction'))->bind('standardize')->assert('id', '\d+');
 
 
 
@@ -37,18 +37,29 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
      * Fetch the dataset from the db and run the requested mapping against the API for the first x records (NUMBER_TO_TEST)
      *
      * @param Application $app
-     * @param integer $datasetId
+     * @param integer $id
      * @return string
      */
-    public function testAction(Application $app, $datasetId)
+    public function testAction(Application $app, $id)
     {
-        $stmt = $app['db']->prepare("SELECT * FROM datasets where id = :id");
-        $stmt->execute(array('id' => $datasetId));
-
-        $dataset = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
         if (!$dataset) {
-            $app->abort(404, "Dataset with id ($datasetId) does not exist.");
+            $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
+
+        if (!$dataset) {
+            $app->abort(404, "Dataset with id ($id) does not exist.");
+        }
+
+        // attempt to make sense of the csv file
+        $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
+        $csv = \League\Csv\Reader::createFromPath($file);
+
+        // todo, iets met eerste rij buiten beschouwing laten
+        $rows = $csv->setOffset(0)->setLimit(self::NUMBER_TO_TEST)->fetchAll();
+
+        var_dump($rows); die;
         return $app['twig']->render('standardize/test-result.twig', array('dataset' => $dataset));
     }
 
@@ -64,25 +75,5 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         $app->redirect('dataset-upload-form');
     }
 
-    /**
-     * Takes the csv and shows the user the fields that were found so he can map
-     * @param Application $app
-     */
-    public function  mapCsv(Application $app)
-    {
-        return $app['twig']->render('import/field-mapper.twig', array('dummy' => 'iets'));
-    }
-
-    /**
-     * Handles the mapping form and validates it and stores the data in the database
-     * Sens user to test or standardize depending on params
-     *
-     * @param Application $app
-     * @param Request $request
-     */
-    public function handleCsvMapping(Application $app, Request $request)
-    {
-        $request->get('naam van het veld');
-    }
 
 }

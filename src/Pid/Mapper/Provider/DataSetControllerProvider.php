@@ -26,11 +26,11 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $controllers = $app['controllers_factory'];
 
         //$controllers->get('/active', array(new self(), 'showActive'))->bind('datasets-active');
-
         $controllers->get('/', array(new self(), 'showAll'))->bind('datasets-all');
 
         $controllers->get('/{id}', array(new self(), 'showDataset'))->bind('datasets-show')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/delete', array(new self(), 'deleteSet'))->bind('dataset-delete')->value('id', null)->assert('id', '\d+');
+        $controllers->get('/fieldmap/{id}', array(new self(), 'showMapping'))->bind('dataset-showmapping')->assert('id', '\d+');
 
         return $controllers;
     }
@@ -110,9 +110,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function deleteSet(Application $app, $id)
     {
-        /** @var DatasetSErvice $dataset */
         $dataset = $app['dataset_service']->fetchDataset($id);
-
         if (!$dataset) {
             $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
             return $app->redirect($app['url_generator']->generate('datasets-all'));
@@ -127,4 +125,16 @@ class DataSetControllerProvider implements ControllerProviderInterface
 
         return $app->redirect($app['url_generator']->generate('datasets-all'));
     }
+
+    /**
+     * Shows an example of the way the fields are mapped for the first x records of the csv file
+     *
+     * @param Application $app
+     * @param $id
+     */
+    public function showMapping(Application $app, $id)
+    {
+        // todo show how the fields were mapped
+    }
+
 }

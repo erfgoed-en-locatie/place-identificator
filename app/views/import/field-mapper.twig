@@ -5,75 +5,48 @@
 		<div class="col-md-6">
 			<h2>Velden benoemen</h2>
 
-			<form action="" method="post">
+			{% form_theme form 'bootstrap_3_layout.html.twig' %}
 
-				<label>Welk veld bevat de te standaardiseren plaatsnaam? (verplicht)</label>
-				<select class="form-control" name="originalNameField" required>
-					<option value="">selecteer een veld</option>
-					{% for key,column in columnNames %}
-						<option value="{{ key }}">{{ column }}</option>
-					{% endfor %}
-				</select>
+			{{ form_start(form) }}
 
-				<label>Is er een veld met uw kenmerk of id dat in het eindresultaat terug moet komen</label>
-				<select class="form-control" name="originalNameField">
-					<option value="">selecteer een veld</option>
-					{% for key,column in columnNames %}
-						<option value="{{ key }}">{{ column }}</option>
-					{% endfor %}
-				</select>
+			{{ form_row(form.placename) }}
 
+			{{ form_row(form.identifier) }}
+
+			<div class="col-sm-offset-2 form-actions">
 				<input class="btn btn-primary" type="submit" value="verder">
+			</div>
 
 				<p>Eventueel kunt u hieronder nog aangeven of uw bestand contextuele informatie biedt die de zoekresultaten verder kunnen filteren</p>
 
 				<fieldset>
 					<legend>contextuele informatie</legend>
 
-					<label>Provincie</label>
-					<select class="form-control" name="originalNameField">
-						<option value="">selecteer een veld</option>
-						{% for key,column in columnNames %}
-							<option value="{{ key }}">{{ column }}</option>
-						{% endfor %}
-					</select>
+					{{ form_row(form.province) }}
 
-					<label>Land</label>
-					<select class="form-control" name="originalNameField">
-						<option value="">selecteer een veld</option>
-						{% for key,column in columnNames %}
-							<option value="{{ key }}">{{ column }}</option>
-						{% endfor %}
-					</select>
+					{{ form_row(form.country) }}
 
-					<label>Lattitude / breedtegraad</label>
-					<select class="form-control" name="originalNameField">
-						<option value="">selecteer een veld</option>
-						{% for key,column in columnNames %}
-							<option value="{{ key }}">{{ column }}</option>
-						{% endfor %}
-					</select>
+					{{ form_row(form.lat) }}
 
-					<label>Longitude / lengtegraad</label>
-					<select class="form-control" name="originalNameField">
-						<option value="">selecteer een veld</option>
-						{% for key,column in columnNames %}
-							<option value="{{ key }}">{{ column }}</option>
-						{% endfor %}
-					</select>
+					{{ form_row(form.lon) }}
 
 				</fieldset>
 
-			</form>
+			<div class="col-sm-offset-2 form-actions">
+				<input class="btn btn-primary" type="submit" value="test">
+				<input class="btn btn-success" type="submit" value="standaardiseer">
+			</div>
+
+			{{ form_end(form) }}
+
 		</div>
+
 		<div class="col-md-6">
 
 			<h2>Uitleg</h2>
 
 			<p>Blijkbaar is het uploaden van het csv-bestand goed gegaan en kan de gebruiker ons nu gaan vertellen in welk veld de te standaardiseren plaatsnamen staan en in welke velden eventuele context gegeven wordt.</p>
 
-			<p>
-			</p>
 		</div>
 	</div>
 

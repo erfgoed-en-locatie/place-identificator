@@ -34,6 +34,22 @@ INSERT INTO `datasets` (`id`, `name`, `filename`, `user_id`, `status`, `created_
 
 -- --------------------------------------------------------
 
+CREATE TABLE IF NOT EXISTS `field_mapping` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dataset_id` int(11) DEFAULT NULL,
+  `placename` int(11) DEFAULT NULL,
+  `identifier` int(11) DEFAULT NULL,
+  `province` int(11) DEFAULT NULL,
+  `country` int(11) DEFAULT NULL,
+  `lat` int(11) DEFAULT NULL,
+  `lon` int(11) DEFAULT NULL,
+  `created_on` datetime DEFAULT NULL,
+  `updated_on` datetime DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `record_dataset` (`dataset_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 COMMENT='Which column in the dataset has what info' ;
+
 --
 -- Table structure for table `multiples`
 --
@@ -139,6 +155,10 @@ ADD CONSTRAINT `multiple_ibfk_2` FOREIGN KEY (`record_id`) REFERENCES `records` 
 --
 ALTER TABLE `records`
 ADD CONSTRAINT `record_ibfk_1` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `field_mapping`
+ADD CONSTRAINT `field_mapping_ibfk_1` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
