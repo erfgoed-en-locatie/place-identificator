@@ -3,6 +3,7 @@
 namespace Pid\Mapper\Provider;
 
 use Pid\Mapper\Model\Dataset;
+use Pid\Mapper\Service\GeocoderService;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 
@@ -61,12 +62,10 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
 
         $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
 
-        foreach ($rows as &$row) {
-            $placename = $row[$placeColumn];
-            $row['response'] = 'call API with ' . $placename;
-        }
+        /** @var GeocoderService $geocoder */
+        $geocoder = $app['geocoder_service'];
+        $geocoder->map($rows, $placeColumn);
 
-        var_dump($rows); die;
         return $app['twig']->render('standardize/test-result.twig', array('dataset' => $dataset));
     }
 

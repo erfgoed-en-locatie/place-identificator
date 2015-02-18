@@ -4,9 +4,12 @@
  *
  */
 
-// CUSTOM servive
+// CUSTOM services
 $app['dataset_service'] = $app->share(function ($app) {
     return new \Pid\Mapper\Service\DatasetService($app['db']);
+});
+$app['geocoder_service'] = $app->share(function ($app) {
+    return new \Pid\Mapper\Service\GeocoderService();
 });
 
 // TWIG

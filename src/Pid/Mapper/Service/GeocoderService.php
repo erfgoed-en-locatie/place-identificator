@@ -11,11 +11,20 @@ use Symfony\Component\PropertyAccess\Exception\RuntimeException;
  */
 class GeocoderService {
 
+    const SEARCH_MUNICIPALITIES = 99;
+    const SEARCH_PLACES         = 98;
+    const SEARCH_BOTH           = 97;
+
     /**
      * @var string $baseUri Uri of the service to call
      */
-    //private $baseUri = 'http://erfgeo.nl/histograph/search';
-    private $baseUri = 'http://pid.silex/answer.json';
+    //private $baseUri = 'http://erfgeo.nl/histograph/';
+    private $baseUri = 'http://pid.silex/answer.json?';
+
+    /**
+     * @var integer Whether to search the geocoder for places or municipalities or both
+     */
+    private $searchOn = self::SEARCH_PLACES;
 
     public function __construct()
     {
@@ -34,24 +43,42 @@ class GeocoderService {
         if (!$rows[0][$key]) {
             throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
         }
-        foreach($rows as $row) {
+
+        foreach($rows as &$row) {
             $name = $row[$key];
 
+            // try and catch ofzo
             $response = $this->client->get($this->searchExact($name));
             if ($response->getStatusCode() === 200) {
-
-                //
-                return $response->json();
+                $row['reponse'] = $this->handleResponse($response->json());
             }
+
         }
     }
 
+    /**
+     * Provides the uri for exact searching
+     *
+     * @param $name
+     * @return string
+     */
     private function searchExact($name) {
         return $this->baseUri . 'search?name=' . $name;
     }
 
-    private function handleResponse($response)
+    /**
+     * Loops through the clumps and tries to find PITs
+     * @param $json
+     */
+    private function handleResponse($json)
     {
+        if ($this->searchOn == self::SEARCH_PLACES) {
+
+            if ($json)
+
+            var_dump(count($json['features']));
+
+        }
 
     }
 
