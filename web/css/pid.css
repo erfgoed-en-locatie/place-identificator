@@ -7,14 +7,35 @@
 body{
 	background-color: #eeeeee;
 }
-.navbar-default{
-	background-color: #bfd2dd;
-}
 ul{
 	padding-left: 20px;
 }
 h1,h2,h3{
 	font-family: 'Roboto Slab', serif;
+}
+a{
+	color: #638197;
+}
+
+
+#resultnav{
+	margin-bottom: 24px;
+}
+#resultnav a{
+	font-size: 18px;
+	font-family: 'Roboto Slab', serif;
+	display: inline-block;
+	padding: 0 20px 5px 20px;
+	border-bottom: 2px solid #638197;
+	margin: 0;
+	text-decoration: none;
+	color: #bfd2dd;
+}
+#resultnav a.current{
+	color: #638197;
+}
+.navbar-default{
+	background-color: #bfd2dd;
 }
 .btn-primary{
 	background-color: #638197;

@@ -49,19 +49,30 @@ class DatasetService {
     public function fetchCountForDatasetWithStatus($id, $status)
     {
         $sql = '
-          SELECT d.* COUNT(r.*)
-          FROM records r
-          JOIN datasets d ON d.id = r.dataset_id
-          WHERE d.id = :id
-          AND r.status = :status
+          SELECT COUNT(*) AS aantal
+          FROM records
+          WHERE dataset_id = :id
+          AND status = :status
           ';
         $params = array(
             'id' => (int) $id,
             'status' => $status
         );
         $stmt = $this->db->executeQuery($sql, $params);
-        return $stmt->fetch();
+        return $stmt->fetchColumn(0);
     }
+
+    public function fetchRecsWithStatus($id,$status)
+    {
+        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status = :status';
+        $params = array(
+            'id' => (int)$id,
+            'status' => $status);
+        $stmt = $this->db->executeQuery($sql, $params);
+        
+        return $stmt->fetchAll();
+    }
+    
 
     /**
      * Save the provided mapping

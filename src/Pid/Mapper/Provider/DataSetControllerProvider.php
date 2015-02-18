@@ -3,6 +3,7 @@
 namespace Pid\Mapper\Provider;
 
 use Pid\Mapper\Model\Dataset;
+use Pid\Mapper\Model\Status;
 use Pid\Mapper\Service\DatasetService;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
@@ -32,6 +33,11 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $controllers->get('/{id}/delete', array(new self(), 'deleteSet'))->bind('dataset-delete')->value('id', null)->assert('id', '\d+');
         $controllers->get('/fieldmap/{id}', array(new self(), 'showMapping'))->bind('dataset-showmapping')->assert('id', '\d+');
 
+        $controllers->get('/{id}/standardized', array(new self(), 'showStandardized'))->bind('dataset-standardized')->value('id', null)->assert('id', '\d+');
+        $controllers->get('/{id}/multiples', array(new self(), 'showMultiples'))->bind('dataset-multiples')->value('id', null)->assert('id', '\d+');
+        $controllers->get('/{id}/noresults', array(new self(), 'showNoResults'))->bind('dataset-noresults')->value('id', null)->assert('id', '\d+');
+        $controllers->get('/{id}/download', array(new self(), 'showDownload'))->bind('dataset-downloads')->value('id', null)->assert('id', '\d+');
+        
         return $controllers;
     }
 
@@ -136,5 +142,94 @@ class DataSetControllerProvider implements ControllerProviderInterface
     {
         // todo show how the fields were mapped
     }
+
+    /**
+     * Show all standardized recs
+     *
+     * @param Application $app
+     * @param $id
+     */
+    public function showStandardized(Application $app, $id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id);
+        if (!$dataset) {
+            $app->abort(404, "Dataset with id ($id) does not exist.");
+        }
+
+        $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
+        $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
+        $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+
+        $standardized = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT);
+        
+        return $app['twig']->render('datasets/standardized.twig', array('dataset' => $dataset, "standardized" => $standardized));
+    }
+
+    /**
+     * Show all multiple recs
+     *
+     * @param Application $app
+     * @param $id
+     */
+    public function showMultiples(Application $app, $id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id);
+        if (!$dataset) {
+            $app->abort(404, "Dataset with id ($id) does not exist.");
+        }
+
+        $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
+        $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
+        $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+
+        $multiples = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
+        
+        return $app['twig']->render('datasets/multiples.twig', array('dataset' => $dataset, "multiples" => $multiples));
+    }
+
+    /**
+     * Show all recs without results
+     *
+     * @param Application $app
+     * @param $id
+     */
+    public function showNoResults(Application $app, $id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id);
+        if (!$dataset) {
+            $app->abort(404, "Dataset with id ($id) does not exist.");
+        }
+
+        $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
+        $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
+        $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+
+        $standardized = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        
+        return $app['twig']->render('datasets/noresults.twig', array('dataset' => $dataset, "noresults" => $standardized));
+    }
+
+
+    /**
+     * Show downloadpage for this dataset
+     *
+     * @param Application $app
+     * @param $id
+     */
+    public function showDownload(Application $app, $id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id);
+        if (!$dataset) {
+            $app->abort(404, "Dataset with id ($id) does not exist.");
+        }
+
+        $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
+        $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
+        $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+
+        return $app['twig']->render('datasets/download.twig', array('dataset' => $dataset));
+    }
+
+
 
 }
