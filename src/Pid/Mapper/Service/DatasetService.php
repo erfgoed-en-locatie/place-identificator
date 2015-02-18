@@ -103,7 +103,7 @@ class DatasetService {
      * @param array $data
      * @return int
      */
-    public function storeMappedRecords($data)
+    public function storeMappedRecord($data)
     {
         $date = new \DateTime('now');
         $data['created_on'] = $date->format('Y-m-d H:i:s');
@@ -111,5 +111,46 @@ class DatasetService {
         return $this->db->insert('records', $data);
     }
 
+
+    /**
+     * Transform the result from the API into storable data and store that data
+     * @param array $mappedRows
+     * @param string $placeColumn
+     * @return integer $datasetId
+     */
+    public function storeMappedRecords($mappedRows, $placeColumn, $datasetId)
+    {
+        foreach($mappedRows as $mapped) {
+            $data['original_name'] = $mapped[$placeColumn];
+            $data['dataset_id'] = $datasetId;
+
+            if ($mapped['response']['hits'] == 1) {
+                $data['status'] = Status::MAPPED_EXACT;
+                $data['hits'] = 1;
+                if (isset($mapped['response']['data']['geonames'])) {
+                    $data['geonames'] = json_encode($mapped['response']['data']['geonames']);
+                }
+                if (isset($mapped['response']['data']['tgn'])) {
+                    $data['tgn'] = json_encode($mapped['response']['data']['tgn']);
+                }
+                if (isset($mapped['response']['data']['bag'])) {
+                    $data['bag'] = json_encode($mapped['response']['data']['bag']);
+                }
+                if (isset($mapped['response']['data']['gg'])) {
+                    $data['gg'] = json_encode($mapped['response']['data']['gg']);
+                }
+            } elseif ($mapped['response']['hits'] == 0) {
+                $data['hits'] =  $mapped['response']['hits'];
+                $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
+            } else {
+                $data['hits'] =  $mapped['response']['hits'];
+                $data['status'] = Status::MAPPED_EXACT_MULTIPLE;
+            }
+
+            $this->storeMappedRecord($data);
+        }
+
+        return true;
+    }
 
 }

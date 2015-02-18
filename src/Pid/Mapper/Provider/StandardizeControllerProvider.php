@@ -3,6 +3,7 @@
 namespace Pid\Mapper\Provider;
 
 use Pid\Mapper\Model\Dataset;
+use Pid\Mapper\Model\Status;
 use Pid\Mapper\Service\GeocoderService;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
@@ -64,9 +65,12 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
 
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
-        $geocoder->map($rows, $placeColumn);
+        $mappedRows = $geocoder->map($rows, $placeColumn);
 
-        return $app['twig']->render('standardize/test-result.twig', array('dataset' => $dataset));
+        // fixme Now temporarily storing the records
+        $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
+
+        return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
     }
 
     /**

@@ -61,7 +61,7 @@ class GeocoderService {
             // todo try and catch? or more robust error handling
             $response = $this->client->get($this->searchExact($name));
             if ($response->getStatusCode() === 200) {
-                $row['reponse'] = $this->handleResponse($response->json(array('object' => true)));
+                $row['response'] = $this->handleResponse($response->json(array('object' => true)));
             }
         }
 
