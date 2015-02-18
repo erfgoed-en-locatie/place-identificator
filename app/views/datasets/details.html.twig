@@ -1,0 +1,79 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Details dataset "{{ dataset.name }}"</h1>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th>
+                                Bestandsnaam
+                            </th>
+                            <td>
+                                {{ dataset.filename }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Aangemaakt op
+                            </th>
+                            <td>
+                                {{ dataset.created_on }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Status
+                            </th>
+                            <td>
+                                {{ dataset.status }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Gestandaardiseerd
+                            </th>
+                            <td>
+                                <a href="/datasets/{{ dataset.id }}/standardized">{{ dataset.countStandardized }} record{% if dataset.countStandardized != 1 %}s{% endif %}</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Meerdere resultaten
+                            </th>
+                            <td>
+                                <a href="/datasets/{{ dataset.id }}/multiples">{{ dataset.countMultiples }} records</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Geen resultaten
+                            </th>
+                            <td>
+                                <a href="/datasets/{{ dataset.id }}/noresults">{{ dataset.countNoResults }} records</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Download
+                            </th>
+                            <td>
+                                Download <a href="/datasets/{{ dataset.id }}/download">hier</a> de resultaten.
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="col-md-6">
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
