@@ -53,6 +53,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
+                {#
                 <li><a href="/">Dashboard</a></li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Examples <span class="caret"></span></a>
@@ -64,9 +65,10 @@
                         <li><a href="/dummy/w">Dummy with invalid param</a></li>
                     </ul>
                 </li>
-
+                #}
                 <li><a href="{{ path('dataset-upload-form') }}">Upload dataset</a></li>
                 <li><a href="{{ path('datasets-all') }}" title="Lijstje met datasets">Mijn datasets</a></li>
+                <li><a href="/colofon">Colofon</a></li>
 
             </ul>
 
