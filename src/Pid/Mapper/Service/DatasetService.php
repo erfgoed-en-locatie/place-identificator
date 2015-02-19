@@ -72,6 +72,16 @@ class DatasetService {
         
         return $stmt->fetchAll();
     }
+
+    public function fetchRec($recid)
+    {
+        $sql = 'SELECT * FROM records WHERE id = :id';
+        $params = array(
+            'id' => (int)$recid);
+        $stmt = $this->db->executeQuery($sql, $params);
+        
+        return $stmt->fetchAll();
+    }
     
 
     /**
