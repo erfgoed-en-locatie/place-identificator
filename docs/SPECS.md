@@ -1,6 +1,9 @@
 # FRONTEND PiD - PlaceIdentificator
  
-The tool to IdThisPlace
+
+TODO
+- [ ] uitzoeken waarom de homepage en adnere uitgezonderde pagina's geen app['user'] heeft?
+
 
 ## SPECIFICATIES
 

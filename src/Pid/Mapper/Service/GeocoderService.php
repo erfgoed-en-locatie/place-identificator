@@ -1,6 +1,7 @@
 <?php
 
 namespace Pid\Mapper\Service;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 
 
@@ -27,8 +28,7 @@ class GeocoderService {
     /**
      * @var string $baseUri Uri of the service to call
      */
-    //private $baseUri = 'http://erfgeo.nl/histograph/';
-    private $baseUri = 'http://pid.silex/answer.json?';
+    private $baseUri = 'http://erfgeo.nl/histograph/';
 
     /**
      * @var array Fields in the API result that hold the data we want to store
@@ -58,7 +58,6 @@ class GeocoderService {
         foreach($rows as &$row) {
             $name = $row[$key];
 
-            // todo try and catch? or more robust error handling
             $response = $this->client->get($this->searchExact($name));
             if ($response->getStatusCode() === 200) {
                 $row['response'] = $this->handleResponse($response->json(array('object' => true)));
@@ -75,11 +74,14 @@ class GeocoderService {
      * @return string
      */
     private function searchExact($name) {
-        return $this->baseUri . 'search?name=' . $name;
+        $fakeAPI = array('answer.json', 'no-answer.json', 'answer-middelburg.json');
+        return 'http://pid.silex/' . array_rand(array_flip($fakeAPI), 1);
+        //return $this->baseUri . 'search?name=' . $name;
     }
 
     /**
      * Loops through the clumps and tries to find PITs
+     *
      * @param $json
      * @return array
      */
@@ -129,7 +131,6 @@ class GeocoderService {
             }
             return $output;
         }
-
 
     }
 

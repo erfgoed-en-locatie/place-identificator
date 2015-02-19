@@ -50,12 +50,12 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
 
-        if (!$dataset) {
-            $app->abort(404, "Dataset with id ($id) does not exist.");
-        }
-
         // attempt to make sense of the csv file
         $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
+        if (!file_exists($file)) {
+            $app['session']->getFlashBag()->set('error', 'Sorry maar het csv-bestand bestaat niet meer.');
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
         $csv = \League\Csv\Reader::createFromPath($file);
 
         // todo, iets met eerste rij buiten beschouwing laten
@@ -65,10 +65,13 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
 
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
-        $mappedRows = $geocoder->map($rows, $placeColumn);
-
-        // fixme Now temporarily storing the records
-        $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
+        try {
+            $mappedRows = $geocoder->map($rows, $placeColumn);
+            // fixme Now temporarily storing the records
+            $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
+        } catch (\Exception $e) {
+            $app->abort(404, 'The histograph API returned an error. It might be down.');
+        }
 
         return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
     }
@@ -82,7 +85,7 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
      */
     public function standardizeAction(Application $app, $datasetId)
     {
-        $app->redirect('dataset-upload-form');
+
     }
 
 
