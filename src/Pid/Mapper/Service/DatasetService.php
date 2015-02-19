@@ -45,7 +45,14 @@ class DatasetService {
         return $stmt->fetch();
     }
 
-    // todo finish this query
+    /**
+     * Fetch by status
+     *
+     * @param $id
+     * @param $status
+     * @return bool|string
+     * @throws \Doctrine\DBAL\DBALException
+     */
     public function fetchCountForDatasetWithStatus($id, $status)
     {
         $sql = '
@@ -139,10 +146,11 @@ class DatasetService {
     public function storeMappedRecords($mappedRows, $placeColumn, $datasetId, $deleteOld = true)
     {
         if ($deleteOld === true) {
-            // todo delete alles met dataset_id
+            $this->db->delete('records', array('dataset_id' => $datasetId));
         }
 
         foreach($mappedRows as $mapped) {
+            $data = array();
             $data['original_name'] = $mapped[$placeColumn];
             $data['dataset_id'] = $datasetId;
 
@@ -158,12 +166,13 @@ class DatasetService {
                 if (isset($mapped['response']['data']['bag'])) {
                     $data['bag'] = json_encode($mapped['response']['data']['bag']);
                 }
-                if (isset($mapped['response']['data']['gg'])) {
-                    $data['gg'] = json_encode($mapped['response']['data']['gg']);
+                if (isset($mapped['response']['data']['gemeentegeschiedenis'])) {
+                    $data['gg'] = json_encode($mapped['response']['data']['gemeentegeschiedenis']);
                 }
             } elseif ($mapped['response']['hits'] == 0) {
                 $data['hits'] =  $mapped['response']['hits'];
                 $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
+
             } else {
                 $data['hits'] =  $mapped['response']['hits'];
                 $data['status'] = Status::MAPPED_EXACT_MULTIPLE;

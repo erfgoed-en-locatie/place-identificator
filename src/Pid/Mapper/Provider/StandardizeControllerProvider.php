@@ -58,11 +58,11 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         }
         $csv = \League\Csv\Reader::createFromPath($file);
 
-        $offset = 0;
+
+        $rows = $csv->setOffset(0)->setLimit(self::NUMBER_TO_TEST)->fetchAll();
         if ($dataset['skip_first_row']) {
-            $offset = 1;
+            array_shift($rows);
         }
-        $rows = $csv->setOffset($offset)->setLimit(self::NUMBER_TO_TEST)->fetchAll();
 
         $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
 
@@ -103,11 +103,10 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         }
         $csv = \League\Csv\Reader::createFromPath($file);
 
-        $offset = 0;
+        $rows = $csv->setOffset(0)->fetchAll();
         if ($dataset['skip_first_row']) {
-            $offset = 1;
+            array_shift($rows);
         }
-        $rows = $csv->setOffset($offset)->fetchAll();
 
         $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
 
@@ -115,7 +114,6 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         $geocoder = $app['geocoder_service'];
         try {
             $mappedRows = $geocoder->map($rows, $placeColumn);
-            // fixme Now temporarily storing the records
             $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
         } catch (\Exception $e) {
             $app->abort(404, 'The histograph API returned an error. It might be down.');
@@ -123,6 +121,5 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
 
         return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
     }
-
 
 }

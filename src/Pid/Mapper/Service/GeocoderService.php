@@ -34,7 +34,7 @@ class GeocoderService {
      * @var array Fields in the API result that hold the data we want to store
      */
     private $fieldsOfInterest = array(
-        'geonames', 'tgn', 'bag', 'gg'
+        'geonames', 'tgn', 'bag', 'gemeentegeschiedenis'
     );
 
     public function __construct()
@@ -68,7 +68,7 @@ class GeocoderService {
     }
 
     /**
-     * Maps one place name
+     * Call API for one place name and try to find as much info as possible
      *
      * @param string $name
      * @return array The array contains hits|data keys
@@ -77,8 +77,41 @@ class GeocoderService {
     {
         $response = $this->client->get($this->searchExact($name));
         if ($response->getStatusCode() === 200) {
-            return $this->handleResponse($response->json(array('object' => true)));
+            return $this->handleMapOneResponse($response->json(array('object' => true)));
         }
+    }
+
+    /**
+     * Loops through the clumps and tries to find PITs
+     *
+     * @param $json
+     * @return array The array contains hits|data keys
+     */
+    private function handleMapOneResponse($json)
+    {
+        if (!property_exists($json, 'features')) {
+            return array('hits' => 0);
+        } else {
+            $output = array();
+
+
+                $hitCount = 0;
+                // look for only place types in the features
+                foreach ($json->features as $feature) {
+
+                        $hitCount++;
+                        $output['data'][] = $this->getStandardizedDataForSaving($feature);
+
+                }
+                if ($hitCount == 1) {
+                    $output['hits'] = 1;
+                } else if ($hitCount > 1) {
+                    $output['hits'] = $hitCount;
+                }
+
+            return $output;
+        }
+
     }
 
     /**
@@ -88,8 +121,8 @@ class GeocoderService {
      * @return string
      */
     private function searchExact($name) {
-        $fakeAPI = array('answer-middelburg.json');
-        return 'http://idthisplace.local:8888/' . array_rand(array_flip($fakeAPI), 1);
+        $fakeAPI = array('answer.json', 'no-answer.json', 'answer-middelburg.json');
+        return 'http://pid.silex/' . array_rand(array_flip($fakeAPI), 1);
         //return $this->baseUri . 'search?name=' . $name;
     }
 
@@ -112,7 +145,7 @@ class GeocoderService {
                 foreach ($json->features as $feature) {
                     if ($feature->properties->type == self::API_PLACE_TYPE) {
                         $hitCount++;
-                        $output['data'][] = $this->getStandardizedData($feature);
+                        $output['data'] = $this->getStandardizedDataForSaving($feature);
                     }
                 }
                 if ($hitCount == 1) {
@@ -126,7 +159,7 @@ class GeocoderService {
                 foreach ($json->features as $feature) {
                     if ($feature->properties->type == self::API_MUNICIPALITY_TYPE) {
                         $hitCount++;
-                        $output['data'] = $this->getStandardizedData($feature);
+                        $output['data'] = $this->getStandardizedDataForSaving($feature);
                     }
                 }
                 if ($hitCount == 1) {
@@ -140,7 +173,7 @@ class GeocoderService {
 
                 // only return data if there's only one match
                 if ($output['hits'] == 1) {
-                    $output['data'] = $this->getStandardizedData($json->features[0]);
+                    $output['data'] = $this->getStandardizedDataForSaving($json->features[0]);
                 }
             }
             return $output;
@@ -149,12 +182,32 @@ class GeocoderService {
     }
 
     /**
+     * Plucks the data to show the user (so he can make a selection)
+     *
+     * @param object $feature
+     * @return array
+     */
+    private function getStandardizedDataForDisplaying($feature)
+    {
+        $data = array();
+        foreach($feature->properties->pits as $pit) {
+            if (in_array($pit->source, $this->fieldsOfInterest)) {
+                $data[$pit->source]['name'] = $pit->name;
+                $data[$pit->source]['uri'] = $pit->uri;
+                $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
+                $data[$pit->source]['type'] = $feature->type;
+            }
+        }
+        return $data;
+    }
+
+    /**
      * Plucks the data we want to store from the geocoder PITs
      *
      * @param object $feature
      * @return array
      */
-    private function getStandardizedData($feature)
+    private function getStandardizedDataForSaving($feature)
     {
         $data = array();
         foreach($feature->properties->pits as $pit) {
