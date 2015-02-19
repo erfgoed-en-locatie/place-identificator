@@ -119,12 +119,19 @@ class DatasetService {
 
     /**
      * Transform the result from the API into storable data and store that data
+     *
+     * If the dataset was standardize before, als delete all old mappings
      * @param array $mappedRows
      * @param string $placeColumn
+     * @param boolean $deleteOld Whether to delete previously standardized data
      * @return integer $datasetId
      */
-    public function storeMappedRecords($mappedRows, $placeColumn, $datasetId)
+    public function storeMappedRecords($mappedRows, $placeColumn, $datasetId, $deleteOld = true)
     {
+        if ($deleteOld === true) {
+            // todo delete alles met dataset_id
+        }
+
         foreach($mappedRows as $mapped) {
             $data['original_name'] = $mapped[$placeColumn];
             $data['dataset_id'] = $datasetId;

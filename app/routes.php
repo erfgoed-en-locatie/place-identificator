@@ -17,6 +17,7 @@ $app->get('/colofon', function () use ($app) {
 $app->mount('/datasets', new \Pid\Mapper\Provider\DataSetControllerProvider());
 $app->mount('/import', new \Pid\Mapper\Provider\ImportControllerProvider());
 $app->mount('/standardize', new \Pid\Mapper\Provider\StandardizeControllerProvider());
+$app->mount('/api', new \Pid\Mapper\Provider\ApiControllerProvider());
 
 // Mount the user controller routes:
 $app->mount('/user', $simpleUserProvider);

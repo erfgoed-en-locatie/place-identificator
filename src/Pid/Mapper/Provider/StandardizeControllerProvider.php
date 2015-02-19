@@ -84,11 +84,44 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
      * Run all the calls to the API and send the user an email when done
      *
      * @param Application $app
-     * @param integer $datasetId
+     * @param integer $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function standardizeAction(Application $app, $datasetId)
+    public function standardizeAction(Application $app, $id)
     {
+        $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
+        if (!$dataset) {
+            $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
 
+        // attempt to make sense of the csv file
+        $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
+        if (!file_exists($file)) {
+            $app['session']->getFlashBag()->set('error', 'Sorry maar het csv-bestand bestaat niet meer.');
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
+        $csv = \League\Csv\Reader::createFromPath($file);
+
+        $offset = 0;
+        if ($dataset['skip_first_row']) {
+            $offset = 1;
+        }
+        $rows = $csv->setOffset($offset)->fetchAll();
+
+        $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
+
+        /** @var GeocoderService $geocoder */
+        $geocoder = $app['geocoder_service'];
+        try {
+            $mappedRows = $geocoder->map($rows, $placeColumn);
+            // fixme Now temporarily storing the records
+            $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
+        } catch (\Exception $e) {
+            $app->abort(404, 'The histograph API returned an error. It might be down.');
+        }
+
+        return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
     }
 
 

@@ -14,7 +14,7 @@
 
             <p>Onder 'verwijder' komt een knop die de standaardisatie verwijdert en het record een status van MAPPED_EXACT_NOT_FOUND geeft. En oja, paginering...</p>
 
-            <table class="table">
+            <table class="table actions">
             	<tr>
             		<th>plaatsnaam</th>
             		<th>Geonames</th>
@@ -23,16 +23,80 @@
             		<th>Koppeling juist?</th>
             	</tr>
             	{% for rec in standardized %}
-            	<tr>
+            	<tr id="row_{{ rec.id }}">
             		<td>{{ rec.original_name }}</td>
             		<td><a href="{{ rec.geonames.uri }}" target="_blank">{{ rec.geonames.name }}</a></td>
             		<td><a href="{{ rec.tgn.uri }}" target="_blank">{{ rec.tgn.name }}</a></td>
             		<td>{{ rec.gg }}</td>
-            		<td><a class="btn btn-danger" href="">niet juist</a></td>
+            		<td><a class="btn btn-danger clear-mapping" data-id="{{ rec.id }}" href="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
             	</tr>
             	{% endfor %}
             </table>
         </div>
     </div>
 
+
+	<script>
+
+		jQuery(function () {
+			// reset a mapped record
+			$(".actions").on( "click", "a.clear-mapping", function(e) {
+				e.preventDefault();
+				var uri = $(this).attr('href');
+				var id = $(this).attr('data-id');
+				askAPI('GET', uri+'/'+id, null, deleteRow());
+			});
+
+			$(".unmappable").click(function () {
+				var id = $(this).attr('data-name-id');
+				askAPI('GET', '/pleiades/unmappable/'+id, null, null);
+			});
+
+		});
+
+		function deleteRow(json) {
+			console.log(json.id);
+			var tr = '#row_'+json.id;
+			$(tr).remove();
+		}
+
+		/** Wrapper for API calls */
+		function askAPI(type, url, data, callback) {
+			$('#fb').html('');
+			var request = jQuery.ajax({
+				type: type,
+				url: url,
+				data: data,
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function (resp, status, jqXHR) {
+					if (!callback) {
+						//console.log('no callback!');
+						$('#fb').html(resp.message);
+					} else { // default callback expects data element
+						if (resp.data) {
+							callback(resp.data);
+						} else { // others simply pass on the data
+							callback(resp);
+						}
+					}
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					if (jqXHR.status == 400) {
+						// fetch message from repsonse and present to user
+						var answer =  jqXHR.responseJSON;
+						$('#response').find('p').text(answer.message);
+						$('#response').show();
+					} else if (jqXHR.status == 404) {
+						console.log('Requested page not found. [404]');
+					} else if (jqXHR.status == 500) {
+						console.log('Received an internal server error.');
+					}
+				}
+
+			});
+
+		}
+
+	</script>
 {% endblock %}
