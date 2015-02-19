@@ -1,0 +1,133 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "hg:Place",
+        "pits": [
+          {
+
+            "startDate": "1942-01-01",
+            "source": "gemeentegeschiedenis",
+            "name": "Middelburg [Ze]",
+            "endDate": "1967-01-01",
+            "type": "hg:Gemeente",
+            "uri": "gemeentegeschiedenis/1544",
+            "matchedQuery": "TODO",
+            "geometryIndex": 0
+
+          }
+        ]
+      },
+      "geometry": {
+        "type":"GeometryCollection","geometries":[{"type":"Polygon","coordinates":[[[3.649628,51.516303],[3.645007,51.512818],[3.631845,51.502911],[3.644255,51.494826],[3.644846,51.490699],[3.645546,51.479921],[3.635393,51.474375],[3.622344,51.480472],[3.617033,51.476345],[3.610923,51.477961],[3.593374,51.481199],[3.591039,51.485658],[3.591025,51.4933],[3.587226,51.501962],[3.587113,51.508434],[3.583647,51.50865],[3.582361,51.515643],[3.586934,51.516612],[3.586827,51.519308],[3.595973,51.521246],[3.596677,51.518021],[3.606375,51.51691],[3.607036,51.514763],[3.613667,51.514684],[3.643509,51.525562],[3.650121,51.52602],[3.648006,51.521044],[3.649628,51.516303]]]}]}
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "hg:Municipality",
+        "pits": [
+          {
+            "startDate": "1818-01-01",
+            "source": "gemeentegeschiedenis",
+            "name": "Middelburg [ZH]",
+            "endDate": "1855-01-01",
+            "type": "hg:Gemeente",
+            "uri": "gemeentegeschiedenis/1547",
+            "matchedQuery": "TODO",
+            "geometryIndex": 0
+          }
+        ]
+      },
+      "geometry": {
+        "type": "GeometryCollection",
+        "geometries": [
+          {"type":"Polygon","coordinates":[[[4.686903,52.084334],[4.694781,52.093818],[4.699582,52.094745],[4.701928,52.09404],[4.705488,52.090286],[4.699043,52.082338],[4.695599,52.069195],[4.685723,52.04817],[4.682898,52.042155],[4.675008,52.043366],[4.6762,52.050923],[4.676344,52.053066],[4.676672,52.057937],[4.680597,52.067938],[4.686903,52.084334]]]
+          }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "hg:Place",
+        "pits": [
+          {
+            "startDate": "",
+            "source": "tgn",
+            "name": "Middelburg",
+            "endDate": "",
+            "type": "hg:Place",
+            "uri": "tgn/7006752",
+            "matchedQuery": "TODO",
+            "geometryIndex": 0
+          }
+        ]
+      },
+      "geometry": {
+        "type": "GeometryCollection",
+        "geometries": [
+           {
+            "type": "Point",
+             "coordinates": [ 3.616667, 51.5 ]
+            }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "hg:Place",
+        "pits": [
+          {
+            "startDate": "",
+            "source": "tgn",
+            "name": "Middelburg",
+            "endDate": "",
+            "type": "hg:Place",
+            "uri": "tgn/7269799",
+            "matchedQuery": "TODO",
+            "geometryIndex": 0
+          }
+        ]
+      },
+      "geometry": {
+        "type": "GeometryCollection",
+        "geometries": [
+           {
+            "type": "Point",
+             "coordinates": [ 4.683333, 52.05 ]
+            }
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "type": "hg:Place",
+        "pits": [
+          {
+            "startDate": "",
+            "source": "geonames",
+            "name": "Middelburg",
+            "endDate": "",
+            "type": "hg:Place",
+            "uri": "geonames/6621557",
+            "matchedQuery": "TODO",
+            "geometryIndex": 0
+          }
+        ]
+      },
+      "geometry": {
+        "type": "GeometryCollection",
+        "geometries": [
+           {
+            "type": "Point",
+             "coordinates": [6.12891, 52.19159 ]
+            }
+        ]
+      }
+    }
+  ]
+}
