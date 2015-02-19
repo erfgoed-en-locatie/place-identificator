@@ -94,20 +94,12 @@ class GeocoderService {
         } else {
             $output = array();
 
-
-                $hitCount = 0;
-                // look for only place types in the features
-                foreach ($json->features as $feature) {
-
-                        $hitCount++;
-                        $output['data'][] = $this->getStandardizedDataForSaving($feature);
-
-                }
-                if ($hitCount == 1) {
-                    $output['hits'] = 1;
-                } else if ($hitCount > 1) {
-                    $output['hits'] = $hitCount;
-                }
+            $hitCount = 0;
+            foreach ($json->features as $feature) {
+                $hitCount++;
+                $output['data'][] = $this->getStandardizedDataForDisplaying($feature);
+            }
+            $output['hits'] = $hitCount;
 
             return $output;
         }
@@ -195,7 +187,7 @@ class GeocoderService {
                 $data[$pit->source]['name'] = $pit->name;
                 $data[$pit->source]['uri'] = $pit->uri;
                 $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
-                $data[$pit->source]['type'] = $feature->type;
+                $data[$pit->source]['type'] = $pit->type;
             }
         }
         return $data;

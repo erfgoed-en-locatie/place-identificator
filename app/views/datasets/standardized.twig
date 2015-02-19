@@ -28,7 +28,7 @@
             		<td>{% if rec.geonames is not empty %}<a href="{{ rec.geonames.uri }}" target="_blank">{{ rec.geonames.name }}</a>{% endif %}</td>
             		<td>{% if rec.tgn is not empty %}<a href="{{ rec.tgn.uri }}" target="_blank">{{ rec.tgn.name }}</a>{% endif %}</td>
             		<td>{% if rec.gg is not empty %}<a href="{{ rec.gg.uri }}" target="_blank">{{ rec.gg.name }}</a>{% endif %}</td>
-					<td><a class="btn btn-danger clear-mapping" data-id="{{ rec.id }}" href="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
+					<td><a class="btn btn-danger clear-mapping" data-id="{{ rec.id }}" data-ref="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
             	</tr>
             	{% endfor %}
             </table>
@@ -42,9 +42,8 @@
 			// reset a mapped record
 			$(".actions").on( "click", "a.clear-mapping", function(e) {
 				e.preventDefault();
-				var uri = $(this).attr('href');
-				var id = $(this).attr('data-id');
-				askAPI('GET', uri+'/'+id, null, deleteRow());
+				var uri = $(this).attr('data-ref');
+				askAPI('GET', uri, null, deleteRow);
 			});
 
 			$(".unmappable").click(function () {
@@ -55,7 +54,6 @@
 		});
 
 		function deleteRow(json) {
-			console.log(json.id);
 			var tr = '#row_'+json.id;
 			$(tr).remove();
 		}
@@ -73,7 +71,7 @@
 					if (!callback) {
 						//console.log('no callback!');
 						$('#fb').html(resp.message);
-					} else { // default callback expects data element
+					} else {
 						if (resp.data) {
 							callback(resp.data);
 						} else { // others simply pass on the data

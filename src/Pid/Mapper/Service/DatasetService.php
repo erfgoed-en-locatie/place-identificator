@@ -97,6 +97,26 @@ class DatasetService {
         
         return $stmt->fetchAll();
     }
+
+
+    /**
+     * Clear the results for a record
+     *
+     * @param integer $id
+     * @return int
+     * @internal param $data
+     */
+    public function clearRecord($id)
+    {
+        //$data['status'] = Status::UNMAPPED;
+        $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
+        $data['geonames'] = null;
+        $data['tgn'] = null;
+        $data['bag'] = null;
+        $data['gg'] = null;
+        $data['hits'] = 0;
+        return $this->db->update('records', $data, array('id' => $id));
+    }
     
 
     /**
@@ -191,5 +211,6 @@ class DatasetService {
 
         return true;
     }
+
 
 }

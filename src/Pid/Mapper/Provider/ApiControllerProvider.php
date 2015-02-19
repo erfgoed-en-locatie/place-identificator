@@ -32,12 +32,18 @@ class ApiControllerProvider implements ControllerProviderInterface {
 
     /**
      * Delete the found standardized info for a certain record and reset it to an UNMAPPED status
+     *
      * @param Application $app
      * @param integer $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function clearStandardization(Application $app, $id)
     {
+        if ($app['dataset_service']->clearRecord($id)){
+            return $app->json(array('id' => $id));
+        }
 
+        return $app->json(array('error' => 'Record could not be updated'), 400);
     }
 
 }
