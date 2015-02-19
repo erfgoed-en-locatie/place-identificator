@@ -165,6 +165,12 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
 
         $standardized = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT);
+
+        //print_r($standardized);
+        for ($i=0; $i<count($standardized); $i++) {
+            $standardized[$i]['geonames'] = json_decode($standardized[$i]['geonames']);
+            $standardized[$i]['tgn'] = json_decode($standardized[$i]['tgn']);
+        }
         
         return $app['twig']->render('datasets/standardized.twig', array('dataset' => $dataset, "standardized" => $standardized));
     }

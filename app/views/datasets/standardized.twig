@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <h3>Dataset "{{ dataset.name }}"</h3>
+            <p>Je werkt in dataset "{{ dataset.name }}"</p>
 
             <div id="resultnav">
                 <a class="current" href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
@@ -25,8 +25,8 @@
             	{% for rec in standardized %}
             	<tr>
             		<td>{{ rec.original_name }}</td>
-            		<td>{{ rec.geonames }}</td>
-            		<td>{{ rec.tgn }}</td>
+            		<td><a href="{{ rec.geonames.uri }}" target="_blank">{{ rec.geonames.name }}</a></td>
+            		<td><a href="{{ rec.tgn.uri }}" target="_blank">{{ rec.tgn.name }}</a></td>
             		<td>{{ rec.gg }}</td>
             		<td><a class="btn btn-danger" href="">niet juist</a></td>
             	</tr>
