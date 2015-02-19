@@ -170,7 +170,6 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 'choices'   => $fieldChoices,
                 'empty_value' => 'selecteer een veld',
                 'constraints' =>  array(
-                    new Assert\NotBlank(),
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
