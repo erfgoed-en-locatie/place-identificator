@@ -57,6 +57,14 @@ class ImportControllerProvider implements ControllerProviderInterface {
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
+            ->add('skip_first_row', 'choice', array(
+                'label'     => 'Bevat de eerste rij de kolomnamen?',
+                'required'  => true,
+                'choices'   => array(1 => 'Ja', 0 => 'Nee'),
+                'constraints' =>  array(
+                    new Assert\Type('integer')
+                )
+            ))
             ->add('csvFile', 'file', array(
                 'label'     => 'Kies een csv-bestand op uw computer',
                 'required'  => true,
@@ -113,6 +121,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
             $db = $app['db'];
             $db->insert('datasets', array(
                 'name'      => $data['name'],
+                'skip_first_row' => $data['skip_first_row'],
                 'filename'  => $filename,
                 'created_on' => $date->format('Y-m-d H:i:s'),
                 'status'    => Dataset::STATUS_NEW,

@@ -58,8 +58,11 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         }
         $csv = \League\Csv\Reader::createFromPath($file);
 
-        // todo, iets met eerste rij buiten beschouwing laten
-        $rows = $csv->setOffset(0)->setLimit(self::NUMBER_TO_TEST)->fetchAll();
+        $offset = 0;
+        if ($dataset['skip_first_row']) {
+            $offset = 1;
+        }
+        $rows = $csv->setOffset($offset)->setLimit(self::NUMBER_TO_TEST)->fetchAll();
 
         $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
 
