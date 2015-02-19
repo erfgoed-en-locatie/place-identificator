@@ -76,6 +76,9 @@ $app['security.firewalls'] = array(
     'homepage' => array(
         'pattern' => '^/$',
     ),
+    'colofon' => array(
+        'pattern' => '^/colofon$',
+    ),
     // everything else is secured
     'secured_area' => array(
         'pattern' => '^.*$',
