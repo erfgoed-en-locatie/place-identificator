@@ -69,6 +69,14 @@ class DatasetService {
         return $stmt->fetchColumn(0);
     }
 
+    public function fetchFieldmappingForDataset($id)
+    {
+            $stmt = $this->db->executeQuery('SELECT * FROM field_mapping WHERE dataset_id = :id', array(
+                'id' => (int) $id
+            ));
+        return $stmt->fetch();
+    }
+
     public function fetchRecsWithStatus($id,$status)
     {
         $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status = :status';
@@ -101,7 +109,7 @@ class DatasetService {
     {
         $date = new \DateTime('now');
 
-        if ($this->fetchDataset($data['dataset_id'])) {
+        if ($this->fetchFieldmappingForDataset($data['dataset_id'])) {
             $data['updated_on'] = $date->format('Y-m-d H:i:s');
             return $this->db->update('field_mapping', $data, array('dataset_id' => $data['dataset_id']));
         }
