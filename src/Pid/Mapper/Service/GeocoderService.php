@@ -88,8 +88,8 @@ class GeocoderService {
      * @return string
      */
     private function searchExact($name) {
-        $fakeAPI = array('answer.json', 'no-answer.json', 'answer-middelburg.json');
-        return 'http://pid.silex/' . array_rand(array_flip($fakeAPI), 1);
+        $fakeAPI = array('answer-middelburg.json');
+        return 'http://idthisplace.local:8888/' . array_rand(array_flip($fakeAPI), 1);
         //return $this->baseUri . 'search?name=' . $name;
     }
 
@@ -112,7 +112,7 @@ class GeocoderService {
                 foreach ($json->features as $feature) {
                     if ($feature->properties->type == self::API_PLACE_TYPE) {
                         $hitCount++;
-                        $output['data'] = $this->getStandardizedData($feature);
+                        $output['data'][] = $this->getStandardizedData($feature);
                     }
                 }
                 if ($hitCount == 1) {

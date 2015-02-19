@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <h3>Dataset "{{ dataset.name }}"</h3>
+            <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
                 <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a class="current" href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
@@ -11,6 +11,20 @@
             
             <p>Hier wordt steeds één record getoond dat meerdere resultaten heeft. De api wordt opnieuw aangeroepen om alle resultaten op te halen en deze worden vervolgens getoond (op een kaart, dat zou het mooist zijn). De gebruiker kan dan de juiste plaats aanklikken, of 'geen van allen', in wek geval het record de status MAPPED_EXACT_NOT_FOUND krijgt.</p>
 
+            <table class="table">
+            	<tr>
+            		<th>plaatsnaam</th>
+            		<th>aantal hits</th>
+            		<th>bewerk</th>
+            	</tr>
+            	{% for rec in multiples %}
+            	<tr>
+            		<td>{{ rec.original_name }}</td>
+            		<td>{{ rec.hits }}</td>
+            		<td><a class="btn btn-primary" href="/datasets/{{ dataset.id }}/multiples/{{ rec.id }}">bewerk</a></td>
+            	</tr>
+            	{% endfor %}
+            </table>
 
         </div>
     </div>

@@ -1,0 +1,37 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
+
+            <div id="resultnav">
+                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a class="current" href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+            </div>
+            
+            
+
+            <div class="row">
+                <div class="col-md-4">
+                    <h3>Meerdere resultaten voor "{{ rec.original_name }}"</h3>
+                    <p>Klik op het juiste resultaat hieronder of op het respectievelijke icoon op de kaart.</p>
+
+                    
+
+                    
+
+                </div>
+                <div class="col-md-8">
+                    
+                    <div id="mapcanvas">
+
+                    </div>
+                    
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

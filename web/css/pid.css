@@ -61,3 +61,8 @@ a{
 	border-radius: 12px;
 	font-family: 'Roboto Slab', serif;
 }
+#mapcanvas{
+	width: 100%;
+	height: 400px;
+	background-color: #bfd2dd;
+}
