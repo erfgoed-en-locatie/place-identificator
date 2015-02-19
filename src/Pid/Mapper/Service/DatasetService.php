@@ -75,7 +75,7 @@ class DatasetService {
     
 
     /**
-     * Save the provided mapping
+     * Save the provided mapping or update if it already exists
      *
      * @param array $data
      * @return int
@@ -83,8 +83,13 @@ class DatasetService {
     public function storeFieldMapping($data)
     {
         $date = new \DateTime('now');
-        $data['created_on'] = $date->format('Y-m-d H:i:s');
 
+        if ($this->fetchDataset($data['dataset_id'])) {
+            $data['updated_on'] = $date->format('Y-m-d H:i:s');
+            return $this->db->update('field_mapping', $data, array('dataset_id' => $data['dataset_id']));
+        }
+
+        $data['created_on'] = $date->format('Y-m-d H:i:s');
         return $this->db->insert('field_mapping', $data);
     }
 
