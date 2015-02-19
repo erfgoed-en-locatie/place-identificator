@@ -68,6 +68,20 @@ class GeocoderService {
     }
 
     /**
+     * Maps one place name
+     *
+     * @param string $name
+     * @return array The array contains hits|data keys
+     */
+    public function mapOne($name)
+    {
+        $response = $this->client->get($this->searchExact($name));
+        if ($response->getStatusCode() === 200) {
+            return $this->handleResponse($response->json(array('object' => true)));
+        }
+    }
+
+    /**
      * Provides the uri for exact searching
      *
      * @param $name
@@ -83,7 +97,7 @@ class GeocoderService {
      * Loops through the clumps and tries to find PITs
      *
      * @param $json
-     * @return array
+     * @return array The array contains hits|data keys
      */
     private function handleResponse($json)
     {
