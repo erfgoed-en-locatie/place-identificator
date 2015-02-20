@@ -1,6 +1,9 @@
 # FRONTEND PiD - PlaceIdentificator
  
 
+L.marker([{{ location.lat }}, {{ location.lon }}], {icon: mapIcon}).addTo(map)
+                    .bindPopup('<b>Een puntje!</b>');
+
 TODO
 - [ ] uitzoeken waarom de homepage en adnere uitgezonderde pagina's geen app['user'] heeft?
 

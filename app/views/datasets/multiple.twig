@@ -6,10 +6,10 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a class="current" href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a class="current" href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a>
             </div>
-            
-            
+
+
 
             <div class="row">
                 <div class="col-md-4">
@@ -17,25 +17,73 @@
                     <p>Klik op het juiste resultaat hieronder of op het respectievelijke icoon op de kaart.</p>
 
                     <ul>
-                    {% for opt in possibilities %}
-                        <li></td></li> 
-                    {% endfor %}
+                        {% for opt in possibilities.data %}
+                            <li>
+                                {% for src,pit in opt %}
+                                    {{ pit.name }} - {{ pit.type }}, volgens {{ src }}
+                                {% endfor %}
+                            </li>
+
+                        {% endfor %}
                     </ul>
 
-                    
-
+                    {{ dump(possibilities.data) }}
                 </div>
+
                 <div class="col-md-8">
-                    
+
                     <div id="mapcanvas">
 
                     </div>
-                    
+
 
                 </div>
             </div>
 
         </div>
     </div>
+
+
+    <script>
+        {% set mapFocus = [] %}
+        {# loop een keer door alle geometrien heen op zoek naar een lat.lon om de kaart op te kunnen centreren #}
+        {% for opt in possibilities.data %}
+        {% for pit in opt if pit.geometry is not empty and pit.geometry.type == 'Point' %}
+            {% set mapFocus = pit.geometry.coordinates %}
+        {% endfor %}
+        {% endfor %}
+
+        /** OpenStreetMap config */
+        {% if mapFocus is defined %}
+        var map = L.map('mapcanvas').setView([ {{ mapFocus[1]}}, {{ mapFocus[0]}}], 10);
+        {% else %}
+        var map = L.map('mapcanvas').setView([52.079, 5.077], 8);
+        {% endif %}
+
+
+        L.tileLayer('//{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var mapIcon = L.icon({
+            iconUrl: '/images/map-marker-128x128.png',
+            iconSize:     [32, 32], // size of the icon
+            shadowSize:   [50, 64], // size of the shadow
+            iconAnchor:   [16, 32], // point of the icon which will correspond to marker's location
+            shadowAnchor: [4, 62],  // the same for the shadow
+            popupAnchor:  [-3, -26] // point from which the popup should open relative to the iconAnchor
+        });
+
+        {% for opt in possibilities.data %}
+            {% for src,pit in opt %}
+                {% if pit.geometry is not empty and pit.geometry.type == 'Point' %}
+                    L.marker([{{ pit.geometry.coordinates[1] }}, {{ pit.geometry.coordinates[0] }}], {icon: mapIcon}).addTo(map)
+                        .bindPopup('<b>{{ pit.name }} - {{ pit.type }}</b> volgens {{ src }}');
+        // todo uitzoeken hoe je een polygon weergeeft
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+    </script>
 
 {% endblock %}
