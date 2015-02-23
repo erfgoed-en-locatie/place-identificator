@@ -53,43 +53,5 @@
 			$(tr).remove();
 		}
 
-		/** Wrapper for API calls */
-		function askAPI(type, url, data, callback) {
-			$('#fb').html('');
-			var request = jQuery.ajax({
-				type: type,
-				url: url,
-				data: data,
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				success: function (resp, status, jqXHR) {
-					if (!callback) {
-						//console.log('no callback!');
-						$('#fb').html(resp.message);
-					} else {
-						if (resp.data) {
-							callback(resp.data);
-						} else { // others simply pass on the data
-							callback(resp);
-						}
-					}
-				},
-				error: function (jqXHR, textStatus, errorThrown) {
-					if (jqXHR.status == 400) {
-						// fetch message from repsonse and present to user
-						var answer =  jqXHR.responseJSON;
-						$('#response').find('p').text(answer.message);
-						$('#response').show();
-					} else if (jqXHR.status == 404) {
-						console.log('Requested page not found. [404]');
-					} else if (jqXHR.status == 500) {
-						console.log('Received an internal server error.');
-					}
-				}
-
-			});
-
-		}
-
 	</script>
 {% endblock %}
