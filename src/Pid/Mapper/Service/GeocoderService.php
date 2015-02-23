@@ -77,8 +77,7 @@ class GeocoderService {
     {
         $response = $this->client->get($this->searchExact($name));
         if ($response->getStatusCode() === 200) {
-            return (string) $response->getBody();
-            //return $this->handleMapOneResponse($response->json(array('object' => true)));
+            return $this->handleMapOneResponse($response->json(array('object' => true)));
         }
     }
 

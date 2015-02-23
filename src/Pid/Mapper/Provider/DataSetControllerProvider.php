@@ -221,13 +221,12 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $recs = $app['dataset_service']->fetchRec($recid);
         $rec = $recs[0];
 
-        $geoJsonString = $app['geocoder_service']->mapOne($rec['original_name']);
+        $possibilities = $app['geocoder_service']->mapOne($rec['original_name']);
 
         return $app['twig']->render('datasets/multiple.twig', array(
             'dataset' => $dataset,
             "rec" => $rec,
-            //"possibilities" => $possibilities,
-            'geoJson' => $geoJsonString
+            "possibilities" => $possibilities
         ));
     }
 
