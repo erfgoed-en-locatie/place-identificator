@@ -5,12 +5,25 @@
  */
 
 // CUSTOM services
+use Symfony\Component\HttpFoundation\Request;
+
 $app['dataset_service'] = $app->share(function ($app) {
     return new \Pid\Mapper\Service\DatasetService($app['db']);
 });
 $app['geocoder_service'] = $app->share(function ($app) {
     return new \Pid\Mapper\Service\GeocoderService();
 });
+$app['uri_resolver_service'] = $app->share(function ($app) {
+    return new \Pid\Mapper\Service\UriResolverService();
+});
+
+
+/*$app->before(function (Request $request) {
+    if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
+        $data = json_decode($request->getContent(), true);
+        $request->request->replace(is_array($data) ? $data : array());
+    }
+});*/
 
 // TWIG
 $app->register(new Silex\Provider\TwigServiceProvider(), array(

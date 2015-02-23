@@ -6,14 +6,9 @@
 
 		function setUri(recid){
 			uri = jQuery('#uri-with-' + recid).val();
-			console.log(uri);
-			data = {"uri" : uri};
-
-			askAPI('POST', '/api/record/map/'+recid, data, deleteRow);
-
-			
+			data = {"uri": uri };
+			askAPI('GET', '/api/record/map/'+recid, data, deleteRow);
 		}
-
 
 
 		function deleteRow(json) {
