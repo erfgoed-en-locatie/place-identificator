@@ -61,8 +61,12 @@ class ApiControllerProvider implements ControllerProviderInterface {
         if (!is_string($uri)) {
             return $app->json(array('error' => 'Invalid uri received'), 400);
         }
+        try {
 
-        $record = $app['uri_resolver_service']->findOne($uri);
+            $record = $app['uri_resolver_service']->findOne($uri);
+        } catch (\Exception $e) {
+            return $app->json(array('id' => $id));
+        }
 
         return $app->json(array('id' => $id));
         // todo dit ook nog echt opslaan en achterhalen in welk veld het moet
