@@ -223,11 +223,13 @@ class DataSetControllerProvider implements ControllerProviderInterface
 
         $possibilities = $app['geocoder_service']->mapOne($rec['original_name']);
 
+
         return $app['twig']->render('datasets/multiple.twig', array(
             'dataset' => $dataset,
             "rec" => $rec,
             "possibilities" => $possibilities
         ));
+
     }
 
     /**
@@ -247,9 +249,9 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
         $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
 
-        $standardized = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        $noresults = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
         
-        return $app['twig']->render('datasets/noresults.twig', array('dataset' => $dataset, "noresults" => $standardized));
+        return $app['twig']->render('datasets/noresults.twig', array('dataset' => $dataset, "noresults" => $noresults));
     }
 
 

@@ -1,6 +1,28 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
+
+	<script type="text/javascript">
+
+		function setUri(recid){
+			uri = jQuery('#uri-with-' + recid).val();
+			console.log(uri);
+			data = {"id" : recid, "uri" : uri};
+
+			askAPI('POST', '/api/record/map/'+recid, data, deleteRow);
+
+			
+		}
+
+
+		function deleteRow(json) {
+			var tr = '#row_'+json.id;
+			$(tr).remove();
+		}
+
+	</script>
+    
+
     <div class="row">
         <div class="col-md-12">
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
@@ -9,6 +31,22 @@
                 <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a class="current" href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
             </div>
             
+            <p>Hieronder de plaatsnamen waar geen enkel resultaat voor gevonden is. Eventueel kunt u handmatig een TGN, gemeentegeschiedenis of Geonames URI invoeren.</p>
+
+            <table class="table">
+            	<tr>
+            		<th>plaatsnaam</th>
+            		<th>en de juiste uri is...</th>
+            		<th>go!</th>
+            	</tr>
+            	{% for rec in noresults %}
+            	<tr id="row_{{ rec.id }}">
+            		<td>{{ rec.original_name }}</td>
+            		<td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value="jkj {{ rec.id }}" /></td>
+            		<td><button class="btn btn-primary" onclick="setUri({{ rec.id }})">sla op</button></td>
+            	</tr>
+            	{% endfor %}
+            </table>
 
         </div>
     </div>
