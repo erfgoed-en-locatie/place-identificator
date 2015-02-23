@@ -124,7 +124,19 @@
 
 <script>
 
-        
+    function setNumbers(one,more,none){
+
+        if(one!=null){
+            jQuery('#nr-one').html(one);
+        }
+        if(more!=null){
+            jQuery('#nr-more').html(more);
+        }
+        if(none!=null){
+            jQuery('#nr-none').html(none);
+        }
+
+    }
 
     /** Wrapper for API calls */
     function askAPI(type, url, data, callback) {

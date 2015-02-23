@@ -7,7 +7,7 @@
 		function setUri(recid){
 			uri = jQuery('#uri-with-' + recid).val();
 			console.log(uri);
-			data = {"id" : recid, "uri" : uri};
+			data = {"uri" : uri};
 
 			askAPI('POST', '/api/record/map/'+recid, data, deleteRow);
 
@@ -15,9 +15,18 @@
 		}
 
 
+
 		function deleteRow(json) {
 			var tr = '#row_'+json.id;
 			$(tr).remove();
+
+            var one = jQuery('#nr-one').html();
+            console.log(one);
+            one = Number(one) + 1;
+            var none = jQuery('#nr-none').html();
+            none = Number(none) - 1;
+
+            setNumbers(one,null,none);
 		}
 
 	</script>
@@ -28,7 +37,7 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a class="current" href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd (<span id="nr-one">{{ dataset.countStandardized }}</span>)</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten (<span id="nr-more">{{ dataset.countMultiples }}</span>)</a><a class="current" href="/datasets/{{ dataset.id }}/noresults">Geen resultaten (<span id="nr-none">{{ dataset.countNoResults }}</span>)</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
             </div>
             
             <p>Hieronder de plaatsnamen waar geen enkel resultaat voor gevonden is. Eventueel kunt u handmatig een TGN, gemeentegeschiedenis of Geonames URI invoeren.</p>

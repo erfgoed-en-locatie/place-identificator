@@ -6,7 +6,7 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a class="current" href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+                <a class="current" href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd (<span id="nr-one">{{ dataset.countStandardized }}</span>)</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten (<span id="nr-more">{{ dataset.countMultiples }}</span>)</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten (<span id="nr-none">{{ dataset.countNoResults }}</span>)</a><a href="/datasets/{{ dataset.id }}/download">Download</a>
             </div>
             
 
@@ -51,6 +51,14 @@
 		function deleteRow(json) {
 			var tr = '#row_'+json.id;
 			$(tr).remove();
+
+            var one = jQuery('#nr-one').html();
+            console.log(one);
+            one = Number(one) - 1;
+            var none = jQuery('#nr-none').html();
+            none = Number(none) + 1;
+
+            setNumbers(one,null,none);
 		}
 
 	</script>
