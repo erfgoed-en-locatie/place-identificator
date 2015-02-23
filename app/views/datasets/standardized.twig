@@ -46,11 +46,6 @@
 				askAPI('GET', uri, null, deleteRow);
 			});
 
-			$(".unmappable").click(function () {
-				var id = $(this).attr('data-name-id');
-				askAPI('GET', '/pleiades/unmappable/'+id, null, null);
-			});
-
 		});
 
 		function deleteRow(json) {
