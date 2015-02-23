@@ -25,6 +25,7 @@ class ApiControllerProvider implements ControllerProviderInterface {
         $controllers = $app['controllers_factory'];
 
         $controllers->get('/record/unmap/{id}', array(new self(), 'clearStandardization'))->bind('api-clear-mapping')->assert('id', '\d+');
+        $controllers->post('/record/map/{id}', array(new self(), 'setStandardization'))->bind('api-set-mapping')->assert('id', '\d+');
 
 
         return $controllers;
@@ -41,6 +42,23 @@ class ApiControllerProvider implements ControllerProviderInterface {
     {
         if ($app['dataset_service']->clearRecord($id)){
             return $app->json(array('id' => $id));
+        }
+
+        return $app->json(array('error' => 'Record could not be updated'), 400);
+    }
+
+    /**
+     * Standardize record with UNMAPPED status
+     *
+     * @param Application $app
+     * @param integer $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function setStandardization(Application $app, $id)
+    {   
+        return $app->json(array('id' => $id));
+        if ($app['dataset_service']->clearRecord($id)){
+            return $app->json(array('message' => "update geslaagd"));
         }
 
         return $app->json(array('error' => 'Record could not be updated'), 400);
