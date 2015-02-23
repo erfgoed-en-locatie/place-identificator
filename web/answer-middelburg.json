@@ -62,6 +62,16 @@
             "uri": "tgn/7006752",
             "matchedQuery": "TODO",
             "geometryIndex": 0
+          },
+          {
+            "startDate": "",
+            "source": "geonames",
+            "name": "Middelburg",
+            "endDate": "",
+            "type": "hg:Place",
+            "uri": "geonames/fakeid7006752",
+            "matchedQuery": "TODO",
+            "geometryIndex": 1
           }
         ]
       },
@@ -71,7 +81,11 @@
            {
             "type": "Point",
              "coordinates": [ 3.616667, 51.5 ]
-            }
+            },
+          {
+            "type": "Point",
+            "coordinates": [ 3.616687, 51.58 ]
+          }
         ]
       }
     },

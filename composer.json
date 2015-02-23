@@ -25,11 +25,5 @@
         "psr-0": {
             "Pid": "src"
         }
-    },
-    "petra_maybe_use_later": {
-        "symfony/form": "~2.3",
-        "symfony/validator": "~2.3",
-        "symfony/config": "~2.3",
-        "symfony/translation": "~2.3"
     }
 }

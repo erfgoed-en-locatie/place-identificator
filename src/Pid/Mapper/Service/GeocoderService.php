@@ -77,7 +77,8 @@ class GeocoderService {
     {
         $response = $this->client->get($this->searchExact($name));
         if ($response->getStatusCode() === 200) {
-            return $this->handleMapOneResponse($response->json(array('object' => true)));
+            return (string) $response->getBody();
+            //return $this->handleMapOneResponse($response->json(array('object' => true)));
         }
     }
 
@@ -114,6 +115,7 @@ class GeocoderService {
      */
     private function searchExact($name) {
         $fakeAPI = array('answer.json', 'no-answer.json', 'answer-middelburg.json');
+        $fakeAPI = array('answer-middelburg.json');
         return 'http://pid.silex/' . array_rand(array_flip($fakeAPI), 1);
         //return $this->baseUri . 'search?name=' . $name;
     }
