@@ -56,6 +56,8 @@ class ApiControllerProvider implements ControllerProviderInterface {
      */
     public function setStandardization(Application $app, $id)
     {   
+        // http://www.islandsofmeaning.nl/projects/resolve_uri/?uri=http://www.geonames.org/2759797
+        
         return $app->json(array('id' => $id));
         if ($app['dataset_service']->clearRecord($id)){
             return $app->json(array('message' => "update geslaagd"));
