@@ -46,7 +46,7 @@
             	{% for rec in noresults %}
             	<tr id="row_{{ rec.id }}">
             		<td>{{ rec.original_name }}</td>
-            		<td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value="jkj {{ rec.id }}" /></td>
+            		<td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value="" /></td>
             		<td><button class="btn btn-primary" onclick="setUri({{ rec.id }})">sla op</button></td>
             	</tr>
             	{% endfor %}

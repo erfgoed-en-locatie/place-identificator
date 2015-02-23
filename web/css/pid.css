@@ -51,7 +51,7 @@ a{
 .jumbotron li{
 	font-size: 18px;
 }
-.jumbotron .btn-primary{
+.jumbotron .btn-primary, .downloadbutton{
 	font-size: 20px;
 	margin-top: 30px;
 	margin-left: 120px;
@@ -60,6 +60,10 @@ a{
 	padding: 20px;
 	border-radius: 12px;
 	font-family: 'Roboto Slab', serif;
+}
+.downloadbutton{
+	margin-left: 0px;
+	margin-top: 100px;
 }
 #mapcanvas{
 	width: 100%;
