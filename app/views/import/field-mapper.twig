@@ -42,16 +42,24 @@
 
 			{{ form_row(form.gemeenten) }}
 
-			<ul>
-				<li>Kies type waarop je wilt zoeken (place/ municipality)</li>
-				<li>Periode (beginjaar + eindjaar)</li>
-				<li>Fuzzy of excact zoeekn? Met / zonder wildcard</li>
-				<li>Bounding box</li>
-			</ul>
+			<label>Fuzzy of exact zoeken?</label>
 
-			<div class="col-sm-offset-2 form-actions">
-				<input class="btn btn-primary" type="submit" value="test">
-				<input class="btn btn-success" type="submit" value="standaardiseer">
+			{{ form_row(form.fuzzy_search) }}
+
+
+			<div class="row form-actions">
+				<div class="col-md-6">
+					<input class="btn btn-primary" type="submit" value="standaardiseer 20 records" />
+					<p>Deze optie standaardiseert de eerste 20 records. Dit is handig om te kijken of alles goed gaat alvorens het hele bestand te verwerken.</p>
+
+					<p>Let op: alle data bij dit bestand wordt eerst verwijderd!</p>
+				</div>
+				<div class="col-md-6">
+					<input class="btn btn-primary" type="submit" value="standaardiseer alle records" />
+					<p>Deze optie standaardiseert alle records. Dit proces kan enige tijd duren.</p>
+
+					<p>Let op: alle data bij dit bestand wordt eerst verwijderd!</p>
+				</div>
 			</div>
 		</div>
 

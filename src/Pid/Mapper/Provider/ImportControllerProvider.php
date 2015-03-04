@@ -197,11 +197,18 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 'required'  => false,
                 'value' => '1',
                 'attr' => array('checked' => 'checked')
-            ))->add('gemeenten', 'checkbox', array(
+            ))
+            ->add('gemeenten', 'checkbox', array(
                 'label'         => 'zoek gemeenten',
                 'required'  => false,
                 'value' => '1',
                 'attr' => array('checked' => 'checked')
+            ))
+            ->add('fuzzy_search', 'checkbox', array(
+                'label'         => 'fuzzy search aan (nog niet beschikbaar)',
+                'required'  => false,
+                'value' => '1',
+                'attr' => array('disabled' => 'disabled')
             ))
             /*
             ->add('lat', 'choice', array(
