@@ -129,7 +129,7 @@ class GeocoderService {
         } else {
             $output = array();
             if ($this->searchOn == self::SEARCH_PLACES) {
-
+                $output['hits'] = 0;
                 $hitCount = 0;
                 // look for only place types in the features
                 foreach ($json->features as $feature) {
@@ -204,7 +204,10 @@ class GeocoderService {
             if (in_array($pit->source, $this->fieldsOfInterest)) {
                 $data[$pit->source]['name'] = $pit->name;
                 $data[$pit->source]['uri'] = $pit->uri;
-                $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
+                if (isset($feature->geometry->geometries[$pit->geometryIndex])) {
+                    $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
+                }
+
             }
         }
         return $data;

@@ -193,7 +193,6 @@ class DatasetService {
         return $this->db->update('records', $data, array('id' => $id));
     }
 
-
     /**
      * Transform the result from the API into storable data and store that data
      *
