@@ -6,7 +6,7 @@
             <p>Je werkt in dataset "<a href="{{ path('datasets-show', {'id': dataset.id }) }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a class="current" href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd (<span id="nr-one">{{ dataset.countStandardized }}</span>)</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten (<span id="nr-more">{{ dataset.countMultiples }}</span>)</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten (<span id="nr-none">{{ dataset.countNoResults }}</span>)</a><a href="/datasets/{{ dataset.id }}/download">Download</a>
+                <a class="current" href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd (<span id="nr-one">{{ dataset.countStandardized }}</span>)</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten (<span id="nr-more">{{ dataset.countMultiples }}</span>)</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten (<span id="nr-none">{{ dataset.countNoResults }}</span>)</a><a href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar({{ dataset.countUnmappables }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a>
             </div>
             
 

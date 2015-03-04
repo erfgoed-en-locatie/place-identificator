@@ -37,6 +37,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $controllers->get('/{id}/multiples', array(new self(), 'showMultiples'))->bind('dataset-multiples')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/multiples/{recid}', array(new self(), 'showMultipleRec'))->bind('dataset-multiple-rec')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/noresults', array(new self(), 'showNoResults'))->bind('dataset-noresults')->value('id', null)->assert('id', '\d+');
+        $controllers->get('/{id}/unmappables', array(new self(), 'showUnmappables'))->bind('dataset-unmappables')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/download', array(new self(), 'showDownload'))->bind('dataset-downloads')->value('id', null)->assert('id', '\d+');
         
         return $controllers;
@@ -164,6 +165,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
         $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
         $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::UNMAPPED);
 
         $standardized = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT);
 
@@ -194,6 +196,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
         $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
         $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::UNMAPPED);
 
         $multiples = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
         
@@ -217,6 +220,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
         $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
         $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::UNMAPPED);
 
         $recs = $app['dataset_service']->fetchRec($recid);
         $rec = $recs[0];
@@ -248,10 +252,35 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
         $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
         $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::UNMAPPED);
 
         $noresults = $app['dataset_service']->fetchRecsWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
         
         return $app['twig']->render('datasets/noresults.twig', array('dataset' => $dataset, "noresults" => $noresults));
+    }
+
+
+    /**
+     * Show all recs without results
+     *
+     * @param Application $app
+     * @param $id
+     */
+    public function showUnmappables(Application $app, $id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id);
+        if (!$dataset) {
+            $app->abort(404, "Dataset with id ($id) does not exist.");
+        }
+
+        $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
+        $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
+        $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::UNMAPPED);
+
+        $unmappables = $app['dataset_service']->fetchRecsWithStatus($id, Status::UNMAPPED);
+        
+        return $app['twig']->render('datasets/unmappables.twig', array('dataset' => $dataset, "unmappables" => $unmappables));
     }
 
 
@@ -271,6 +300,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
         $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
         $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::UNMAPPED);
 
         return $app['twig']->render('datasets/download.twig', array('dataset' => $dataset));
     }

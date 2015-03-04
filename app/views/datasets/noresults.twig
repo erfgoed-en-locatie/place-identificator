@@ -41,7 +41,7 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd (<span id="nr-one">{{ dataset.countStandardized }}</span>)</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten (<span id="nr-more">{{ dataset.countMultiples }}</span>)</a><a class="current" href="/datasets/{{ dataset.id }}/noresults">Geen resultaten (<span id="nr-none">{{ dataset.countNoResults }}</span>)</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd (<span id="nr-one">{{ dataset.countStandardized }}</span>)</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten (<span id="nr-more">{{ dataset.countMultiples }}</span>)</a><a class="current" href="/datasets/{{ dataset.id }}/noresults">Geen resultaten (<span id="nr-none">{{ dataset.countNoResults }}</span>)</a><a href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar({{ dataset.countUnmappables }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
             </div>
             
             <p>Hieronder de plaatsnamen waar geen enkel resultaat voor gevonden is. U kunt hier handmatig een <a href="http://vocab.getty.edu/" target="_blank">TGN</a>, <a href="http://www.gemeentegeschiedenis.nl/" target="_blank">Gemeentegeschiedenis</a> of <a href="http://www.geonames.org/">Geonames</a> URI invoeren.</p>

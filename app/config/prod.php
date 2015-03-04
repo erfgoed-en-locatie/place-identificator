@@ -101,8 +101,8 @@ $app["db.options"] = array(
     'driver'   => 'pdo_mysql',
     'host'     => 'localhost',
     'user'     => 'root',
-    'password' => 'dreis002',
-    'dbname'   => 'pid',
+    'password' => 'root',
+    'dbname'   => 'erfgoedenlocatie_pid',
     'charset'   => 'utf8',
 );
 

@@ -6,7 +6,7 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a class="current" href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar({{ dataset.countUnmappables }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a class="current" href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar({{ dataset.countUnmappables }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
             </div>
             
             <p></p>
@@ -17,7 +17,7 @@
             		<th>aantal hits</th>
             		<th>bewerk</th>
             	</tr>
-            	{% for rec in multiples %}
+            	{% for rec in unmappables %}
             	<tr>
             		<td>{{ rec.original_name }}</td>
             		<td>{{ rec.hits }}</td>
