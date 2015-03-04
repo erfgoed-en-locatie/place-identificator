@@ -2,25 +2,25 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
 
-            <h2>Dataset Uploaden</h2>
+            <h1>Dataset Uploaden</h1>
 
             <p>Upload een csv-bestand met de te standaardiseren plaatsnamen. In het csvbestand mogen ook contextverschaffende velden opgenomen zijn - bijvoorbeeld voor provincie of land. Het csv-bestand mag maximaal 2MB groot zijn.</p>
 
-            <p>In een volgende scherm kunt u aangeven welk velden wat bevatten</p>
-
-            {% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+            
+            {% form_theme form 'bootstrap_3_layout.html.twig' %}
 
             {{ form_start(form) }}
             {{ form_widget(form) }}
-            <div class="col-sm-offset-2 form-actions">
+
+            <div class="form-actions">
                 <button type="submit" class="btn btn-primary">bestand uploaden</button>
             </div>
             {{ form_end(form) }}
 
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
 
         </div>
     </div>

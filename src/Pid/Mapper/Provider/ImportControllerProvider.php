@@ -285,7 +285,8 @@ class ImportControllerProvider implements ControllerProviderInterface {
         // form or form errors
         return $app['twig']->render('import/field-mapper.twig', array(
             'columnNames' => $columnNames,
-            'form'  => $form->createView()
+            'form'  => $form->createView(),
+            'dataset' => $dataset
         ));
     }
 

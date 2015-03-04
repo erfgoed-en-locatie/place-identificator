@@ -2,9 +2,11 @@
 
 {% block content %}
 
+    <h1>Details dataset "{{ dataset.name }}"</h1>
+
     <div class="row">
         <div class="col-md-6">
-            <h1>Details dataset "{{ dataset.name }}"</h1>
+            
 
             <table class="table">
                 <tr>
@@ -33,42 +35,31 @@
                 </tr>
                 <tr>
                     <th>
-                        Gestandaardiseerd
+                        Resultaten
                     </th>
                     <td>
-                        <a href="/datasets/{{ dataset.id }}/standardized">{{ dataset.countStandardized }} record{% if dataset.countStandardized != 1 %}s{% endif %}</a>
+                        <a class="btn btn-primary" href="/datasets/{{ dataset.id }}/standardized">bekijk gestandaardiseerde record{% if dataset.countStandardized != 1 %}s ({{ dataset.countStandardized }}){% endif %} </a>
+
+                        <a class="btn btn-primary" class="btn btn-primary" href="/datasets/{{ dataset.id }}/multiples">bekijk records met meerdere resultaten ({{ dataset.countMultiples }})</a><br />
+
+                        <a class="btn btn-primary" href="/datasets/{{ dataset.id }}/noresults">bekijk  records zonder resultaat ({{ dataset.countNoResults }})</a>
                     </td>
                 </tr>
-                <tr>
-                    <th>
-                        Meerdere resultaten
-                    </th>
-                    <td>
-                        <a href="/datasets/{{ dataset.id }}/multiples">{{ dataset.countMultiples }} records</a>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        Geen resultaten
-                    </th>
-                    <td>
-                        <a href="/datasets/{{ dataset.id }}/noresults">{{ dataset.countNoResults }} records</a>
-                    </td>
-                </tr>
+                
                 <tr>
                     <th>
                         Download
                     </th>
                     <td>
-                        Download <a href="/datasets/{{ dataset.id }}/download">hier</a> de resultaten.
+                        <a href="/datasets/{{ dataset.id }}/download">Download hier de resultaten</a>.
                     </td>
                 </tr>
             </table>
         </div>
 
         <div class="col-md-6">
-            <h2>Opties</h2>
-            <a href="{{ path('standardize-test', {'id': dataset.id}) }}" title="Test de huidige mapping" class="btn btn-primary">Test</a>
+            
+            <a href="{{ path('import-mapcsv', {'id': dataset.id}) }}" title="Test de huidige mapping" class="btn btn-danger">Instellingen wijzigen / opnieuw standaardiseren</a>
         </div>
 
     </div>
