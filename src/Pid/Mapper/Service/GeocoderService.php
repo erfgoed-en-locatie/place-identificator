@@ -113,9 +113,11 @@ class GeocoderService {
      * @return string
      */
     private function searchExact($name) {
+
         $fakeAPI = array('answer.json', 'no-answer.json', 'answer-middelburg.json');
         //$fakeAPI = array('answer-middelburg.json');
-        return 'http://pid.silex/' . array_rand(array_flip($fakeAPI), 1);
+        return 'http://idthisplace.local:8888/' . array_rand(array_flip($fakeAPI), 1);
+        
         //return $this->baseUri . 'search?name=' . $name;
     }
 

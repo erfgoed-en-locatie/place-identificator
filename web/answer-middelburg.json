@@ -4,10 +4,9 @@
     {
       "type": "Feature",
       "properties": {
-        "type": "hg:Place",
+        "type": "hg:Municipality",
         "pits": [
           {
-
             "startDate": "1942-01-01",
             "source": "gemeentegeschiedenis",
             "name": "Middelburg [Ze]",
