@@ -184,7 +184,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 )
             ))
             ->add('country', 'choice', array(
-                'label'         => 'Land',
+                'label'         => 'Land (wordt overgeslagen indien geen "Nederland" of "NL")',
                 'required'  => false,
                 'choices'   => $fieldChoices,
                 'empty_value' => 'selecteer een veld',
@@ -192,6 +192,18 @@ class ImportControllerProvider implements ControllerProviderInterface {
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
+            ->add('plaatsen', 'checkbox', array(
+                'label'         => 'zoek plaatsen',
+                'required'  => false,
+                'value' => '1',
+                'attr' => array('checked' => 'checked')
+            ))->add('gemeenten', 'checkbox', array(
+                'label'         => 'zoek gemeenten',
+                'required'  => false,
+                'value' => '1',
+                'attr' => array('checked' => 'checked')
+            ))
+            /*
             ->add('lat', 'choice', array(
                 'label'         => 'Lattitude / breedtegraad',
                 'required'  => false,
@@ -210,6 +222,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
+            */
 
             ->getForm()
         ;
