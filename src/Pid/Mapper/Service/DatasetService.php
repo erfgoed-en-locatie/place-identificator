@@ -98,7 +98,6 @@ class DatasetService {
         return $stmt->fetchAll();
     }
 
-
     /**
      * Clear the results for a record
      *
@@ -117,7 +116,23 @@ class DatasetService {
         $data['hits'] = 0;
         return $this->db->update('records', $data, array('id' => $id));
     }
-    
+
+    /**
+     * Mark the record as unmappable so a user can skip it in the interface
+     *
+     * @param $id
+     * @return int
+     */
+    public function setRecordAsUnmappable($id)
+    {
+        $data['status'] = Status::UNMAPPABLE;
+        $data['geonames'] = null;
+        $data['tgn'] = null;
+        $data['bag'] = null;
+        $data['gg'] = null;
+        $data['hits'] = 0;
+        return $this->db->update('records', $data, array('id' => $id));
+    }
 
     /**
      * Save the provided mapping or update if it already exists

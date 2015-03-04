@@ -16,12 +16,21 @@
 			$(tr).remove();
 
             var one = jQuery('#nr-one').html();
-            console.log(one);
             one = Number(one) + 1;
             var none = jQuery('#nr-none').html();
             none = Number(none) - 1;
 
             setNumbers(one,null,none);
+		}
+
+		function deleteUnmappedRow(json) {
+			var tr = '#row_'+json.id;
+			$(tr).remove();
+
+			var none = jQuery('#nr-none').html();
+			none = Number(none) - 1;
+
+			setNumbers(null, null,none);
 		}
 
 	</script>
@@ -48,6 +57,7 @@
             		<td>{{ rec.original_name }}</td>
             		<td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
             		<td><button class="btn btn-primary" onclick="setUri({{ rec.id }})">sla op</button></td>
+					<td><a class="btn btn-danger unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te mappen</a></td>
             	</tr>
             	{% endfor %}
             </table>
@@ -55,4 +65,17 @@
         </div>
     </div>
 
+	<script>
+
+		jQuery(function () {
+			// reset a mapped record
+			$(".table").on( "click", "a.unmappable", function(e) {
+				e.preventDefault();
+				var uri = $(this).attr('data-ref');
+				askAPI('GET', uri, null, deleteUnmappedRow);
+			});
+
+		});
+
+	</script>
 {% endblock %}

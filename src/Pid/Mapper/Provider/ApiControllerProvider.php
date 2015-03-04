@@ -26,6 +26,7 @@ class ApiControllerProvider implements ControllerProviderInterface {
 
         $controllers->get('/record/unmap/{id}', array(new self(), 'clearStandardization'))->bind('api-clear-mapping')->assert('id', '\d+');
         $controllers->get('/record/map/{id}', array(new self(), 'setStandardization'))->bind('api-set-mapping')->assert('id', '\d+');
+        $controllers->get('/record/ummappable/{id}', array(new self(), 'setUnmappable'))->bind('api-unmappable')->assert('id', '\d+');
 
 
         return $controllers;
@@ -44,7 +45,24 @@ class ApiControllerProvider implements ControllerProviderInterface {
             return $app->json(array('id' => $id));
         }
 
-        return $app->json(array('error' => 'Record could not be updated'), 400);
+        return $app->json(array('error' => 'Record could not be updated'), 503);
+    }
+
+
+    /**
+     * Delete the found standardized info for a certain record and reset it to an UNMAPPED status
+     *
+     * @param Application $app
+     * @param integer $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function setUnmappable(Application $app, $id)
+    {
+        if ($app['dataset_service']->setRecordAsUnmappable($id)){
+            return $app->json(array('id' => $id));
+        }
+
+        return $app->json(array('error' => 'Record could not be updated'), 503);
     }
 
     /**
