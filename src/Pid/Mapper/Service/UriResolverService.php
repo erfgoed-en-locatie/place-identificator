@@ -30,7 +30,6 @@ class UriResolverService {
         $this->client = new \GuzzleHttp\Client();
     }
 
-
     /**
      * Call Menno's uri resolver for a given uri
      *
@@ -42,18 +41,22 @@ class UriResolverService {
         $apiUri = $this->baseUri . '?uri=' . $uri;
         $response = $this->client->get($apiUri);
         if ($response->getStatusCode() === 200) {
-            return $this->handleResponse($response->json(array('object' => true)));
+            return $this->transformResponse($response->json(array('object' => true)));
         }
     }
 
-
-    public function handleResponse($json)
+    /**
+     * Transform the response to a json storable string
+     * @param $json
+     * @return string
+     */
+    public function transformResponse($json)
     {
         $data['name'] = $json->label[0];
         $data['uri'] = $json->uri;
         $data['geomety']['type'] = 'Point';
         $data['geometry']['coordinates'] = array($json->lat, $json->lon);
-        return $data;
+        return json_encode($data);
     }
 
 }

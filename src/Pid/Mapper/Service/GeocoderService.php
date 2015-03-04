@@ -28,7 +28,7 @@ class GeocoderService {
     /**
      * @var string $baseUri Uri of the service to call
      */
-    private $baseUri = 'http://erfgeo.nl/histograph/';
+    private $baseUri = 'http://api.histograph.io';
 
     /**
      * @var array Fields in the API result that hold the data we want to store
@@ -113,10 +113,7 @@ class GeocoderService {
      * @return string
      */
     private function searchExact($name) {
-        $fakeAPI = array('answer.json', 'no-answer.json', 'answer-middelburg.json');
-        //$fakeAPI = array('answer-middelburg.json');
-        return 'http://pid.silex/' . array_rand(array_flip($fakeAPI), 1);
-        //return $this->baseUri . 'search?name=' . $name;
+        return $this->baseUri . '/search?name=' . $name;
     }
 
     /**
@@ -188,7 +185,7 @@ class GeocoderService {
                 $data[$pit->source]['name'] = $pit->name;
                 $data[$pit->source]['uri'] = $pit->uri;
                 $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
-                $data[$pit->source]['type'] = $pit->type;
+                $data[$pit->source]['type'] = $feature->properties->type;
             }
         }
         return $data;

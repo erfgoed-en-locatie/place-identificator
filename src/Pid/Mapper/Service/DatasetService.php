@@ -161,6 +161,23 @@ class DatasetService {
         return $this->db->insert('records', $data);
     }
 
+    /**
+     * Save the manually mapped record
+     *
+     * @param array $data
+     * @param integer $id
+     * @return int
+     */
+    public function storeManualMapping($data, $id)
+    {
+        $date = new \DateTime('now');
+        $data['updated_on'] = $date->format('Y-m-d H:i:s');
+        $data['status'] = Status::MAPPED_MANUALLY;
+        $data['hits'] = 0;
+
+        return $this->db->update('records', $data, array('id' => $id));
+    }
+
 
     /**
      * Transform the result from the API into storable data and store that data

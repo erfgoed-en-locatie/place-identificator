@@ -58,23 +58,44 @@ class ApiControllerProvider implements ControllerProviderInterface {
     {
         //$data = $request->getContent();
         $uri = $request->get('uri');
+        // todo find out how to do this with a proper POST as json data
         if (!is_string($uri)) {
             return $app->json(array('error' => 'Invalid uri received'), 400);
         }
         try {
-
             $record = $app['uri_resolver_service']->findOne($uri);
+
+            $column = $this->discoverSourceType($uri);
+            $data[$column] = $record;
+            if ($app['dataset_service']->storeManualMapping($data, $id)){
+                return $app->json(array('id' => $id));
+            }
+
         } catch (\Exception $e) {
-            return $app->json(array('id' => $id));
+            return $app->json(array('id' => $id), 503);
         }
 
-        return $app->json(array('id' => $id));
-        // todo dit ook nog echt opslaan en achterhalen in welk veld het moet
+    }
 
-        /*if ($app['dataset_service']->clearRecord($id)){
-            return $app->json(array('message' => "update geslaagd"));
-        }*/
-
+    /**
+     * Find out what sort of uri it is (geonames/tgn etc)
+     *
+     * @param $uri
+     * @return string The name matches the column name of table.
+     */
+    protected function discoverSourceType($uri)
+    {
+        if (strpos($uri, 'geonames')) {
+            return 'geonames';
+        } else if (strpos($uri, 'getty')) {
+            return 'tgn';
+        } else if (strpos($uri, 'gemeentegeschiedenis')) {
+            return 'gg';
+        } else if (strpos($uri, 'kadaster')) {
+            return 'bag';
+        } else {
+            return 'erfgeo';
+        }
     }
 
 }
