@@ -43,9 +43,9 @@ class UriResolverService {
         $response = $this->client->get($apiUri);
         if ($response->getStatusCode() === 200) {
             return $this->handleResponse($response->json(array('object' => true)));
-
         }
     }
+
 
     public function handleResponse($json)
     {
@@ -55,6 +55,5 @@ class UriResolverService {
         $data['geometry']['coordinates'] = array($json->lat, $json->lon);
         return $data;
     }
-
 
 }
