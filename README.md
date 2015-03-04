@@ -15,8 +15,11 @@ The app uses the API of the Dutch Historical Geocoder  as it is being developed 
     `curl -sS https://getcomposer.org/installer | php`
 
 3. And run `php composer.phar install`
-4. Have a look at the `./app/config/prod.php` file and change the database etc setting according to your setup
-5. Create a virtual host or point your browser to the location you set up for this site
+4. Create a database based on the file: `sql/pid.sql`
+5. Have a look at the `./app/config/prod.php` file and change the database etc setting according to your setup
+6. Create a virtual host or point your browser to the location you set up for this site
+7. Composers post install script should have created the following dirs and made them accessible
+    ``
 
 
 ## TODO explain what the app does
