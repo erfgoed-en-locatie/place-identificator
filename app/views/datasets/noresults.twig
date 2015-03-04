@@ -56,8 +56,9 @@
             	<tr id="row_{{ rec.id }}">
             		<td>{{ rec.original_name }}</td>
             		<td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
-            		<td><button class="btn btn-primary" onclick="setUri({{ rec.id }})">sla op</button></td>
-					<td><a class="btn btn-danger unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te mappen</a></td>
+            		<td><button class="btn btn-primary" onclick="setUri({{ rec.id }})">sla op</button>
+						<a class="btn btn-danger unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te mappen</a>
+					</td>
             	</tr>
             	{% endfor %}
             </table>
