@@ -59,11 +59,10 @@ class DatasetService {
           SELECT COUNT(*) AS aantal
           FROM records
           WHERE dataset_id = :id
-          AND status = :status
+          AND status IN (' . implode(",",$status) . ')
           ';
         $params = array(
-            'id' => (int) $id,
-            'status' => $status
+            'id' => (int) $id
         );
         $stmt = $this->db->executeQuery($sql, $params);
         return $stmt->fetchColumn(0);
@@ -79,10 +78,9 @@ class DatasetService {
 
     public function fetchRecsWithStatus($id,$status)
     {
-        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status = :status';
+        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status IN (' . implode(",",$status) . ')';
         $params = array(
-            'id' => (int)$id,
-            'status' => $status);
+            'id' => (int)$id);
         $stmt = $this->db->executeQuery($sql, $params);
         
         return $stmt->fetchAll();

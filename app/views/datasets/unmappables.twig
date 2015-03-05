@@ -1,29 +1,53 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
+
+    <script type="text/javascript">
+
+        function setUri(recid){
+            uri = jQuery('#uri-with-' + recid).val();
+            data = {"uri": uri };
+            askAPI('GET', '/api/record/map/'+recid, data, deleteRow);
+        }
+
+
+        function deleteRow(json) {
+            var tr = '#row_'+json.id;
+            $(tr).remove();
+
+            var one = jQuery('#nr-one').html();
+            one = Number(one) + 1;
+            var unmappables = jQuery('#nr-unmappables').html();
+            unmappables = Number(unmappables) - 1;
+            console.log(one);
+            setNumbers(one,null,null,unmappables);
+        }
+
+    </script>
+
     <div class="row">
         <div class="col-md-12">
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a class="current" href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar({{ dataset.countUnmappables }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd (<span id="nr-one">{{ dataset.countStandardized }}</span>)</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a class="current" href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar(<span id="nr-unmappables">{{ dataset.countUnmappables }}</span>)</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
             </div>
             
             <p></p>
 
             <table class="table">
-            	<tr>
-            		<th>plaatsnaam</th>
-            		<th>aantal hits</th>
-            		<th>bewerk</th>
-            	</tr>
-            	{% for rec in unmappables %}
-            	<tr>
-            		<td>{{ rec.original_name }}</td>
-            		<td>{{ rec.hits }}</td>
-            		<td><a class="btn btn-primary" href="/datasets/{{ dataset.id }}/multiples/{{ rec.id }}">bewerk</a></td>
-            	</tr>
-            	{% endfor %}
+                <tr>
+                    <th>plaatsnaam</th>
+                    <th>toch nog de juiste URI gevonden?</th>
+                    <th></th>
+                </tr>
+                {% for rec in unmappables %}
+                <tr id="row_{{ rec.id }}">
+                    <td>{{ rec.original_name }}</td>
+                    <td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
+                    <td><button class="btn btn-primary" onclick="setUri({{ rec.id }})">sla op</button></td>
+                </tr>
+                {% endfor %}
             </table>
 
         </div>

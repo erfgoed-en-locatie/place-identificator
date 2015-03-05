@@ -111,8 +111,8 @@
 
 <script>
 
-    function setNumbers(one,more,none){
-
+    function setNumbers(one,more,none,unmappable){
+        console.log(one);
         if(one!=null){
             jQuery('#nr-one').html(one);
         }
@@ -121,6 +121,9 @@
         }
         if(none!=null){
             jQuery('#nr-none').html(none);
+        }
+        if(unmappable!=null){
+            jQuery('#nr-unmappables').html(unmappable);
         }
 
     }
