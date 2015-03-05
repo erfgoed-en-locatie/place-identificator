@@ -58,19 +58,6 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                {#
-                <li><a href="/">Dashboard</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Examples <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="/dummy">Dummy page</a></li>
-                        <li><a href="/dummy/2">Dummy with parameter</a></li>
-                        <li class="divider"></li>
-                        <li class="dropdown-header">Error</li>
-                        <li><a href="/dummy/w">Dummy with invalid param</a></li>
-                    </ul>
-                </li>
-                #}
                 <li><a href="{{ path('dataset-upload-form') }}">Upload dataset</a></li>
                 <li><a href="{{ path('datasets-all') }}" title="Lijstje met datasets">Mijn datasets</a></li>
                 <li><a href="/colofon">Colofon</a></li>
@@ -84,18 +71,18 @@
                 {% endif %}
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        Hello, {{ app.user.displayName }}!
+                        Hallo, {{ app.user.displayName }}!
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="{{ path('user') }}"><span class="glyphicon glyphicon-user"></span> View your profile</a></li>
-                        <li><a href="{{ path('user.edit', { id: app.user.id }) }}"><span class="glyphicon glyphicon-edit"></span> Edit your profile</a></li>
-                        <li><a href="{{ path('user.logout') }}"><span class="glyphicon glyphicon-off"></span> Sign out</a></li>
+                        <li><a href="{{ path('user') }}"><span class="glyphicon glyphicon-user"></span> Profiel bekijken</a></li>
+                        <li><a href="{{ path('user.edit', { id: app.user.id }) }}"><span class="glyphicon glyphicon-edit"></span> Profiel bewerken</a></li>
+                        <li><a href="{{ path('user.logout') }}"><span class="glyphicon glyphicon-off"></span> Afmelden</a></li>
                     </ul>
                 </li>
             {% else %}
-                <li><a href="{{ path('user.login') }}">Sign in</a></li>
-                <li><a href="{{ path('user.register') }}">Create account</a></li>
+                <li><a href="{{ path('user.login') }}">Aanmelden</a></li>
+                <li><a href="{{ path('user.register') }}">Account maken</a></li>
             {% endif %}
             </ul>
         </div>

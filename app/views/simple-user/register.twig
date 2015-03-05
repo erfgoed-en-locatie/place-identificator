@@ -1,20 +1,20 @@
 {% extends layout_template  %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Registreren{% endblock %}
 
 {% block content %}
 
     {% if app.user %}
-        <p>Hello, {{ app.user.displayName }}. You are already registered and signed in.</p>
-        <p><a href="{{ path('user.logout') }}">Sign out</a></p>
+        <p>Hallo, {{ app.user.displayName }}. Je bent al geregistreerd en aangemeld.</p>
+        <p><a href="{{ path('user.logout') }}">Afmelden</a></p>
 
     {% else %}
         <h1>
-            Create an account
+            Maak een account
         </h1>
 
         <p class="text-muted lead">
-            Already have an account? <a href="{{ path('user.login') }}">Sign in now.</a>
+            Heb je al een account? <a href="{{ path('user.login') }}">Meld je nu aan.</a>
         </p>
 
         {% if error %}
@@ -24,10 +24,10 @@
         <form class="form-horizontal" method="POST">
 
             <div class="form-group">
-                <label class="col-sm-2 control-label" for="input-name">Name</label>
+                <label class="col-sm-2 control-label" for="input-name">Naam</label>
                 <div class="col-sm-8">
-                    <input class="form-control" name="name" type="text" id="input-name" placeholder="Name" value="{{ name }}">
-                    <span class="help-inline">Shown publicly</span>
+                    <input class="form-control" name="name" type="text" id="input-name" placeholder="Naam" value="{{ name }}">
+                    <span class="help-inline">Publiek zichtbaar</span>
                 </div>
             </div>
 
@@ -35,36 +35,36 @@
                 <label class="col-sm-2 control-label" for="input-email">Email</label>
                 <div class="col-sm-8">
                     <input class="form-control" name="email" type="email" id="input-email" placeholder="Email" required value="{{ email }}">
-                    <span class="help-inline">Never shared</span>
+                    <span class="help-inline">Wordt nooit gedeeld</span>
                 </div>
             </div>
 
             {% if isUsernameRequired %}
                 <div class="form-group">
-                    <label class="col-sm-2 control-label" for="input-username">Username</label>
+                    <label class="col-sm-2 control-label" for="input-username">Gebruikersnaam</label>
                     <div class="col-sm-8">
-                        <input class="form-control" name="username" type="text" id="input-username" placeholder="Username" required value="{{ username }}">
+                        <input class="form-control" name="username" type="text" id="input-username" placeholder="Gebruikersnaam" required value="{{ username }}">
                     </div>
                 </div>
             {% endif %}
 
             <div class="form-group">
-                <label class="col-sm-2 control-label" for="input-password">Password</label>
+                <label class="col-sm-2 control-label" for="input-password">Wachtwoord</label>
                 <div class="col-sm-8">
-                    <input class="form-control" name="password" type="password" id="input-password" required placeholder="Password">
+                    <input class="form-control" name="password" type="password" id="input-password" required placeholder="Wachtwoord">
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-sm-2 control-label" for="input-confirm-password">Re-type password</label>
+                <label class="col-sm-2 control-label" for="input-confirm-password">Type wachtwoord nogmaals</label>
                 <div class="col-sm-8">
-                    <input class="form-control" name="confirm_password" type="password" id="input-confirm-password" required placeholder="Confirm password">
+                    <input class="form-control" name="confirm_password" type="password" id="input-confirm-password" required placeholder="Bevestig wachtwoord">
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="col-sm-8 col-sm-offset-2">
-                    <button type="submit" class="btn btn-primary">Register</button>
+                    <button type="submit" class="btn btn-primary">Registreren</button>
                 </div>
             </div>
         </form>

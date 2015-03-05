@@ -1,22 +1,22 @@
 {% extends layout_template  %}
 
-{% block title %}Email confirmation needed{% endblock %}
+{% block title %}Email bevestiging nodig{% endblock %}
 
 {% block content %}
 
-    <h1>Your account is not yet active</h1>
+    <h1>Je account is nog niet actief!</h1>
 
-    <p>An email should have been sent to you at <strong>{{ email }}</strong> when you registered.</p>
+    <p>Er zou een email gestuurd moeten zijn naar <strong>{{ email }}</strong> tijdens het registratieproces.</p>
 
-    <p>Please click the link in that message to confirm your email address and activate your account.</p>
+    <p>Klik op de link in die email om je emailadres te bevestigen.</p>
 
     <div style="margin: 20px 0px;">
         <form method="POST" action="{{ resendUrl }}">
             <input type="hidden" name="email" value="{{ email }}">
-            <button type="submit" class="btn btn-default">Resend the message</button>
+            <button type="submit" class="btn btn-default">Nogmaals sturen</button>
         </form>
     </div>
 
-    <p>Make sure to check your junk or spam folder. The sender is <strong>{{ fromAddress }}</strong>.</p>
+    <p>Kijk eventueel ook in je spamfolder. De afzender is <strong>{{ fromAddress }}</strong>.</p>
 
 {% endblock %}

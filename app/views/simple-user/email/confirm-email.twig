@@ -7,15 +7,15 @@ Variables passed to this template:
 
 {# The subject line. #}
 {%- block subject -%}{%- autoescape false -%}
-    Welcome! Please confirm your email.
+    Welkom! Bevestig alsjeblieft dit email-adres.
 {%- endautoescape -%}{%- endblock -%}
 
 {# The plain text message. #}
 {%- block body_text -%}{%- autoescape false -%}
 
-Thanks for joining our site!
+Dank voor je aanmeldeing!
 
-Please click the link below to confirm your email:
+Klik alsjeblieft op onderstaande link om je email-adres te bevestigen:
 {{ confirmationUrl }}
 
 {%- endautoescape -%}{%- endblock -%}
@@ -23,10 +23,10 @@ Please click the link below to confirm your email:
 {# The HTML message. Optional. #}
 {%- block body_html -%}
 
-    <h1>Thanks for joining our site!</h1>
+    <h1>Dank voor je aanmeldeing!</h1>
 
     <p>
-        Please <a href="{{ confirmationUrl }}">click here to confirm your email</a>.
+        <a href="{{ confirmationUrl }}">Klik op deze link om je email-adres te bevestigen</a>.
     </p>
 
 {%- endblock -%}
