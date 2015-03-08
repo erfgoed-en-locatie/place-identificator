@@ -105,9 +105,10 @@ class DataSetControllerProvider implements ControllerProviderInterface
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }
-        $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT);
-        $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_MULTIPLE);
-        $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, Status::MAPPED_EXACT_NOT_FOUND);
+        $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::MAPPED_EXACT, Status::MAPPED_MANUALLY));
+        $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::MAPPED_EXACT_MULTIPLE));
+        $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::MAPPED_EXACT_NOT_FOUND));
+        $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::UNMAPPABLE));
 
         return $app['twig']->render('datasets/details.html.twig', array('dataset' => $dataset));
     }
