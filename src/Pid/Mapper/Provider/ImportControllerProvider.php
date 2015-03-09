@@ -220,6 +220,15 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 'data'      => (bool) $mapping['fuzzy_search'],
                 'attr' => array('disabled' => 'disabled')
             ))
+            ->add('map', 'submit', array(
+                'label' => 'test 20 records',
+                'attr'  => array('class' => 'btn btn-primary'),
+            ))
+            ->add('mapall', 'submit', array(
+                'label' => 'standaardiseer alle records',
+                'attr'  => array('class' => 'btn btn-primary'),
+            ))
+
             /*
             ->add('lat', 'choice', array(
                 'label'         => 'Lattitude / breedtegraad',
@@ -287,7 +296,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
                     $app['session']->getFlashBag()->set('alert', 'De mapping is bewaard.');
 
                     // and go straight to mapping all, if clicked
-                    if ($form->get('map-all')->isClicked()) {
+                    if ($form->get('mapall')->isClicked()) {
                         return $app->redirect($app['url_generator']->generate('standardize', array('id' => $id)));
                     } else {
                         return $app->redirect($app['url_generator']->generate('standardize-test', array('id' => $id)));

@@ -42,14 +42,14 @@
 
 			<div class="row form-actions">
 				<div class="col-md-6">
-					<input class="btn btn-primary" type="submit" value="test 20 records" />
+					{{ form_widget(form.map) }}
 					<p>Deze optie standaardiseert de eerste 20 records. Dit is handig om te kijken of alles goed gaat alvorens het hele bestand te verwerken.</p>
 
 					<p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
 				</div>
 
 				<div class="col-md-6">
-					<input class="btn btn-primary" type="submit" value="standaardiseer alle records" />
+					{{ form_widget(form.mapall) }}
 					<p>Deze optie standaardiseert alle records. Dit proces kan enige tijd duren.</p>
 
 					<p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>

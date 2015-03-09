@@ -68,7 +68,6 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         $geocoder = $app['geocoder_service'];
         try {
             $mappedRows = $geocoder->map($rows, $placeColumn);
-            // fixme Now temporarily storing the records
             $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
         } catch (\Exception $e) {
             $app->abort(404, 'The histograph API returned an error. It might be down.');
@@ -113,6 +112,8 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         try {
             $mappedRows = $geocoder->map($rows, $placeColumn);
             $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
+
+            $app['session']->getFlashBag()->set('notice', 'De standaardisatie is gedaan!');
         } catch (\Exception $e) {
             $app->abort(404, 'The histograph API returned an error. It might be down.');
         }
