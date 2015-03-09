@@ -100,11 +100,20 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         }
         $csv = \League\Csv\Reader::createFromPath($file);
 
-        $rows = $csv->setOffset(0)->fetchAll();
+        $rows =
+            $csv->setOffset(0)
+                // skipping empty rows
+                ->addFilter(function($row) {
+                    if (!empty($row[0])) {
+                        return $row;
+                    }
+                })
+                ->fetchAll();
         if ($dataset['skip_first_row']) {
             array_shift($rows);
         }
 
+        // todo offload to the cli
         $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
 
         /** @var GeocoderService $geocoder */

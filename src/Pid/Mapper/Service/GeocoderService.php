@@ -55,9 +55,12 @@ class GeocoderService {
             throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
         }
 
+        if (empty($rows)) {
+            throw new RuntimeException('No rows to process.');
+        }
+
         foreach($rows as &$row) {
             $name = $row[$key];
-
             $response = $this->client->get($this->searchExact($name));
             if ($response->getStatusCode() === 200) {
                 $row['response'] = $this->handleResponse($response->json(array('object' => true)));
