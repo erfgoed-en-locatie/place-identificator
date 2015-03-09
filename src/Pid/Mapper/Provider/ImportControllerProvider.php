@@ -152,7 +152,15 @@ class ImportControllerProvider implements ControllerProviderInterface {
      * @param $fieldChoices
      * @return mixed
      */
-    private function getFieldMapForm(Application $app, $fieldChoices, $mapping = null) {
+    private function getFieldMapForm(Application $app, $fieldChoices, $mapping = false) {
+
+        if (!$mapping) {
+            $mapping = array(
+                'plaatsen' => true,
+                'gemeenten' => true,
+                'fuzzy_search' => false,
+            );
+        }
 
         /** @var FormFactory $form */
         $form = $app['form.factory']
@@ -277,8 +285,13 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 $data['dataset_id'] = $id;
                 if ($app['dataset_service']->storeFieldMapping($data)) { // ok
                     $app['session']->getFlashBag()->set('alert', 'De mapping is bewaard.');
-                    //return $app->redirect($app['url_generator']->generate('dataset-showmapping', array('id' => $id)));
-                    return $app->redirect($app['url_generator']->generate('standardize-test', array('id' => $id)));
+
+                    // and go straight to mapping all, if clicked
+                    if ($form->get('map-all')->isClicked()) {
+                        return $app->redirect($app['url_generator']->generate('standardize', array('id' => $id)));
+                    } else {
+                        return $app->redirect($app['url_generator']->generate('standardize-test', array('id' => $id)));
+                    }
                 } else {
                     $app['session']->getFlashBag()->set('error', 'Sorry maar de velden konden niet bewaard worden.');
                     return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
