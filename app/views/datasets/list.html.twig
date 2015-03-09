@@ -13,12 +13,12 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Name</th>
-                        <th>Filename</th>
-                        <th>User</th>
-                        <th>Created</th>
+                        <th>Naam</th>
+                        <th>Bestandsnaam</th>
+                        <th>Gebruiker</th>
+                        <th>Aangemaakt</th>
                         <th>Status</th>
-                        <th>Options</th>
+                        <th>Opties</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -26,7 +26,7 @@
                         <tr>
                             <td>{{ set.id }}</td>
                             <td>{{ set.name }}</td>
-                            <td>{{ set.filename }}</td>
+                            <td>{{ set.original_name }}</td>
                             <td>{{ set.email }}</td>
                             <td>{{ set.created_on|date('d-m-Y') }}</td>
                             <td>
@@ -38,9 +38,9 @@
                                 <span class="label {{ statClass }}">{{ set.status }}</span>
                             </td>
                             <td>
-                                <a href="/datasets/{{ set.id }}" class="btn btn-xs btn-success" title="View"><i class="fa fa-search-plus"></i> </a>
-                                {#<a href="/datasets/{{ set.id }}/edit" title="Edit" class="btn btn-xs btn-warning"><i class="fa fa-pencil"></i> </a>#}
-                                <a href="/datasets/{{ set.id }}/delete" title="Delete" class="btn btn-xs btn-danger delete"><i class="fa fa-trash"></i> </a>
+                                <a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="View"><i class="fa fa-search-plus"></i> </a>
+                                <a href="{{ path('import-mapcsv', {'id': set.id }) }}" title="Bekijk of bewerk mapping" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i> </a>
+                                <a href="{{ path('dataset-delete', {'id': set.id }) }}" title="Delete" class="btn btn-xs btn-danger delete"><i class="fa fa-trash"></i> </a>
                             </td>
                         </tr>
 

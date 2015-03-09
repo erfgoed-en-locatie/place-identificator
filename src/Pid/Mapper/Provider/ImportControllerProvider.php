@@ -110,19 +110,20 @@ class ImportControllerProvider implements ControllerProviderInterface {
         if ($form->isValid()) {
             $files = $request->files->get($form->getName());
 
-            $filename = $files['csvFile']->getClientOriginalName();
+            $filename = time(). '.csv';
+            $originalName = $files['csvFile']->getClientOriginalName();
             $files['csvFile']->move($app['upload_dir'], $filename);
 
             $data = $form->getData();
             $date = new \DateTime('now');
 
-            // todo hernoem het bestand?
             /** @var \Doctrine\DBAL\Connection $db */
             $db = $app['db'];
             $db->insert('datasets', array(
                 'name'      => $data['name'],
-                'skip_first_row' => $data['skip_first_row'],
-                'filename'  => $filename,
+                'skip_first_row'    => $data['skip_first_row'],
+                'filename'          => $filename,
+                'original_name'     => $originalName,
                 'created_on' => $date->format('Y-m-d H:i:s'),
                 'status'    => Dataset::STATUS_NEW,
                 'user_id'   => (int) $app['user']->getId()
