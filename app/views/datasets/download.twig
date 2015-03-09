@@ -13,36 +13,38 @@
 
             
             <div class="row">
+            	<form action="/datasets/{{ dataset.id }}/download" method="post">
 		        <div class="col-md-6">
 
 		        	<p>Welke velden, indien beschikbaar, moeten worden opgenomen in het bestand?</p>
 		            
-		            <form>
+		            
 
-		            	<input type="checkbox" value="tgn-uri" checked="checked" /> TGN URI <br />
-		            	<input type="checkbox" value="tgn-coords" checked="checked" /> TGN coördinaten <br />
-		            	<input type="checkbox" value="tgn-label" checked="checked" /> TGN label <br />
+		            	<input type="checkbox" value="1" name="tgn-uri" checked="checked" /> TGN URI <br />
+		            	<input type="checkbox" value="1" name="tgn-geometry" checked="checked" /> TGN geometrie <br />
+		            	<input type="checkbox" value="1" name="tgn-label" checked="checked" /> TGN label <br />
 		            	<br />
-						<input type="checkbox" value="geonames-uri" checked="checked" /> geonames URI <br />
-		            	<input type="checkbox" value="geonames-coords" checked="checked" /> geonames coördinaten <br />
-		            	<input type="checkbox" value="geonames-label" checked="checked" /> geonames label <br />
+						<input type="checkbox" value="1" name="geonames-uri" checked="checked" /> geonames URI <br />
+		            	<input type="checkbox" value="1" name="geonames-geometry" checked="checked" /> geonames geometrie <br />
+		            	<input type="checkbox" value="1" name="geonames-label" checked="checked" /> geonames label <br />
 		            	<br />
-		            	<input type="checkbox" value="gemeentegeschiedenis-uri" checked="checked" /> gemeentegeschiedenis URI <br />
-		            	<input type="checkbox" value="gemeentegeschiedenis-coords" checked="checked" /> gemeentegeschiedenis coördinaten <br />
-		            	<input type="checkbox" value="gemeentegeschiedenis-label" checked="checked" /> gemeentegeschiedenis label <br />
+		            	<input type="checkbox" value="1" name="gg-uri" checked="checked" /> gemeentegeschiedenis URI <br />
+		            	<input type="checkbox" value="1" name="gg-geometry" checked="checked" /> gemeentegeschiedenis geometrie <br />
+		            	<input type="checkbox" value="1" name="gg-label" checked="checked" /> gemeentegeschiedenis label <br />
 
 
 
 
-		            </form>
+		            
 		            
 
 		        </div>
 		        <div class="col-md-6">
 		            
-		        	<a href="" class="btn btn-primary downloadbutton">Download csv-bestand</a>
-
+		        	<input type="submit" class="btn btn-primary downloadbutton" value="Download csv-bestand" />
+					
 		        </div>
+		    	</form>
 		    </div>
 
         </div>

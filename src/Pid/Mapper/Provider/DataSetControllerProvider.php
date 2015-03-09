@@ -13,6 +13,9 @@ use SimpleUser\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use League\Csv\Writer;
+use SplTempFileObject;
+
 /**
  * Class DataSetControllerProvider
  * List datasets (for a certain user)
@@ -38,6 +41,8 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $controllers->get('/{id}/noresults', array(new self(), 'showNoResults'))->bind('dataset-noresults')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/unmappables', array(new self(), 'showUnmappables'))->bind('dataset-unmappables')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/download', array(new self(), 'showDownload'))->bind('dataset-downloads')->value('id', null)->assert('id', '\d+');
+        
+        $controllers->post('/{id}/download', array(new self(), 'doDownload'))->bind('dataset-downloadcsv')->value('id', null)->assert('id', '\d+');
         
         return $controllers;
     }
@@ -303,6 +308,86 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::UNMAPPABLE));
 
         return $app['twig']->render('datasets/download.twig', array('dataset' => $dataset));
+    }
+
+
+    /**
+     * Show downloadpage for this dataset
+     *
+     * @param Application $app
+     * @param $id
+     */
+    public function doDownload(Application $app, $id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id);
+        if (!$dataset) {
+            $app->abort(404, "Dataset with id ($id) does not exist.");
+        }
+
+        $csv = Writer::createFromFileObject(new SplTempFileObject());
+        
+        $fieldnames = array('original_name');
+        
+        // TODO: get user's placename identifier (if user told us we should include one)
+
+        foreach ($_POST as $key => $value) {
+            $fieldnames[] = $key;
+        }
+        $csv->insertOne($fieldnames);
+
+        // get records in dataset
+        $records = $app['dataset_service']->fetchRecs($id);
+
+        for($i=0; $i < count($records); $i++) {
+
+            // split up jsonblobs for geonames, tgn and gemeentegeschiedenis
+            if($records[$i]['geonames']!=""){
+                $geonames = json_decode($records[$i]['geonames']);
+                $records[$i]['geonames-uri'] = $geonames->uri;
+                $records[$i]['geonames-label'] = $geonames->name;
+                $records[$i]['geonames-geometry'] = json_encode($geonames->geometry);
+            }else{
+                $records[$i]['geonames-uri'] = "";
+                $records[$i]['geonames-label'] = "";
+                $records[$i]['geonames-geometry'] = "";
+            }
+            if($records[$i]['tgn']!=""){
+                $tgn = json_decode($records[$i]['tgn']);
+                $records[$i]['tgn-uri'] = $tgn->uri;
+                $records[$i]['tgn-label'] = $tgn->name;
+                $records[$i]['tgn-geometry'] = json_encode($tgn->geometry);
+            }else{
+                $records[$i]['tgn-uri'] = "";
+                $records[$i]['tgn-label'] = "";
+                $records[$i]['tgn-geometry'] = "";
+            }
+            if($records[$i]['gg']!=""){
+                $gg = json_decode($records[$i]['gg']);
+                $records[$i]['gg-uri'] = $gg->uri;
+                $records[$i]['gg-label'] = $gg->name;
+                $records[$i]['gg-geometry'] = json_encode($gg->geometry);
+            }else{
+                $records[$i]['gg-uri'] = "";
+                $records[$i]['gg-label'] = "";
+                $records[$i]['gg-geometry'] = "";
+            }
+
+            $wanted = array();
+            foreach ($fieldnames as $field) {
+                $wanted[$field] = $records[$i][$field];
+            }
+            
+            $csv->insertOne($wanted);
+        }
+
+        
+        
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $dataset['name'] . '.csv"');
+        $csv->output();
+
+        return '';
+        
     }
 
 

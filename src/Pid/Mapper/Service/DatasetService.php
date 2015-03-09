@@ -96,6 +96,16 @@ class DatasetService {
         return $stmt->fetchAll();
     }
 
+    public function fetchRecs($setid)
+    {
+        $sql = 'SELECT * FROM records WHERE dataset_id = :id';
+        $params = array(
+            'id' => (int)$setid);
+        $stmt = $this->db->executeQuery($sql, $params);
+        
+        return $stmt->fetchAll();
+    }
+
     /**
      * Clear the results for a record
      *
