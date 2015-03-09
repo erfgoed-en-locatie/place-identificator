@@ -10,6 +10,7 @@ use Silex\ControllerProviderInterface;
 
 use Silex\Provider\FormServiceProvider;
 use SimpleUser\User;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -151,9 +152,11 @@ class ImportControllerProvider implements ControllerProviderInterface {
      * @param $fieldChoices
      * @return mixed
      */
-    private function getFieldMapForm(Application $app, $fieldChoices) {
+    private function getFieldMapForm(Application $app, $fieldChoices, $mapping = null) {
+
+        /** @var FormFactory $form */
         $form = $app['form.factory']
-            ->createBuilder('form')
+            ->createBuilder('form', $mapping)
 
             ->add('placename', 'choice', array(
                 'label'         => 'Welk veld bevat de te standaardiseren plaatsnaam? (verplicht)',
@@ -196,19 +199,17 @@ class ImportControllerProvider implements ControllerProviderInterface {
             ->add('plaatsen', 'checkbox', array(
                 'label'         => 'zoek plaatsen',
                 'required'  => false,
-                'value' => '1',
-                'attr' => array('checked' => 'checked')
+                'data'      => (bool) $mapping['plaatsen'],
             ))
             ->add('gemeenten', 'checkbox', array(
                 'label'         => 'zoek gemeenten',
                 'required'  => false,
-                'value' => '1',
-                'attr' => array('checked' => 'checked')
+                'data'      => (bool) $mapping['gemeenten'],
             ))
             ->add('fuzzy_search', 'checkbox', array(
                 'label'         => 'fuzzy search aan (nog niet beschikbaar)',
                 'required'  => false,
-                'value' => '1',
+                'data'      => (bool) $mapping['fuzzy_search'],
                 'attr' => array('disabled' => 'disabled')
             ))
             /*
@@ -262,7 +263,9 @@ class ImportControllerProvider implements ControllerProviderInterface {
         $csv = \League\Csv\Reader::createFromPath($file);
         $columnNames = $csv->fetchOne();
 
-        $form = $this->getFieldMapForm($app, $columnNames);
+        // see if we already have a mapping..
+        $mapping = $app['dataset_service']->fetchFieldmappingForDataset($id);
+        $form = $this->getFieldMapForm($app, $columnNames, $mapping);
 
         // if the form was posted
         if ($request->getMethod() == 'POST') {

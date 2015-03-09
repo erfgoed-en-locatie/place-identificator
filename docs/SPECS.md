@@ -4,7 +4,8 @@
 TODO
 - [ ] uitzoeken waarom de homepage en adnere uitgezonderde pagina's geen app['user'] heeft?
 - [ ] hrefs aanpassen en nethjes path() gebruiken
-- [ ] plaatsen en gemeenten uit mapping tabel in het Engels doen...
+- [ ] plaatsen en gemeenten uit mapping tabel in het Engels doen.
+- [ ] op noresults pagina na verwijderen met ajax flash message tonen
 
 
 ## SPECIFICATIES

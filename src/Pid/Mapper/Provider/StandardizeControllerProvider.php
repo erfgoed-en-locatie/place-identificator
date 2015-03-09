@@ -30,8 +30,6 @@ class StandardizeControllerProvider implements ControllerProviderInterface {
         $controllers->get('/test/{id}', array(new self(), 'testAction'))->bind('standardize-test')->assert('id', '\d+');
         $controllers->get('/run/{id}', array(new self(), 'standardizeAction'))->bind('standardize')->assert('id', '\d+');
 
-
-
         return $controllers;
     }
 

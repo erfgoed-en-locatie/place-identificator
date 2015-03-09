@@ -1,10 +1,9 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
-	<h1>Instellingen ingeven en standaardiseren dataset "{{ dataset.name }}"</h1>
+	<h1>Instellingen voor dataset "{{ dataset.name }}"</h1>
 	<div class="row">
 		<div class="col-md-6">
-			
 
 			{% form_theme form 'bootstrap_3_layout.html.twig' %}
 
@@ -14,18 +13,17 @@
 
 			{{ form_row(form.identifier) }}
 
-			
-				<p>Eventueel kunt u hieronder nog aangeven of uw bestand contextuele informatie biedt die de zoekresultaten verder kunnen filteren</p>
 
-				<fieldset>
-					<legend>contextuele informatie</legend>
+			<p>Eventueel kunt u hieronder nog aangeven of uw bestand contextuele informatie biedt die de zoekresultaten verder kunnen filteren.</p>
 
-					{{ form_row(form.province) }}
+			<fieldset>
+				<legend>contextuele informatie</legend>
 
-					{{ form_row(form.country) }}
+				{{ form_row(form.province) }}
 
+				{{ form_row(form.country) }}
 
-				</fieldset>
+			</fieldset>
 
 		</div>
 
@@ -44,23 +42,23 @@
 
 			<div class="row form-actions">
 				<div class="col-md-6">
-					<input class="btn btn-primary" type="submit" value="standaardiseer 20 records" />
+					<input class="btn btn-primary" type="submit" value="test 20 records" />
 					<p>Deze optie standaardiseert de eerste 20 records. Dit is handig om te kijken of alles goed gaat alvorens het hele bestand te verwerken.</p>
 
-					<p>Let op: eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
+					<p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
 				</div>
+
 				<div class="col-md-6">
 					<input class="btn btn-primary" type="submit" value="standaardiseer alle records" />
 					<p>Deze optie standaardiseert alle records. Dit proces kan enige tijd duren.</p>
 
-					<p>Let op: eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
+					<p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
 				</div>
 			</div>
 		</div>
 
 		{{ form_end(form) }}
 
-		
 	</div>
 
 {% endblock %}
