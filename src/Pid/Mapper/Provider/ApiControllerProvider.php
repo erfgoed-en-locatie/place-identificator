@@ -28,7 +28,7 @@ class ApiControllerProvider implements ControllerProviderInterface {
         $controllers->get('/record/map/{id}', array(new self(), 'setStandardization'))->bind('api-set-mapping')->assert('id', '\d+');
         $controllers->get('/record/ummappable/{id}', array(new self(), 'setUnmappable'))->bind('api-unmappable')->assert('id', '\d+');
 
-
+        $controllers->post('/record/choose-pit/{id}', array(new self(), 'choosePit'))->bind('api-choose-pit')->assert('id', '\d+');
         return $controllers;
     }
 
@@ -76,9 +76,10 @@ class ApiControllerProvider implements ControllerProviderInterface {
     {
         //$data = $request->getContent();
         $uri = $request->get('uri');
+
         // todo find out how to do this with a proper POST as json data
-        if (!is_string($uri)) {
-            return $app->json(array('error' => 'Invalid uri received'), 400);
+        if (empty($uri) || !is_string($uri)) {
+            return $app->json(array('error' => 'Geen of geen valide uri ontvangen. Er is niets opgeslagen.'), 400);
         }
         try {
             $record = $app['uri_resolver_service']->findOne($uri);
@@ -92,7 +93,39 @@ class ApiControllerProvider implements ControllerProviderInterface {
         } catch (\Exception $e) {
             return $app->json(array('id' => $id), 503);
         }
+    }
 
+    /**
+     * When selecting one PIT of multiple results we need to store the entire klont that get's passed in as json
+     *
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function choosePit(Application $app, Request $request, $id)
+    {
+        $jsonData = json_decode($data = $request->getContent());
+        $data = [];
+
+        if (isset($jsonData->geonames)) {
+            $data['geonames'] = json_encode($jsonData->geonames);
+        }
+        if (isset($jsonData->tgn)) {
+            $data['tgn'] = json_encode($jsonData->tgn);
+        }
+        if (isset($jsonData->bag)) {
+            $data['bag'] = json_encode($jsonData->bag);
+        }
+        if (isset($jsonData->gg)) {
+            $data['gg'] = json_encode($jsonData->gg);
+        }
+
+        if ($app['dataset_service']->storeManualMapping($data, $id)){
+            return $app->json(array('id' => $id));
+        }
+
+        return $app->json(array('id' => $id), 503);
     }
 
     /**

@@ -14,12 +14,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Holds all the controllers for automatically calling the geocoder API
+ * Actions for automatically calling the geocoder API
  *
- * @package Pid\Mapper\Provider
  */
-class StandardizeControllerProvider implements ControllerProviderInterface {
-
+class StandardizeControllerProvider implements ControllerProviderInterface
+{
 
     const NUMBER_TO_TEST    = 20;
 

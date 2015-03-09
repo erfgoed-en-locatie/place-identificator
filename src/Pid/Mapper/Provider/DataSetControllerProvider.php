@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\Response;
  * Class DataSetControllerProvider
  * List datasets (for a certain user)
  *
- * @package Pid\Demo
  */
 class DataSetControllerProvider implements ControllerProviderInterface
 {

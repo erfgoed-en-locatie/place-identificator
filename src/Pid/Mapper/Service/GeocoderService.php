@@ -28,7 +28,9 @@ class GeocoderService {
     /**
      * @var string $baseUri Uri of the service to call
      */
-    private $baseUri = 'http://api.histograph.io';
+    //private $baseUri = 'http://api.histograph.io';
+    //private $baseUri = 'http://10.0.135.53:3000';
+    private $baseUri = 'http://pid.silex/api-dummy.json?';
 
     /**
      * @var array Fields in the API result that hold the data we want to store
