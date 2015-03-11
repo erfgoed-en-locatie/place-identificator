@@ -63,10 +63,12 @@ class StandardizeControllerProvider implements ControllerProviderInterface
 
         $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
 
+
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
         try {
             $mappedRows = $geocoder->map($rows, $placeColumn);
+            //var_dump($mappedRows); die;
             $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
         } catch (\Exception $e) {
             $app->abort(404, 'The histograph API returned an error. It might be down.');

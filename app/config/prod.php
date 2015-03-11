@@ -116,7 +116,6 @@ $app['swiftmailer.options'] = array(
     'auth_mode' => null
 );
 
-
 $app['cache.path'] = __DIR__ . '/../storage/cache';
 // CACHES
 // Http cache

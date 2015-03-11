@@ -5,25 +5,19 @@
  */
 
 // CUSTOM services
+use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 
 $app['dataset_service'] = $app->share(function ($app) {
     return new \Pid\Mapper\Service\DatasetService($app['db']);
 });
 $app['geocoder_service'] = $app->share(function ($app) {
-    return new \Pid\Mapper\Service\GeocoderService();
+    return new \Pid\Mapper\Service\GeocoderService($app);
 });
 $app['uri_resolver_service'] = $app->share(function ($app) {
     return new \Pid\Mapper\Service\UriResolverService();
 });
 
-
-/*$app->before(function (Request $request) {
-    if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
-        $data = json_decode($request->getContent(), true);
-        $request->request->replace(is_array($data) ? $data : array());
-    }
-});*/
 
 // TWIG
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
@@ -63,8 +57,9 @@ $app->register(new Silex\Provider\HttpCacheServiceProvider());
 // MONOLOG
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.logfile' => __DIR__ . '/../app/storage/log/dev.log',
-    'monolog.name'    => 'app',
-    'monolog.level'   => 300 // = Logger::WARNING
+    'monolog.name'    => 'pid-app',
+    'monolog.leve;'   => Logger::DEBUG
+    //'monolog.level'   => 300 // = Logger::WARNING
 ));
 
 return $app;
