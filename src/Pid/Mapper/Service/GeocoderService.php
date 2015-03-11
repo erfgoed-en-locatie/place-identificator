@@ -12,6 +12,8 @@ use Symfony\Component\PropertyAccess\Exception\RuntimeException;
  */
 class GeocoderService {
 
+    const API_TIMEOUT           = 5;
+    const API_CONNECT_TIMEOUT   = 5;
     const SEARCH_MUNICIPALITIES = 99;
     const SEARCH_PLACES         = 98;
     const SEARCH_BOTH           = 97;
@@ -28,9 +30,10 @@ class GeocoderService {
     /**
      * @var string $baseUri Uri of the service to call
      */
-    //private $baseUri = 'http://api.histograph.io';
+    private $baseUri = 'http://api.histograph.io';
     //private $baseUri = 'http://10.0.135.53:3000';
-    private $baseUri = 'http://pid.silex/api-dummy.json?';
+
+    protected $app;
 
     /**
      * @var array Fields in the API result that hold the data we want to store
@@ -39,9 +42,21 @@ class GeocoderService {
         'geonames', 'tgn', 'bag', 'gemeentegeschiedenis'
     );
 
-    public function __construct()
+    public function __construct($app)
     {
+        $this->app = $app;
         $this->client = new \GuzzleHttp\Client();
+    }
+
+    /**
+     * Escape characters before they're send to the API
+     * @param $name
+     * @return string
+     */
+    protected function filterBadCharacters($name)
+    {
+        $bad = ':/?#[]@!$&()*+,;='; // @fixme escape some
+        return str_ireplace(str_split($bad), '', $name);
     }
 
     /**
@@ -63,10 +78,22 @@ class GeocoderService {
 
         foreach($rows as &$row) {
             $name = $row[$key];
-            $response = $this->client->get($this->searchExact($name));
-            if ($response->getStatusCode() === 200) {
-                $row['response'] = $this->handleResponse($response->json(array('object' => true)));
+
+            try {
+                $response = $this->client->get(
+                    $this->searchExact($name),
+                    array(
+                        'timeout' => self::API_TIMEOUT, // Response timeout
+                        'connect_timeout' => self::API_CONNECT_TIMEOUT, // Connection timeout
+                    ));
+                if ($response->getStatusCode() === 200) {
+                    $row['response'] = $this->handleResponse($response->json(array('object' => true)));
+                }
+            } catch (\GuzzleHttp\Exception\RequestException $e) {
+                $this->app['monolog']->addError('Histograph API did not return a response within ' . self::API_TIMEOUT . ' seconds');
+                continue;
             }
+
         }
 
         return $rows;
@@ -80,7 +107,12 @@ class GeocoderService {
      */
     public function mapOne($name)
     {
-        $response = $this->client->get($this->searchExact($name));
+        $response = $this->client->get(
+            $this->searchExact($name),
+            array(
+                'timeout' => self::API_TIMEOUT, // Response timeout
+                'connect_timeout' => self::API_CONNECT_TIMEOUT, // Connection timeout
+            ));
         if ($response->getStatusCode() === 200) {
             return $this->handleMapOneResponse($response->json(array('object' => true)));
         }
@@ -118,8 +150,12 @@ class GeocoderService {
      * @return string
      */
     private function searchExact($name) {
-        return $this->baseUri . '/search?name=' . $name;
+        $uri = $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"';
+        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
+        return $uri;
     }
+
+    // todo create wild card searches and non literal string searches
 
     /**
      * Loops through the clumps and tries to find PITs
@@ -132,6 +168,10 @@ class GeocoderService {
         if (!property_exists($json, 'features')) {
             return array('hits' => 0);
         } else {
+            if (empty($json->features)){
+                return array('hits' => 0);
+            }
+
             $output = array();
             if ($this->searchOn == self::SEARCH_PLACES) {
                 $output['hits'] = 0;
