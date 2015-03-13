@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * Command line script for doing the time consuming part of the standardization
+ * Calls the Histograph API for entire files
+ *
+ */
+
+$loader = require __DIR__ . '/../vendor/autoload.php';
+
+$app = new Silex\Application();
+
+require_once __DIR__ . '/../app/config/dev.php';
+require_once __DIR__ . '/../app/bootstrap.php';
+
+
+$application = $app['console'];
+$application->add(new \Pid\Mapper\Command\StandardizeCommand());
+$application->run();

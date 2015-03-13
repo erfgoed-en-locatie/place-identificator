@@ -93,42 +93,11 @@ class StandardizeControllerProvider implements ControllerProviderInterface
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
 
-        // attempt to make sense of the csv file
-        $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
-        if (!file_exists($file)) {
-            $app['session']->getFlashBag()->set('error', 'Sorry maar het csv-bestand bestaat niet meer.');
-            return $app->redirect($app['url_generator']->generate('datasets-all'));
-        }
-        $csv = \League\Csv\Reader::createFromPath($file);
+        exec('php ../bin/pid standardize ' .  $id . ' > /dev/null &');
+        $app['session']->getFlashBag()->set('alert', 'De standaardisatie is begonnen! U krijgt een mail als het proces klaar is.');
 
-        $rows =
-            $csv->setOffset(0)
-                // skipping empty rows
-                ->addFilter(function($row) {
-                    if (!empty($row[0])) {
-                        return $row;
-                    }
-                })
-                ->fetchAll();
-        if ($dataset['skip_first_row']) {
-            array_shift($rows);
-        }
-
-        // todo offload to the cli
-        $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
-
-        /** @var GeocoderService $geocoder */
-        $geocoder = $app['geocoder_service'];
-        try {
-            $mappedRows = $geocoder->map($rows, $placeColumn);
-            $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
-
-            $app['session']->getFlashBag()->set('notice', 'De standaardisatie is gedaan!');
-        } catch (\Exception $e) {
-            $app->abort(404, 'The histograph API returned an error. It might be down.');
-        }
-
-        return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
+        //return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
+        return $app->redirect($app['url_generator']->generate('datasets-all'));
     }
 
 }
