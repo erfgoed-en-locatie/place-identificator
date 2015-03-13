@@ -94,8 +94,13 @@
             });
 
             function forwardUser(json) {
+                var one = Number(jQuery('#nr-one').html()) +1;
+                var more = Number(jQuery('#nr-more').html()) -1;
+                setNumbers(one,null,null,more);
+
                 alertMessage('De plaats is gestandaardiseerd.');
             }
+
 
         });
     </script>

@@ -6,46 +6,40 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar({{ dataset.countUnmappables }})</a><a class="current" href="/datasets/{{ dataset.id }}/download">Download</a> 
+                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar({{ dataset.countUnmappables }})</a><a class="current" href="/datasets/{{ dataset.id }}/download">Download</a>
             </div>
 
             <h1>Download dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</h1>
 
-            
+
             <div class="row">
-            	<form action="/datasets/{{ dataset.id }}/download" method="post">
-		        <div class="col-md-6">
+                <form action="/datasets/{{ dataset.id }}/download" method="post">
+                    <div class="col-md-6">
 
-		        	<p>Welke velden, indien beschikbaar, moeten worden opgenomen in het bestand?</p>
-		            
-		            
-
-		            	<input type="checkbox" value="1" name="tgn-uri" checked="checked" /> TGN URI <br />
-		            	<input type="checkbox" value="1" name="tgn-geometry" checked="checked" /> TGN geometrie <br />
-		            	<input type="checkbox" value="1" name="tgn-label" checked="checked" /> TGN label <br />
-		            	<br />
-						<input type="checkbox" value="1" name="geonames-uri" checked="checked" /> geonames URI <br />
-		            	<input type="checkbox" value="1" name="geonames-geometry" checked="checked" /> geonames geometrie <br />
-		            	<input type="checkbox" value="1" name="geonames-label" checked="checked" /> geonames label <br />
-		            	<br />
-		            	<input type="checkbox" value="1" name="gg-uri" checked="checked" /> gemeentegeschiedenis URI <br />
-		            	<input type="checkbox" value="1" name="gg-geometry" checked="checked" /> gemeentegeschiedenis geometrie <br />
-		            	<input type="checkbox" value="1" name="gg-label" checked="checked" /> gemeentegeschiedenis label <br />
+                        <p>Welke velden, indien beschikbaar, moeten worden opgenomen in het bestand?</p>
 
 
+                        <label><input type="checkbox" value="1" name="tgn-uri" checked="checked" /> TGN URI</label><br />
+                        <label><input type="checkbox" value="1" name="tgn-geometry" checked="checked" /> TGN geometrie</label> <br />
+                        <label><input type="checkbox" value="1" name="tgn-label" checked="checked" /> TGN label</label> <br />
+                        <br />
+                        <label><input type="checkbox" value="1" name="geonames-uri" checked="checked" /> geonames URI</label><br />
+                        <label><input type="checkbox" value="1" name="geonames-geometry" checked="checked" /> geonames geometrie</label><br />
+                        <label><input type="checkbox" value="1" name="geonames-label" checked="checked" /> geonames label</label><br />
+                        <br />
+                        <label><input type="checkbox" value="1" name="gg-uri" checked="checked" /> gemeentegeschiedenis URI</label><br />
+                        <label><input type="checkbox" value="1" name="gg-geometry" checked="checked" /> gemeentegeschiedenis geometrie </label><br />
+                        <label><input type="checkbox" value="1" name="gg-label" checked="checked" /> gemeentegeschiedenis label </label><br />
 
 
-		            
-		            
+                    </div>
+                    <div class="col-md-6">
 
-		        </div>
-		        <div class="col-md-6">
-		            
-		        	<input type="submit" class="btn btn-primary downloadbutton" value="Download csv-bestand" />
-					
-		        </div>
-		    	</form>
-		    </div>
+                        <input type="submit" class="btn btn-primary downloadbutton" value="Download csv-bestand" />
+
+                    </div>
+                </form>
+            </div>
 
         </div>
     </div>
