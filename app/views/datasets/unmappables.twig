@@ -35,6 +35,7 @@
             
             <p></p>
 
+            {% if unmappables is not empty %}
             <table class="table">
                 <tr>
                     <th>plaatsnaam</th>
@@ -49,6 +50,7 @@
                 </tr>
                 {% endfor %}
             </table>
+            {% endif %}
 
         </div>
     </div>
