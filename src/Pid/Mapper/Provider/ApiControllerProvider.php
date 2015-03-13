@@ -81,6 +81,20 @@ class ApiControllerProvider implements ControllerProviderInterface {
         if (empty($uri) || !is_string($uri)) {
             return $app->json(array('error' => 'Geen of geen valide uri ontvangen. Er is niets opgeslagen.'), 400);
         }
+
+        // only gg, geonames and tgn uri's!
+        if(!preg_match("/http:\/\/www.gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
+            !preg_match("/http:\/\/www.geonames.org/", $uri) &&
+            !preg_match("/http:\/\/vocab.getty.edu\/tgn/", $uri)) {
+            return $app->json(array('error' => 'Geen GG, TGN of GeoNames Uri. Er is niets opgeslagen.'), 400);
+        }
+
+        // if geonames, we do'nt want the last part they keep communicating!
+        if(preg_match("/(http:\/\/www.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
+            //print_r($matches);
+            $uri = $matches[1];
+        } 
+
         try {
             $record = $app['uri_resolver_service']->findOne($uri);
 
