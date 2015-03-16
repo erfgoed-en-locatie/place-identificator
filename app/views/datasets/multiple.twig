@@ -63,26 +63,33 @@
             popupAnchor:  [-3, -26] // point from which the popup should open relative to the iconAnchor
         });
 
+        var pits = new Array();
+
         {% for opt in possibilities.data %}
             {% for src,pit in opt %}
                 {% if pit.geometry is not empty and pit.geometry.type == 'Point' %}
-                    L.marker([{{ pit.geometry.coordinates[1] }}, {{ pit.geometry.coordinates[0] }}], {icon: mapIcon}).addTo(map)
+                    var marker = L.marker([{{ pit.geometry.coordinates[1] }}, {{ pit.geometry.coordinates[0] }}], {icon: mapIcon}).addTo(map)
                         .bindPopup('' +
                         '<span><strong>{{ pit.name }} - {{ pit.type }}</strong> volgens {{ src }}</span>' +
                         '<a href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</a>'
                     );
+                    pits.push(marker);
 
                 {% elseif pit.geometry is not empty and pit.geometry.type == 'Polygon' %}
                     // van de polygon moeten we de lat,lon omdraaien
-                    L.polygon(coordsToLatLng({{ pit.geometry.coordinates[0]|json_encode }})).addTo(map)
+                    var marker = L.polygon(coordsToLatLng({{ pit.geometry.coordinates[0]|json_encode }})).addTo(map)
                         .bindPopup('' +
                             '<span><strong>{{ pit.name }} - {{ pit.type }}</strong> volgens {{ src }}</span>' +
                             '<a href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</a>'
                     );
+                    pits.push(marker);
+
                 {% endif %}
             {% endfor %}
         {% endfor %}
 
+        var group = new L.featureGroup(pits);
+        map.fitBounds(group);
 
         jQuery(function () {
             // reset a mapped record
