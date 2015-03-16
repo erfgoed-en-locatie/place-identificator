@@ -185,7 +185,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
-
+/*
             ->add('province', 'choice', array(
                 'label'         => 'Provincie',
                 'required'  => false,
@@ -203,7 +203,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 'constraints' =>  array(
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
-            ))
+            ))*/
             ->add('plaatsen', 'checkbox', array(
                 'label'         => 'zoek plaatsen',
                 'required'  => false,

@@ -58,14 +58,15 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
+                {% if is_granted('ROLE_USER') %}
                 <li><a href="{{ path('dataset-upload-form') }}">Upload dataset</a></li>
                 <li><a href="{{ path('datasets-all') }}" title="Lijstje met datasets">Mijn datasets</a></li>
+                {% endif %}
                 <li><a href="/colofon">Colofon</a></li>
-
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-            {% if app.user %}
+            {% if is_granted('ROLE_USER') %}
                 {% if is_granted('ROLE_ADMIN') %}
                     <li><a href="{{ path('user.list') }}">List users</a></li>
                 {% endif %}
@@ -81,7 +82,7 @@
                     </ul>
                 </li>
             {% else %}
-                <li><a href="{{ path('user.login') }}">Aanmelden</a></li>
+                <li><a href="{{ path('user.login') }}">Inloggen</a></li>
                 <li><a href="{{ path('user.register') }}">Account maken</a></li>
             {% endif %}
             </ul>
