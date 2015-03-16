@@ -21,8 +21,8 @@ class StandardizeCommand extends Command {
         $this
             ->setName('standardize')
             ->setDescription('Call the Histograpgh API to standardize place names')
-            ->addArgument('dataset', InputArgument::REQUIRED, 'Id of the dataset to proces')
-            ->addOption('test', null, InputOption::VALUE_NONE, 'If set, a test run is done withut persisting the changes');
+            ->addArgument('dataset', InputArgument::REQUIRED, 'Id of the dataset to process')
+            ->addOption('test', null, InputOption::VALUE_NONE, 'If set, a test run is done without persisting the changes');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -59,10 +59,10 @@ class StandardizeCommand extends Command {
         try {
             $mappedRows = $geocoder->map($rows, $placeColumn);
 
-            if ($input->getOption('test')) {
+            //if (true  === $input->getOption('test')) {
                 // do not store anything
-                $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
-            }
+                $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $datasetId);
+            //}
 
             // todo send an email
             // get user via dataset user_id
