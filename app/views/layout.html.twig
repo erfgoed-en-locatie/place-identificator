@@ -111,6 +111,17 @@
 
 <script>
 
+    jQuery(function () {
+        // mark an item as unmappable
+        $(".table").on( "click", ".unmappable", function(e) {
+            e.preventDefault();
+            var uri = $(this).attr('data-ref');
+            askAPI('GET', uri, null, deleteUnmappedRow);
+        });
+
+    });
+
+
     function setNumbers(one,more,none,unmappable){
         if(one!=null){
             jQuery('#nr-one').html(one);

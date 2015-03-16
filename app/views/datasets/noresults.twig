@@ -10,7 +10,6 @@
 			askAPI('GET', '/api/record/map/'+recid, data, deleteRow);
 		}
 
-
 		function deleteRow(json) {
 			var tr = '#row_'+json.id;
 			$(tr).remove();
@@ -43,13 +42,13 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd (<span id="nr-one">{{ dataset.countStandardized }}</span>)</a><a href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten (<span id="nr-more">{{ dataset.countMultiples }}</span>)</a><a class="current" href="/datasets/{{ dataset.id }}/noresults">Geen resultaten (<span id="nr-none">{{ dataset.countNoResults }}</span>)</a><a href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar(<span id="nr-unmappables">{{ dataset.countUnmappables }}</span>)</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+                {% include 'datasets/tabnavs.twig' %}
             </div>
 
             {% if noresults is not empty %}
             <p>Hieronder de plaatsnamen waar geen enkel resultaat voor gevonden is. U kunt hier handmatig een <a href="http://vocab.getty.edu/" target="_blank">TGN</a>, <a href="http://www.gemeentegeschiedenis.nl/" target="_blank">Gemeentegeschiedenis</a> of <a href="http://www.geonames.org/">Geonames</a> URI invoeren.</p>
 
-            <table class="table">
+            <table class="table table-condensed">
             	<tr>
             		<th>plaatsnaam</th>
                     <th>en de juiste uri is...</th>
@@ -60,8 +59,8 @@
             	<tr id="row_{{ rec.id }}">
             		<td>{{ rec.original_name }}</td>
             		<td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
-            		<td><button class="btn btn-primary" onclick="setUri({{ rec.id }})">sla op</button></td>
-                    <td><a class="btn btn-danger unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</a></td>
+            		<td><button type="button" class="btn btn-primary btn-sm" onclick="setUri({{ rec.id }})">sla op</button></td>
+                    <td><button type="button" class="btn-danger btn btn-sm unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button></td>
             	</tr>
             	{% endfor %}
             </table>
@@ -72,15 +71,6 @@
 
 	<script>
 
-		jQuery(function () {
-			// reset a mapped record
-			$(".table").on( "click", "a.unmappable", function(e) {
-				e.preventDefault();
-				var uri = $(this).attr('data-ref');
-				askAPI('GET', uri, null, deleteUnmappedRow);
-			});
-
-		});
 
 	</script>
 {% endblock %}

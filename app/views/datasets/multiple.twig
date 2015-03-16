@@ -6,23 +6,28 @@
             <p>Je werkt in dataset "<a href="{{ path('datasets-show', {'id': dataset.id }) }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a class="current" href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar({{ dataset.countUnmappables }})</a><a href="/datasets/{{ dataset.id }}/download">Download</a>
+                {% include 'datasets/tabnavs.twig' %}
             </div>
 
             <div class="row">
                 <div class="col-md-4">
-                    <h3>Meerdere resultaten voor "{{ rec.original_name }}"</h3>
+                    <h3 class="no-pad">Meerdere resultaten voor "{{ rec.original_name }}"</h3>
                     <p>Klik op het juiste resultaat hieronder of op het respectievelijke icoon op de kaart.</p>
 
                     <ul>
                         {% for opt in possibilities.data %}
                             <li>
+                                <p>
                                 {% for src,pit in opt %}
-                                    {{ pit.name }} - {{ pit.type }}, volgens {{ src }}
+                                    {{ pit.name }} - {{ pit.type }}, volgens {{ src }}</br>
                                 {% endfor %}
+                                </p>
+                                <button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>
                             </li>
                         {% endfor %}
                     </ul>
+
+                {#    <button type="button" class="btn-danger btn unmappable" data-id="{{ app.request.get('recid') }}" data-ref="{{ path('api-unmappable', {'id': app.request.get('recid') }) }}">niet te achterhalen</button>#}
 
                 </div>
 
@@ -70,8 +75,8 @@
                 {% if pit.geometry is not empty and pit.geometry.type == 'Point' %}
                     var marker = L.marker([{{ pit.geometry.coordinates[1] }}, {{ pit.geometry.coordinates[0] }}], {icon: mapIcon}).addTo(map)
                         .bindPopup('' +
-                        '<span><strong>{{ pit.name }} - {{ pit.type }}</strong> volgens {{ src }}</span>' +
-                        '<a href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</a>'
+                        '<p class="no-pad"><strong>{{ pit.name }} - {{ pit.type }}</strong> volgens {{ src }}</p>' +
+                        '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
                     );
                     pits.push(marker);
 
@@ -79,8 +84,8 @@
                     // van de polygon moeten we de lat,lon omdraaien
                     var marker = L.polygon(coordsToLatLng({{ pit.geometry.coordinates[0]|json_encode }})).addTo(map)
                         .bindPopup('' +
-                            '<span><strong>{{ pit.name }} - {{ pit.type }}</strong> volgens {{ src }}</span>' +
-                            '<a href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</a>'
+                            '<p class="no-pad"><strong>{{ pit.name }} - {{ pit.type }}</strong> volgens {{ src }}</p>' +
+                            '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
                     );
                     pits.push(marker);
 
@@ -93,7 +98,7 @@
 
         jQuery(function () {
             // reset a mapped record
-            $(document).on( "click", "a.choose", function(e) {
+            $(document).on( "click", ".choose", function(e) {
                 e.preventDefault();
                 var data = $(this).attr('data-klont');
                 var uri = $(this).attr('href');
@@ -101,13 +106,9 @@
             });
 
             function forwardUser(json) {
-                var one = Number(jQuery('#nr-one').html()) +1;
-                var more = Number(jQuery('#nr-more').html()) -1;
-                setNumbers(one,null,null,more);
-
                 alertMessage('De plaats is gestandaardiseerd.');
+                window.location.href = '{{ path('dataset-multiples', {'id': dataset.id }) }}';
             }
-
 
         });
     </script>

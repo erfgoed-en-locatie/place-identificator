@@ -1,28 +1,44 @@
 {% extends "layout.html.twig" %}
 
 {% block content %}
+    <script type="text/javascript">
+        function deleteUnmappedRow(json) {
+            var tr = '#row_'+json.id;
+            $(tr).remove();
+
+            var min = Number(jQuery('#nr-more').html() -1);
+
+            var unmappables = jQuery('#nr-unmappables').html();
+            unmappables = Number(unmappables) + 1;
+
+            setNumbers(null, min, null, unmappables);
+        }
+    </script>
+
     <div class="row">
         <div class="col-md-12">
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
-                <a href="/datasets/{{ dataset.id }}/standardized">Gestandaardiseerd ({{ dataset.countStandardized }})</a><a class="current" href="/datasets/{{ dataset.id }}/multiples">Meerdere resultaten ({{ dataset.countMultiples }})</a><a href="/datasets/{{ dataset.id }}/noresults">Geen resultaten ({{ dataset.countNoResults }})</a><a href="/datasets/{{ dataset.id }}/unmappables">Onachterhaalbaar(<span id="nr-unmappables">{{ dataset.countUnmappables }}</span>)</a><a href="/datasets/{{ dataset.id }}/download">Download</a> 
+                {% include 'datasets/tabnavs.twig' %}
             </div>
             
-            <p></p>
+            <p>Hieronder de plaatsnamen waarvoor meerdere mogelijkheden gevonden zijn. Klik op bewerk om de opties te bekijken en aan te passen.</p>
 
             {% if multiples is not empty %}
-            <table class="table">
+            <table class="table table-condensed">
             	<tr>
             		<th>plaatsnaam</th>
             		<th>aantal hits</th>
             		<th>bewerk</th>
+                    <th>...niet te achterhalen?</th>
             	</tr>
             	{% for rec in multiples %}
-            	<tr>
+                <tr id="row_{{ rec.id }}">
             		<td>{{ rec.original_name }}</td>
             		<td>{{ rec.hits }}</td>
-            		<td><a class="btn btn-primary" href="/datasets/{{ dataset.id }}/multiples/{{ rec.id }}">bewerk</a></td>
+            		<td><a class="btn btn-primary btn-xs" href="/datasets/{{ dataset.id }}/multiples/{{ rec.id }}">bewerk</a></td>
+                    <td><button type="button" class="btn-danger btn btn-xs unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button></td>
             	</tr>
             	{% endfor %}
             </table>
