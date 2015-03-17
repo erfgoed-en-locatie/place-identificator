@@ -134,7 +134,10 @@ class GeocoderService {
             $hitCount = 0;
             foreach ($json->features as $feature) {
                 $hitCount++;
-                $output['data'][] = $this->getStandardizedDataForDisplaying($feature);
+                $klont = $this->getStandardizedDataForDisplaying($feature);
+                if(count($klont)){
+                    $output['data'][] = $klont;
+                } 
             }
             $output['hits'] = $hitCount;
 

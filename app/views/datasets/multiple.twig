@@ -12,23 +12,26 @@
 
             <div class="row">
                 <div class="col-md-4">
-                    <h3 class="no-pad">Meerdere resultaten voor "{{ rec.original_name }}"</h3>
-                    <p>Klik op het juiste resultaat hieronder of op het respectievelijke icoon op de kaart.</p>
+                    <h3 class="no-pad">"{{ rec.original_name }}" kan zijn ...</h3>
+                    <p>Kies het juiste resultaat hieronder of via het juiste icoon op de kaart.</p>
 
-                    <ul>
+                    <ul class="possibilities">
                         {% for opt in possibilities.data %}
                             <li>
-                                <p>
-                                {% for src,pit in opt %}
-                                    {{ pit.name }} - {{ pit.type }}, volgens {{ src }}</br>
-                                {% endfor %}
-                                </p>
                                 <button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>
+                                {% for src,pit in opt %}
+                                    {% set type = pit.type|replace({'hg:': ''}) %}
+                                    {{ pit.name }} ({{ type|lower }}, {{ src }})</br>
+                                {% endfor %}
+                                
                             </li>
                         {% endfor %}
+                        {# <li>
+                            <button type="button" class="btn-danger btn unmappable" data-id="{{ app.request.get('recid') }}" data-ref="{{ path('api-unmappable', {'id': app.request.get('recid') }) }}">niet te achterhalen</button>
+                        </li> #}
                     </ul>
 
-                {#    <button type="button" class="btn-danger btn unmappable" data-id="{{ app.request.get('recid') }}" data-ref="{{ path('api-unmappable', {'id': app.request.get('recid') }) }}">niet te achterhalen</button>#}
+                  
 
                 </div>
 
@@ -74,18 +77,20 @@
         {% for opt in possibilities.data %}
             {% for src,pit in opt %}
                 {% if pit.geometry is not empty and pit.geometry.type == 'Point' %}
+                    {% set type = pit.type|replace({'hg:': ''}) %}
                     var marker = L.marker([{{ pit.geometry.coordinates[1] }}, {{ pit.geometry.coordinates[0] }}], {icon: mapIcon}).addTo(map)
                         .bindPopup('' +
-                        '<p class="no-pad"><strong>{{ pit.name }} - {{ pit.type }}</strong> volgens {{ src }}</p>' +
+                        '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }}, {{ src }})</p>' +
                         '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
                     );
                     pits.push(marker);
 
                 {% elseif pit.geometry is not empty and pit.geometry.type == 'Polygon' %}
+                    {% set type = pit.type|replace({'hg:': ''}) %}
                     // van de polygon moeten we de lat,lon omdraaien
                     var marker = L.polygon(coordsToLatLng({{ pit.geometry.coordinates[0]|json_encode }})).addTo(map)
                         .bindPopup('' +
-                            '<p class="no-pad"><strong>{{ pit.name }} - {{ pit.type }}</strong> volgens {{ src }}</p>' +
+                            '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }}, {{ src }})</p>' +
                             '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
                     );
                     pits.push(marker);

@@ -232,6 +232,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
 
         $possibilities = $app['geocoder_service']->mapOne($rec['original_name']);
 
+        //print_r($possibilities);
 
         return $app['twig']->render('datasets/multiple.twig', array(
             'dataset' => $dataset,

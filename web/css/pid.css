@@ -9,6 +9,7 @@ body{
 }
 ul{
 	padding-left: 20px;
+	list-style-type: none;
 }
 h1,h2,h3{
 	font-family: 'Roboto Slab', serif;
@@ -19,7 +20,7 @@ h1{
 a{
 	color: #638197;
 }
-
+p{margin-top: 8px;}
 
 #resultnav{
 	margin-bottom: 24px;
@@ -93,8 +94,19 @@ a{
 .form-actions{
 	margin-top: 40px;
 }
+.possibilities{
+	padding-left: 0;
 
-
+}
+.possibilities li{
+	background-color: #fff;
+	padding: 10px;
+	margin-bottom: 10px;
+	min-height: 50px;
+}
+.possibilities li button{
+	float: right;
+}
 .ajax-fb {
 	top: 50px;
 	font-size: 1.2em;

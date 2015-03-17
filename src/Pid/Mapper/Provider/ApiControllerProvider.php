@@ -131,8 +131,8 @@ class ApiControllerProvider implements ControllerProviderInterface {
         if (isset($jsonData->bag)) {
             $data['bag'] = json_encode($jsonData->bag);
         }
-        if (isset($jsonData->gg)) {
-            $data['gg'] = json_encode($jsonData->gg);
+        if (isset($jsonData->gemeentegeschiedenis)) {
+            $data['gg'] = json_encode($jsonData->gemeentegeschiedenis);
         }
 
         if ($app['dataset_service']->storeManualMapping($data, $id)){
