@@ -38,11 +38,11 @@
                         Resultaten
                     </th>
                     <td>
-                        <a class="btn btn-link" href="/datasets/{{ dataset.id }}/standardized">bekijk gestandaardiseerde record{% if dataset.countStandardized != 1 %}s ({{ dataset.countStandardized }}){% endif %} </a>
+                        <a class="btn btn-default" href="/datasets/{{ dataset.id }}/standardized">bekijk gestandaardiseerde record{% if dataset.countStandardized != 1 %}s ({{ dataset.countStandardized }}){% endif %} </a>
 
-                        <a class="btn btn-link" href="/datasets/{{ dataset.id }}/multiples">bekijk records met meerdere resultaten ({{ dataset.countMultiples }})</a><br />
+                        <a class="btn btn-default" href="/datasets/{{ dataset.id }}/multiples">bekijk records met meerdere resultaten ({{ dataset.countMultiples }})</a><br />
 
-                        <a class="btn btn-link" href="/datasets/{{ dataset.id }}/noresults">bekijk  records zonder resultaat ({{ dataset.countNoResults }})</a>
+                        <a class="btn btn-default" href="/datasets/{{ dataset.id }}/noresults">bekijk  records zonder resultaat ({{ dataset.countNoResults }})</a>
                     </td>
                 </tr>
                 

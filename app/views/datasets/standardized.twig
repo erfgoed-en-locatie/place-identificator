@@ -6,6 +6,7 @@
             <p>Je werkt in dataset "<a href="{{ path('datasets-show', {'id': dataset.id }) }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
+                {% set cur = 'standardized' %}
                 {% include 'datasets/tabnavs.twig' %}
             </div>
             
@@ -26,7 +27,7 @@
             		<td>{% if rec.geonames is not empty %}<a href="{{ rec.geonames.uri }}" target="_blank">{{ rec.geonames.name }}</a>{% endif %}</td>
             		<td>{% if rec.tgn is not empty %}<a href="{{ rec.tgn.uri }}" target="_blank">{{ rec.tgn.name }}</a>{% endif %}</td>
             		<td>{% if rec.gg is not empty %}<a href="{{ rec.gg.uri }}" target="_blank">{{ rec.gg.name }}</a>{% endif %}</td>
-					<td><a class="btn btn-danger btn-xs clear-mapping" data-id="{{ rec.id }}" data-ref="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
+					<td><a class="btn btn-danger btn-sm clear-mapping" data-id="{{ rec.id }}" data-ref="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
             	</tr>
             	{% endfor %}
             </table>

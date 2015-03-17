@@ -20,6 +20,7 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
+                {% set cur = 'multiples' %}
                 {% include 'datasets/tabnavs.twig' %}
             </div>
             
@@ -37,8 +38,8 @@
                 <tr id="row_{{ rec.id }}">
             		<td>{{ rec.original_name }}</td>
             		<td>{{ rec.hits }}</td>
-            		<td><a class="btn btn-primary btn-xs" href="/datasets/{{ dataset.id }}/multiples/{{ rec.id }}">bewerk</a></td>
-                    <td><button type="button" class="btn-danger btn btn-xs unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button></td>
+            		<td><a class="btn btn-primary btn-sm" href="/datasets/{{ dataset.id }}/multiples/{{ rec.id }}">bewerk</a></td>
+                    <td><button type="button" class="btn-danger btn btn-sm unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button></td>
             	</tr>
             	{% endfor %}
             </table>

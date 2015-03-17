@@ -42,6 +42,7 @@
             <p>Je werkt in dataset "<a href="/datasets/{{ dataset.id }}">{{ dataset.name }}</a>"</p>
 
             <div id="resultnav">
+                {% set cur = 'noresults' %}
                 {% include 'datasets/tabnavs.twig' %}
             </div>
 
