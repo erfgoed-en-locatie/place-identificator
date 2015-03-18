@@ -1,7 +1,7 @@
 <?php
 
 // SITE
-$app['sitename'] = 'PiD - Place Identificator';
+$app['sitename'] = 'E&L - Plaatsnamen standaardiseren';
 $app['upload_dir'] = __DIR__ . '/../storage/uploads';
 
 // Locale
