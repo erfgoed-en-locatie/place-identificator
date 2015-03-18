@@ -17,9 +17,6 @@ class Home
 
     public function page(Request $request, Application $app)
     {
-
-
-        var_dump($app['monolog']); die;
         return $app['twig']->render('home.html.twig', array());
     }
 
