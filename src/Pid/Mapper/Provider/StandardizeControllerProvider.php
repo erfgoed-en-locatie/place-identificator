@@ -63,7 +63,6 @@ class StandardizeControllerProvider implements ControllerProviderInterface
 
         $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
 
-
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
         try {

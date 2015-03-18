@@ -14,6 +14,7 @@ class GeocoderService {
 
     const API_TIMEOUT           = 5;
     const API_CONNECT_TIMEOUT   = 5;
+
     const SEARCH_MUNICIPALITIES = 99;
     const SEARCH_PLACES         = 98;
     const SEARCH_BOTH           = 97;
@@ -25,13 +26,13 @@ class GeocoderService {
     /**
      * @var integer Whether to search the geocoder for places or municipalities or both
      */
-    private $searchOn = self::SEARCH_PLACES;
+    private $searchOn = self::SEARCH_BOTH;
 
     /**
      * @var string $baseUri Uri of the service to call
      */
     private $baseUri = 'http://api.histograph.io';
-    //private $baseUri = 'http://10.0.135.53:3000';
+    //private $baseUri = 'http://10.0.135.225:3000';
 
     protected $app;
 
@@ -137,7 +138,7 @@ class GeocoderService {
                 $klont = $this->getStandardizedDataForDisplaying($feature);
                 if(count($klont)){
                     $output['data'][] = $klont;
-                } 
+                }
             }
             $output['hits'] = $hitCount;
 
@@ -177,7 +178,6 @@ class GeocoderService {
 
             $output = array();
             if ($this->searchOn == self::SEARCH_PLACES) {
-                $output['hits'] = 0;
                 $hitCount = 0;
                 // look for only place types in the features
                 foreach ($json->features as $feature) {
@@ -186,11 +186,7 @@ class GeocoderService {
                         $output['data'] = $this->getStandardizedDataForSaving($feature);
                     }
                 }
-                if ($hitCount == 1) {
-                    $output['hits'] = 1;
-                } else if ($hitCount > 1) {
-                    $output['hits'] = $hitCount;
-                }
+                $output['hits'] = $hitCount;
             } else if ($this->searchOn == self::SEARCH_MUNICIPALITIES) {
                 $hitCount = 0;
                 // look for only municipalities
@@ -200,20 +196,17 @@ class GeocoderService {
                         $output['data'] = $this->getStandardizedDataForSaving($feature);
                     }
                 }
-                if ($hitCount == 1) {
-                    $output['hits'] = 1;
-                } else if ($hitCount > 1) {
-                    $output['hits'] = $hitCount;
-                }
-
+                $output['hits'] = $hitCount;
             } else if ($this->searchOn == self::SEARCH_BOTH) {
-                $output['hits'] = count($json->features);
-
-                // only return data if there's only one match
-                if ($output['hits'] == 1) {
-                    $output['data'] = $this->getStandardizedDataForSaving($json->features[0]);
+                $output['data'] = [];
+                $hitCount = 0;
+                foreach ($json->features as $feature) {
+                    $hitCount++;
+                    $output['data'] = array_merge($output['data'], $this->getStandardizedDataForSaving($feature));
                 }
+                $output['hits'] = $hitCount;
             }
+            //var_dump($output); die;
             return $output;
         }
 
@@ -259,6 +252,29 @@ class GeocoderService {
             }
         }
         return $data;
+    }
+
+    /**
+     * Set the type of search you want to perform
+     * @return int
+     */
+    public function getSearchOn()
+    {
+        return $this->searchOn;
+    }
+
+    /**
+     * Set the type of search you want to perform
+     *
+     * @param int $searchOn
+     */
+    public function setSearchOn($searchOn)
+    {
+        if ($searchOn == self::SEARCH_MUNICIPALITIES || $searchOn == self::SEARCH_PLACES) {
+            $this->searchOn = $searchOn;
+        } else {
+            $this->searchOn = self::SEARCH_BOTH;
+        }
     }
 
 }
