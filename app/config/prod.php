@@ -1,6 +1,8 @@
 <?php
 
 // SITE
+use Monolog\Logger;
+
 $app['sitename'] = 'E&L - Plaatsnamen standaardiseren';
 $app['upload_dir'] = __DIR__ . '/../storage/uploads';
 
@@ -21,13 +23,20 @@ $app["db.options"] = array(
 
 // MAILER
 $app['swiftmailer.options'] = array(
-    'host' => 'host',
-    'port' => '25',
-    'username' => 'username',
-    'password' => 'password',
-    'encryption' => null,
-    'auth_mode' => null
+    'host' => 'smtp.gmail.com',
+    'port' => 465,
+    'username' => 'histograph.io@gmail.com',
+    'password' => 'xxxx',
+    'encryption' => 'ssl',
+    'auth_mode' => 'login'
 );
+
+// MONOLOG
+$app->register(new Silex\Provider\MonologServiceProvider(), array(
+    'monolog.logfile' => __DIR__ . '/../../app/storage/log/prod.log',
+    'monolog.name'    => 'pid-app-prod',
+    'monolog.level'   => Logger::WARNING,
+));
 
 $app['cache.path'] = __DIR__ . '/../storage/cache';
 // CACHES

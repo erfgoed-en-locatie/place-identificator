@@ -42,6 +42,7 @@ $app->register(new Silex\Provider\DoctrineServiceProvider());
 
 // SWIFT MAILER
 $app->register(new Silex\Provider\SwiftmailerServiceProvider());
+$app['swiftmailer.use_spool'] = false;
 
 // needed for SimpleUser
 $app->register(new Silex\Provider\SecurityServiceProvider());
@@ -62,14 +63,6 @@ $app->register(new Silex\Provider\TranslationServiceProvider());
 // CACHE
 $app->register(new Silex\Provider\HttpCacheServiceProvider());
 
-
-// MONOLOG
-$app->register(new Silex\Provider\MonologServiceProvider(), array(
-    'monolog.logfile' => __DIR__ . '/../app/storage/log/dev.log',
-    'monolog.name'    => 'pid-app',
-    'monolog.leve;'   => Logger::DEBUG
-    //'monolog.level'   => 300 // = Logger::WARNING
-));
 
 // SIMPLE USER
 $app['user.options'] = array(

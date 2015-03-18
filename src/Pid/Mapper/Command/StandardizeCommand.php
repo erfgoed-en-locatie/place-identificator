@@ -66,8 +66,17 @@ class StandardizeCommand extends Command {
 
             // todo send an email
             // get user via dataset user_id
-            $app['monolog']->addInfo('User: ' . $dataset['user_id']);
+            //$app['monolog']->addInfo('User: ' . $dataset['user_id']);
 
+            /**
+            $message = \Swift_Message::newInstance()
+                ->setSubject($app['sitename'] . ' CSV-bestand verwerkt')
+                ->setFrom(array('histograph.io@gmail.com'))
+                ->setTo(array('dreis@xs4all.nl'))
+                ->setBody('Uw plaatsnamenbestand is verwerkt. Klik ergens om de resultaten in te zien of te downloaden');
+
+            $app['mailer']->send($message);
+            */
 
         } catch (\Exception $e) {
             return $app['monolog']->addError('CLI error: Histograph API returned error: ' . $e->getMessage());
