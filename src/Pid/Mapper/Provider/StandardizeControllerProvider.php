@@ -55,8 +55,11 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         }
         $csv = \League\Csv\Reader::createFromPath($file);
 
-
-        $rows = $csv->setOffset(0)->setLimit(self::NUMBER_TO_TEST)->fetchAll();
+        $limit = self::NUMBER_TO_TEST;
+        if ($dataset['skip_first_row']) {
+            $limit++;
+        }
+        $rows = $csv->setOffset(0)->setLimit($limit)->fetchAll();
         if ($dataset['skip_first_row']) {
             array_shift($rows);
         }
