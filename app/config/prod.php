@@ -26,7 +26,7 @@ $app['swiftmailer.options'] = array(
     'host' => 'smtp.gmail.com',
     'port' => 465,
     'username' => 'histograph.io@gmail.com',
-    'password' => 'xxxx',
+    'password' => 'xxx',
     'encryption' => 'ssl',
     'auth_mode' => 'login'
 );

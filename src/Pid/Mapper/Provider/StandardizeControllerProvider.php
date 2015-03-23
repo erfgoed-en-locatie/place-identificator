@@ -39,7 +39,7 @@ class StandardizeControllerProvider implements ControllerProviderInterface
      * @param integer $id
      * @return string
      */
-    public function testAction(Application $app, $id)
+    public function testAction(Application $app, $id, Request $request)
     {
         $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
         if (!$dataset) {
@@ -64,13 +64,17 @@ class StandardizeControllerProvider implements ControllerProviderInterface
             array_shift($rows);
         }
 
-        $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($id);
+        $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($id);
+
+        $placeColumn = (int) $fieldMapping['placename'];
+        $searchOn = (int) $fieldMapping['search_option'];
 
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
+        $geocoder->setSearchOn($searchOn);
+
         try {
             $mappedRows = $geocoder->map($rows, $placeColumn);
-            //var_dump($mappedRows); die;
             $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
         } catch (\Exception $e) {
             $app->abort(404, 'The histograph API returned an error. It might be down.');
@@ -98,7 +102,6 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         exec('php ../bin/pid standardize ' .  $id . ' > /dev/null &');
         $app['session']->getFlashBag()->set('alert', 'De standaardisatie is begonnen! U krijgt een mail als het proces klaar is.');
 
-        //return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
         return $app->redirect($app['url_generator']->generate('datasets-all'));
     }
 

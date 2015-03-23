@@ -36,7 +36,7 @@ class GeocoderService {
     );
 
     /**
-     * @var integer Whether to search the geocoder for a specicifc hg:Type or not
+     * @var integer Whether to search the geocoder for a specific hg:Type or not
      */
     private $searchOn = self::SEARCH_PLACES_AND_MUNICIPALITIES;
 
@@ -94,6 +94,7 @@ class GeocoderService {
             try {
                 $response = $this->client->get(
                     $this->searchExact($name),
+                // todo make the called for method, settable
                     array(
                         'timeout' => self::API_TIMEOUT, // Response timeout
                         'connect_timeout' => self::API_CONNECT_TIMEOUT, // Connection timeout
@@ -314,10 +315,10 @@ class GeocoderService {
      */
     public function setSearchOn($searchOn)
     {
-        if ($searchOn == self::SEARCH_MUNICIPALITIES || $searchOn == self::SEARCH_PLACES) {
+        if (in_array($searchOn, self::$searchOptions)) {
             $this->searchOn = $searchOn;
         } else {
-            $this->searchOn = self::SEARCH_BOTH;
+            $this->searchOn = self::SEARCH_PLACES_AND_MUNICIPALITIES;
         }
     }
 

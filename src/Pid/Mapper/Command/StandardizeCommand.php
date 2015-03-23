@@ -52,31 +52,36 @@ class StandardizeCommand extends Command {
         if ($dataset['skip_first_row']) {
             array_shift($rows);
         }
-        $placeColumn = (int) $app['dataset_service']->getPlaceColumnForDataset($datasetId);
+        $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($datasetId);
+
+        $placeColumn = (int) $fieldMapping['placename'];
+        $searchOn = (int) $fieldMapping['search_option'];
 
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
+        $geocoder->setSearchOn($searchOn);
         try {
             $mappedRows = $geocoder->map($rows, $placeColumn);
 
-            //if (true  === $input->getOption('test')) {
-                // do not store anything
-                $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $datasetId);
-            //}
+            $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $datasetId);
 
-            // todo send an email
             // get user via dataset user_id
-            //$app['monolog']->addInfo('User: ' . $dataset['user_id']);
+            $user = $app['dataset_service']->getUser($dataset['user_id']);
+            $app['monolog']->addError('Sending an email to user, with id: ' . $dataset['user_id']);
 
-            /**
             $message = \Swift_Message::newInstance()
                 ->setSubject($app['sitename'] . ' CSV-bestand verwerkt')
                 ->setFrom(array('histograph.io@gmail.com'))
-                ->setTo(array('dreis@xs4all.nl'))
-                ->setBody('Uw plaatsnamenbestand is verwerkt. Klik ergens om de resultaten in te zien of te downloaden');
+                ->setTo(array($user['email']))
+                ->setBody("Beste {$user['name']},
+
+Uw plaatsnamenbestand '{$dataset['name']}' is verwerkt. Kijk op onderstaande link om de resultaten in te zien of te downloaden.
+
+http://locatienaaruri.erfgeo.nl/datasets/{$datasetId}
+
+                ");
 
             $app['mailer']->send($message);
-            */
 
         } catch (\Exception $e) {
             return $app['monolog']->addError('CLI error: Histograph API returned error: ' . $e->getMessage());

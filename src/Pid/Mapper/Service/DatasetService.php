@@ -162,12 +162,27 @@ class DatasetService {
     }
 
 
-    public function getPlaceColumnForDataset($id)
+    /**
+     * Fetch the user supplied configs for this dataset
+     *
+     * @param $id
+     * @return mixed
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function getFieldMappingForDataset($id)
     {
-        $stmt = $this->db->executeQuery('SELECT placename FROM field_mapping WHERE dataset_id = :id', array(
+        $stmt = $this->db->executeQuery('SELECT placename, search_option FROM field_mapping WHERE dataset_id = :id', array(
             'id' => (int)$id
         ));
-        return $stmt->fetchColumn(0);
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function getUser($id)
+    {
+        $stmt = $this->db->executeQuery('SELECT name, email FROM users WHERE id = :id', array(
+            'id' => (int)$id
+        ));
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     /**
