@@ -20,7 +20,7 @@ class Status {
     /**
      * @var array
      */
-    protected $statusOptions = array(
+    protected static $statusOptions = array(
         self::MAPPED_EXACT            => 'exacte match',
         self::MAPPED_EXACT_MULTIPLE   => 'meer dan een match',
         self::MAPPED_EXACT_NOT_FOUND  => 'geen exacte match',
@@ -32,31 +32,9 @@ class Status {
     /**
      * @return array
      */
-    public function getStatusOptions()
+    public static function getStatusOptions()
     {
-        return $this->statusOptions;
-    }
-
-    /**
-     * @param array $statusOptions
-     */
-    public function setStatusOptions($statusOptions)
-    {
-        $this->statusOptions = $statusOptions;
-    }
-
-
-    /**
-     * Returns the formatted Status option
-     * @param integer $key
-     * @return mixed
-     */
-    public function getFormattedStatus($key)
-    {
-        if (isset($this->statusOptions[$key])) {
-            return $this->statusOptions[$key];
-        }
-        return $key;
+        return self::$statusOptions;
     }
 
 }

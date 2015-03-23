@@ -37,6 +37,13 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path'    => array(__DIR__ . '/../app/views')
 ));
 
+// TWIG extensions
+$app["twig"] = $app->share($app->extend("twig", function (\Twig_Environment $twig, Silex\Application $app) {
+    $twig->addExtension(new \Pid\Mapper\Twig\StatusFilter($app));
+    return $twig;
+}));
+
+
 // DOCTRINE DBAL
 $app->register(new Silex\Provider\DoctrineServiceProvider());
 
