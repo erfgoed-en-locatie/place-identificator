@@ -15,18 +15,30 @@ class GeocoderService {
     const API_TIMEOUT           = 5;
     const API_CONNECT_TIMEOUT   = 5;
 
-    const SEARCH_MUNICIPALITIES = 99;
-    const SEARCH_PLACES         = 98;
-    const SEARCH_BOTH           = 97;
+    const SEARCH_ALL                        = 99;
+    const SEARCH_PLACES                     = 98;
+    const SEARCH_MUNICIPALITIES             = 97;
+    const SEARCH_PLACES_AND_MUNICIPALITIES  = 96;
+    const SEARCH_STREETS                    = 90;
 
     /** @var string The field that the API uses to determine the type of feature */
     const API_PLACE_TYPE        = 'hg:Place';
     const API_MUNICIPALITY_TYPE = 'hg:Municipality';
+    const API_STREET_TYPE        = 'hg:Street';
+
+    /** @var array SearchType options for the geocoder */
+    protected $searchOptions = array(
+        self::SEARCH_ALL    => 'alles',
+        self::SEARCH_PLACES => 'plaatsen',
+        self::SEARCH_MUNICIPALITIES => 'gemeentes',
+        self::SEARCH_PLACES_AND_MUNICIPALITIES => 'plaatsen en gemeentes',
+        self::SEARCH_STREETS => 'straten'
+    );
 
     /**
-     * @var integer Whether to search the geocoder for places or municipalities or both
+     * @var integer Whether to search the geocoder for a specicifc hg:Type or not
      */
-    private $searchOn = self::SEARCH_BOTH;
+    private $searchOn = self::SEARCH_ALL;
 
     /**
      * @var string $baseUri Uri of the service to call
@@ -48,6 +60,12 @@ class GeocoderService {
         $this->app = $app;
         $this->client = new \GuzzleHttp\Client();
     }
+
+    public function getSearchOptions()
+    {
+        return $this->searchOptions;
+    }
+
 
     /**
      * Escape characters before they're send to the API
@@ -134,10 +152,13 @@ class GeocoderService {
 
             $hitCount = 0;
             foreach ($json->features as $feature) {
-                $hitCount++;
-                $klont = $this->getStandardizedDataForDisplaying($feature);
-                if(count($klont)){
-                    $output['data'][] = $klont;
+                // @fixme later: for now we are really only handling places or municipalities!!
+                if ($feature->properties->type == self::API_MUNICIPALITY_TYPE || $feature->properties->type == self::API_PLACE_TYPE) {
+                    $hitCount++;
+                    $klont = $this->getStandardizedDataForDisplaying($feature);
+                    if (count($klont)) {
+                        $output['data'][] = $klont;
+                    }
                 }
             }
             $output['hits'] = $hitCount;
@@ -197,12 +218,15 @@ class GeocoderService {
                     }
                 }
                 $output['hits'] = $hitCount;
-            } else if ($this->searchOn == self::SEARCH_BOTH) {
+            } else if ($this->searchOn == self::SEARCH_ALL) {
                 $output['data'] = [];
                 $hitCount = 0;
                 foreach ($json->features as $feature) {
-                    $hitCount++;
-                    $output['data'] = array_merge($output['data'], $this->getStandardizedDataForSaving($feature));
+                    // @fixme later: for now we are really only handling places or municipalities!!
+                    if ($feature->properties->type == self::API_MUNICIPALITY_TYPE || $feature->properties->type == self::API_PLACE_TYPE) {
+                        $hitCount++;
+                        $output['data'] = array_merge($output['data'], $this->getStandardizedDataForSaving($feature));
+                    }
                 }
                 $output['hits'] = $hitCount;
             }

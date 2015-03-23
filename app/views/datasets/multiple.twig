@@ -26,7 +26,7 @@
                                     {% set type = pit.type|replace({'hg:': ''}) %}
                                     {{ pit.name }} ({{ type|lower }}, {{ src }})</br>
                                 {% endfor %}
-                                
+
                             </li>
                         {% endfor %}
                         {# <li>
@@ -77,32 +77,27 @@
         var pits = new Array();
 
         {% if possibilities.data is defined %}
+
+        var placesLayer = L.geoJson().addTo(map);
+
         {% for opt in possibilities.data %}
-            {% for src,pit in opt %}
-                {% if pit.geometry is not empty and pit.geometry.type == 'Point' %}
-                    {% set type = pit.type|replace({'hg:': ''}) %}
-                    var marker = L.marker([{{ pit.geometry.coordinates[1] }}, {{ pit.geometry.coordinates[0] }}], {icon: mapIcon}).addTo(map)
-                        .bindPopup('' +
-                        '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }}, {{ src }})</p>' +
-                        '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
-                    );
-                    pits.push(marker);
 
-                {% elseif pit.geometry is not empty and pit.geometry.type == 'Polygon' %}
-                    {% set type = pit.type|replace({'hg:': ''}) %}
-                    // van de polygon moeten we de lat,lon omdraaien
-                    var marker = L.polygon(coordsToLatLng({{ pit.geometry.coordinates[0]|json_encode }})).addTo(map)
-                        .bindPopup('' +
-                            '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }}, {{ src }})</p>' +
-                            '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
-                    );
-                    pits.push(marker);
-
-                {% endif %}
-            {% endfor %}
+        {% for src,pit in opt %}
+            var geojsonFeature = {
+                "type": "Feature",
+                "properties": {
+                    "name": "{{ pit.name }}",
+                    "popupContent": "Hier moet de popup button in"
+                },
+                "geometry": {{ pit.geometry|json_encode|raw }}
+            };
+            placesLayer.addData(geojsonFeature);
         {% endfor %}
 
-        var group = new L.featureGroup(pits);
+
+        {% endfor %}
+
+        var group = new L.featureGroup(placesLayer);
         map.fitBounds(group);
 
         jQuery(function () {
