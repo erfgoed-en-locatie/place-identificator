@@ -57,10 +57,9 @@ CREATE TABLE IF NOT EXISTS `field_mapping` (
   `lon` int(11) DEFAULT NULL,
   `created_on` datetime DEFAULT NULL,
   `updated_on` datetime DEFAULT NULL,
-  `status` int(3) DEFAULT NULL,
-  `gemeenten` int(3) DEFAULT NULL,
-  `plaatsen` int(3) DEFAULT NULL,
-  `fuzzy_search` int(3) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `fuzzy_search` int(4) DEFAULT NULL,
+  `search_option` int(4) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `record_dataset` (`dataset_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Which column in the dataset has what info' AUTO_INCREMENT=1 ;

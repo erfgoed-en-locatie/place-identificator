@@ -5,6 +5,7 @@ namespace Pid\Mapper\Provider;
 
 use Pid\Mapper\Model\Dataset;
 use Pid\Mapper\Service\DatasetService;
+use Pid\Mapper\Service\GeocoderService;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 
@@ -195,24 +196,15 @@ class ImportControllerProvider implements ControllerProviderInterface {
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
-            ->add('country', 'choice', array(
-                'label'         => 'Land (wordt overgeslagen indien geen "Nederland" of "NL")',
-                'required'  => false,
-                'choices'   => $fieldChoices,
-                'empty_value' => 'selecteer een veld',
+           */
+            ->add('search_option', 'choice', array(
+                'label'         => 'Zoeken naar',
+                'required'  => true,
+                'choices'   => GeocoderService::$searchOptions,
+                //'empty_value' => 'selecteer een veld',
                 'constraints' =>  array(
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
-            ))*/
-            ->add('plaatsen', 'checkbox', array(
-                'label'         => 'zoek plaatsen',
-                'required'  => false,
-                'data'      => (bool) $mapping['plaatsen'],
-            ))
-            ->add('gemeenten', 'checkbox', array(
-                'label'         => 'zoek gemeenten',
-                'required'  => false,
-                'data'      => (bool) $mapping['gemeenten'],
             ))
             ->add('fuzzy_search', 'checkbox', array(
                 'label'         => 'fuzzy search aan (nog niet beschikbaar)',

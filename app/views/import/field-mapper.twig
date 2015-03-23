@@ -2,64 +2,65 @@
 
 {% block content %}
 
-	<h1>Configuratie voor dataset "{{ dataset.name }}"</h1>
-	<div class="row">
-		<div class="col-md-6">
+    <h1>Configuratie voor dataset "{{ dataset.name }}"</h1>
+    <div class="row">
+        <div class="col-md-6">
 
-			{% form_theme form 'bootstrap_3_layout.html.twig' %}
+            {% form_theme form 'bootstrap_3_layout.html.twig' %}
 
-			{{ form_start(form) }}
+            {{ form_start(form) }}
 
-			{{ form_row(form.placename) }}
+            {{ form_row(form.placename) }}
 
-			{{ form_row(form.identifier) }}
+            {{ form_row(form.identifier) }}
 
+            <fieldset>
+                <legend>Zoekmogelijkheden</legend>
 
+                <p>Geef aan of u wilt zoeken op plaatsen, gemeentes of allebei?</p>
+
+                {{ form_row(form.search_option) }}
+
+                <label>Exact of fuzzy zoeken?</label>
+
+                {{ form_row(form.fuzzy_search) }}
+
+            </fieldset>
+            {#
 			<p>Eventueel kunt u hieronder nog aangeven of uw bestand contextuele informatie biedt die de zoekresultaten verder kunnen filteren.</p>
 
 			<fieldset>
 				<legend>contextuele informatie</legend>
 
-				{#{{ form_row(form.province) }}
+				{{ form_row(form.province) }}
 
-				{{ form_row(form.country) }}#}
+				{{ form_row(form.country) }}
 
-			</fieldset>
+			</fieldset>#}
 
-		</div>
+        </div>
 
-		<div class="col-md-6">
+        <div class="col-md-6">
 
-			<h3>Wilt u zoeken op plaatsen, gemeenten of allebei?</h3>
+            <div class="row form-actions">
+                <div class="col-md-6">
+                    {{ form_widget(form.map) }}
+                    <p>Deze optie standaardiseert de eerste 20 records. Dit is handig om te kijken of alles goed gaat alvorens het hele bestand te verwerken.</p>
 
-			{{ form_row(form.plaatsen) }}
+                    <p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
+                </div>
 
-			{{ form_row(form.gemeenten) }}
+                <div class="col-md-6">
+                    {{ form_widget(form.mapall) }}
+                    <p>Deze optie standaardiseert alle records. Dit proces kan enige tijd duren.</p>
 
-			<label>Fuzzy of exact zoeken?</label>
+                    <p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
+                </div>
+            </div>
+        </div>
 
-			{{ form_row(form.fuzzy_search) }}
+        {{ form_end(form) }}
 
-
-			<div class="row form-actions">
-				<div class="col-md-6">
-					{{ form_widget(form.map) }}
-					<p>Deze optie standaardiseert de eerste 20 records. Dit is handig om te kijken of alles goed gaat alvorens het hele bestand te verwerken.</p>
-
-					<p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
-				</div>
-
-				<div class="col-md-6">
-					{{ form_widget(form.mapall) }}
-					<p>Deze optie standaardiseert alle records. Dit proces kan enige tijd duren.</p>
-
-					<p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
-				</div>
-			</div>
-		</div>
-
-		{{ form_end(form) }}
-
-	</div>
+    </div>
 
 {% endblock %}

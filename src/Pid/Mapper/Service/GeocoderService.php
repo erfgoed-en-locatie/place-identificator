@@ -24,27 +24,26 @@ class GeocoderService {
     /** @var string The field that the API uses to determine the type of feature */
     const API_PLACE_TYPE        = 'hg:Place';
     const API_MUNICIPALITY_TYPE = 'hg:Municipality';
-    const API_STREET_TYPE        = 'hg:Street';
+    const API_STREET_TYPE       = 'hg:Street';
 
     /** @var array SearchType options for the geocoder */
-    protected $searchOptions = array(
-        self::SEARCH_ALL    => 'alles',
-        self::SEARCH_PLACES => 'plaatsen',
-        self::SEARCH_MUNICIPALITIES => 'gemeentes',
+    public static $searchOptions = array(
+        //self::SEARCH_ALL    => 'alles',
         self::SEARCH_PLACES_AND_MUNICIPALITIES => 'plaatsen en gemeentes',
-        self::SEARCH_STREETS => 'straten'
+        self::SEARCH_PLACES         => 'plaatsen',
+        self::SEARCH_MUNICIPALITIES => 'gemeentes',
+        //self::SEARCH_STREETS => 'straten'
     );
 
     /**
      * @var integer Whether to search the geocoder for a specicifc hg:Type or not
      */
-    private $searchOn = self::SEARCH_ALL;
+    private $searchOn = self::SEARCH_PLACES_AND_MUNICIPALITIES;
 
     /**
      * @var string $baseUri Uri of the service to call
      */
     private $baseUri = 'http://api.histograph.io';
-    //private $baseUri = 'http://10.0.135.225:3000';
 
     protected $app;
 
@@ -60,12 +59,6 @@ class GeocoderService {
         $this->app = $app;
         $this->client = new \GuzzleHttp\Client();
     }
-
-    public function getSearchOptions()
-    {
-        return $this->searchOptions;
-    }
-
 
     /**
      * Escape characters before they're send to the API
@@ -169,13 +162,40 @@ class GeocoderService {
     }
 
     /**
-     * Provides the uri for exact searching
+     * Searches the API on a literal (quoted) string, and returns only exact matches (not part of)
+     * Example: http://api.histograph.io/search?name="Bergen op Zoom"&exact=true
      *
      * @param $name
      * @return string
      */
     private function searchExact($name) {
-        $uri = $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"';
+        $uri = $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"&exact=true';
+        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
+        return $uri;
+    }
+
+    /**
+     * Searches the API on a literal string, and returns also matches that were partially found
+     * (Bergen op zoomstraat)
+     * Example: http://api.histograph.io/search?name="Bergen op Zoom"&exact=false
+     *
+     * @param $name
+     * @return string
+     */
+    private function searchExactPhrase($name) {
+        $uri = $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"&exact=false';
+        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
+        return $uri;
+    }
+
+    /**
+     * Searches the API on a (tokenized) word that is contained by the placename
+     *
+     * @param $name
+     * @return string
+     */
+    private function searchExactWord($name) {
+        $uri = $this->baseUri . '/search?name=' . $this->filterBadCharacters($name) . '&exact=true';
         $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
         return $uri;
     }
@@ -218,7 +238,7 @@ class GeocoderService {
                     }
                 }
                 $output['hits'] = $hitCount;
-            } else if ($this->searchOn == self::SEARCH_ALL) {
+            } else if ($this->searchOn == self::SEARCH_PLACES_AND_MUNICIPALITIES) {
                 $output['data'] = [];
                 $hitCount = 0;
                 foreach ($json->features as $feature) {
