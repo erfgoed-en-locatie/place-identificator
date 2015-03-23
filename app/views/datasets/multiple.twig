@@ -15,6 +15,9 @@
                     <h3 class="no-pad">"{{ rec.original_name }}" kan zijn ...</h3>
                     <p>Kies het juiste resultaat hieronder of via het juiste icoon op de kaart.</p>
 
+                    {% if possibilities.data is not defined %}
+                    <p>Er zijn wel concepten gevonden maar dit zijn geen plaatsen of gemeentes... op dit moment worden die nog niet getoond.</p>
+                    {% else %}
                     <ul class="possibilities">
                         {% for opt in possibilities.data %}
                             <li>
@@ -30,8 +33,7 @@
                             <button type="button" class="btn-danger btn unmappable" data-id="{{ app.request.get('recid') }}" data-ref="{{ path('api-unmappable', {'id': app.request.get('recid') }) }}">niet te achterhalen</button>
                         </li> #}
                     </ul>
-
-                  
+                    {% endif %}
 
                 </div>
 
@@ -74,6 +76,7 @@
 
         var pits = new Array();
 
+        {% if possibilities.data is defined %}
         {% for opt in possibilities.data %}
             {% for src,pit in opt %}
                 {% if pit.geometry is not empty and pit.geometry.type == 'Point' %}
@@ -115,8 +118,9 @@
                 alertMessage('De plaats is gestandaardiseerd.');
                 window.location.href = '{{ path('dataset-multiples', {'id': dataset.id }) }}';
             }
-
         });
+
+        {% endif %}
     </script>
 
 {% endblock %}
