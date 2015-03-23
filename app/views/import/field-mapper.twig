@@ -14,10 +14,10 @@
 
             {{ form_row(form.identifier) }}
 
-            <fieldset>
-                <legend>Zoekmogelijkheden</legend>
 
-                <p>Geef aan of u wilt zoeken op plaatsen, gemeentes of allebei?</p>
+            <fieldset>
+                <legend>Zoekopties</legend>
+                <p>Geef aan of u wilt standaardiseren op plaatsen, gemeentes of allebei?</p>
 
                 {{ form_row(form.search_option) }}
 
@@ -26,6 +26,7 @@
                 {{ form_row(form.fuzzy_search) }}
 
             </fieldset>
+
             {#
 			<p>Eventueel kunt u hieronder nog aangeven of uw bestand contextuele informatie biedt die de zoekresultaten verder kunnen filteren.</p>
 
@@ -47,7 +48,6 @@
                     {{ form_widget(form.map) }}
                     <p>Deze optie standaardiseert de eerste 20 records. Dit is handig om te kijken of alles goed gaat alvorens het hele bestand te verwerken.</p>
 
-                    <p class="alert alert-warning"><strong>Let op:</strong> eventueel eerder opgehaalde data bij dit bestand wordt eerst verwijderd!</p>
                 </div>
 
                 <div class="col-md-6">

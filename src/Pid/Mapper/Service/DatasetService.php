@@ -1,6 +1,7 @@
 <?php
 
 namespace Pid\Mapper\Service;
+use Pid\Mapper\Model\DatasetStatus;
 use Pid\Mapper\Model\Status;
 
 
@@ -42,6 +43,24 @@ class DatasetService {
                 'userId' => (int)$userId);
             $stmt = $this->db->executeQuery($sql, $params);
         }
+        return $stmt->fetch();
+    }
+
+    /**
+     * Fetch dataset details with Fieldmappings
+     *
+     * @param $id
+     * @return mixed
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function fetchDatasetDetails($id)
+    {
+        $stmt = $this->db->executeQuery('SELECT d.*, f.fuzzy_search, f.search_option FROM datasets d
+          INNER JOIN field_mapping f ON f.dataset_id = d.id
+          WHERE d.id = :id', array(
+            'id' => (int)$id
+        ));
+
         return $stmt->fetch();
     }
 
@@ -144,6 +163,7 @@ class DatasetService {
 
     /**
      * Save the provided mapping or update if it already exists
+     * Also update the status of the dataset to mapped
      *
      * @param array $data
      * @return int
@@ -151,6 +171,10 @@ class DatasetService {
     public function storeFieldMapping($data)
     {
         $date = new \DateTime('now');
+        $this->db->update('datasets', array('status' => DatasetStatus::STATUS_FIELDS_MAPPED), array(
+            'id' => $data['dataset_id'],
+            'status' => DatasetStatus::STATUS_NEW
+        ));
 
         if ($this->fetchFieldmappingForDataset($data['dataset_id'])) {
             $data['updated_on'] = $date->format('Y-m-d H:i:s');
@@ -161,6 +185,26 @@ class DatasetService {
         return $this->db->insert('field_mapping', $data);
     }
 
+    public function setMappingStarted($datasetId)
+    {
+        return $this->db->update('datasets', array('status' => DatasetStatus::STATUS_BEING_MAPPED), array(
+            'id' => $datasetId
+        ));
+    }
+
+    public function setMappingFinished($datasetId)
+    {
+        return $this->db->update('datasets', array('status' => DatasetStatus::STATUS_MAPPED), array(
+            'id' => $datasetId
+        ));
+    }
+
+    public function setMappingFailed($datasetId)
+    {
+        return $this->db->update('datasets', array('status' => DatasetStatus::STATUS_MAPPING_FAILED), array(
+            'id' => $datasetId
+        ));
+    }
 
     /**
      * Fetch the user supplied configs for this dataset

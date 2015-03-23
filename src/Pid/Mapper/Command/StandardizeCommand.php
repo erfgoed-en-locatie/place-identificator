@@ -61,6 +61,8 @@ class StandardizeCommand extends Command {
         $geocoder = $app['geocoder_service'];
         $geocoder->setSearchOn($searchOn);
         try {
+            $app['dataset_service']->setMappingStarted($datasetId);
+
             $mappedRows = $geocoder->map($rows, $placeColumn);
 
             $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $datasetId);
@@ -68,6 +70,8 @@ class StandardizeCommand extends Command {
             // get user via dataset user_id
             $user = $app['dataset_service']->getUser($dataset['user_id']);
             $app['monolog']->addError('Sending an email to user, with id: ' . $dataset['user_id']);
+
+            $app['dataset_service']->setMappingFinished($datasetId);
 
             $message = \Swift_Message::newInstance()
                 ->setSubject($app['sitename'] . ' CSV-bestand verwerkt')
@@ -84,6 +88,7 @@ http://locatienaaruri.erfgeo.nl/datasets/{$datasetId}
             $app['mailer']->send($message);
 
         } catch (\Exception $e) {
+            $app['dataset_service']->setMappingFailed($datasetId);
             return $app['monolog']->addError('CLI error: Histograph API returned error: ' . $e->getMessage());
         }
 

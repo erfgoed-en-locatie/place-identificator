@@ -2,7 +2,7 @@
 
 namespace Pid\Mapper\Provider;
 
-use Pid\Mapper\Model\Dataset;
+use Pid\Mapper\Model\DatasetStatus;
 use Pid\Mapper\Model\Status;
 use Pid\Mapper\Service\DatasetService;
 use Silex\Application;
@@ -90,7 +90,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
           FROM datasets d
           LEFT JOIN user u ON u.id = d.user_id
           where status != :status");
-        $stmt->execute(array('status' => Dataset::STATUS_FINISHED));
+        $stmt->execute(array('status' => DatasetStatus::STATUS_FINISHED));
         $datasets = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         return $app['twig']->render('datasets/list.html.twig', array('datasets' => $datasets));
@@ -105,7 +105,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function showDataset(Application $app, $id)
     {
-        $dataset = $app['dataset_service']->fetchDataset($id);
+        $dataset = $app['dataset_service']->fetchDatasetDetails($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }

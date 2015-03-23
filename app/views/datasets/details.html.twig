@@ -6,7 +6,6 @@
 
     <div class="row">
         <div class="col-md-6">
-            
 
             <table class="table">
                 <tr>
@@ -30,7 +29,15 @@
                         Status
                     </th>
                     <td>
-                        {{ dataset.status|formatStatus }}
+                        {{ dataset.status|formatDatasetStatus }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Zoekopties
+                    </th>
+                    <td>
+                        {{ dataset.search_option|formatSearchOption }}
                     </td>
                 </tr>
                 <tr>

@@ -40,6 +40,8 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 // TWIG extensions
 $app["twig"] = $app->share($app->extend("twig", function (\Twig_Environment $twig, Silex\Application $app) {
     $twig->addExtension(new \Pid\Mapper\Twig\StatusFilter($app));
+    $twig->addExtension(new \Pid\Mapper\Twig\DatasetStatusFilter($app));
+    $twig->addExtension(new \Pid\Mapper\Twig\SearchOptionFilter($app));
     return $twig;
 }));
 

@@ -35,7 +35,7 @@
                                 {% else %}
                                     {% set statClass = 'label-primary' %}
                                 {% endif %}
-                                <span class="label {{ statClass }}">{{ set.status|formatStatus }}</span>
+                                <span class="label {{ statClass }}">{{ set.status|formatDatasetStatus }}</span>
                             </td>
                             <td>
                                 <a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="Bekijk de resultaten"><i class="fa fa-search-plus"></i> </a>

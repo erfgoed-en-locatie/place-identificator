@@ -93,8 +93,7 @@ class GeocoderService {
 
             try {
                 $response = $this->client->get(
-                    $this->searchExact($name),
-                // todo make the called for method, settable
+                    $this->search($name),
                     array(
                         'timeout' => self::API_TIMEOUT, // Response timeout
                         'connect_timeout' => self::API_CONNECT_TIMEOUT, // Connection timeout
@@ -163,6 +162,33 @@ class GeocoderService {
     }
 
     /**
+     * Wrapper around setting all the settable parameters for calling the API
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function search($name)
+    {
+        $searchOnType = '';
+        if ($this->searchOn == self::SEARCH_PLACES) {
+            $searchOnType = '&type=' . self::API_PLACE_TYPE;
+        }
+        if ($this->searchOn == self::SEARCH_MUNICIPALITIES) {
+            $searchOnType = '&type=' . self::API_MUNICIPALITY_TYPE;
+        }
+        if ($this->searchOn == self::SEARCH_STREETS) {
+            $searchOnType = '&type=' . self::API_STREET_TYPE;
+        }
+
+        // todo create wild card searches and non literal string searches
+        // todo make the fuzzy_search options settable and select between searchExact, searchExactPhrase etc
+        $uri = $this->searchExact($name) . $searchOnType;
+        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
+
+        return $uri;
+    }
+
+    /**
      * Searches the API on a literal (quoted) string, and returns only exact matches (not part of)
      * Example: http://api.histograph.io/search?name="Bergen op Zoom"&exact=true
      *
@@ -170,9 +196,7 @@ class GeocoderService {
      * @return string
      */
     private function searchExact($name) {
-        $uri = $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"&exact=true';
-        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
-        return $uri;
+        return $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"&exact=true';
     }
 
     /**
@@ -184,9 +208,7 @@ class GeocoderService {
      * @return string
      */
     private function searchExactPhrase($name) {
-        $uri = $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"&exact=false';
-        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
-        return $uri;
+        return $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"&exact=false';
     }
 
     /**
@@ -196,12 +218,8 @@ class GeocoderService {
      * @return string
      */
     private function searchExactWord($name) {
-        $uri = $this->baseUri . '/search?name=' . $this->filterBadCharacters($name) . '&exact=true';
-        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
-        return $uri;
+        return $this->baseUri . '/search?name=' . $this->filterBadCharacters($name) . '&exact=true';
     }
-
-    // todo create wild card searches and non literal string searches
 
     /**
      * Loops through the clumps and tries to find PITs
@@ -315,7 +333,7 @@ class GeocoderService {
      */
     public function setSearchOn($searchOn)
     {
-        if (in_array($searchOn, self::$searchOptions)) {
+        if (array_key_exists($searchOn, self::$searchOptions)) {
             $this->searchOn = $searchOn;
         } else {
             $this->searchOn = self::SEARCH_PLACES_AND_MUNICIPALITIES;

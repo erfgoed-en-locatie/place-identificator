@@ -4,7 +4,7 @@ namespace Pid\Mapper\Model;
 
 /**
  * Status class
- * Holds the different statusses that a mapped records can have
+ * Holds the status that mapped records can have
  *
  * @package Pid\Mapper\Model
  */

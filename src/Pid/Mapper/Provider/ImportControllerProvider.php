@@ -3,7 +3,7 @@
 
 namespace Pid\Mapper\Provider;
 
-use Pid\Mapper\Model\Dataset;
+use Pid\Mapper\Model\DatasetStatus;
 use Pid\Mapper\Service\DatasetService;
 use Pid\Mapper\Service\GeocoderService;
 use Silex\Application;
@@ -127,7 +127,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 'filename'          => $filename,
                 'original_name'     => $originalName,
                 'created_on' => $date->format('Y-m-d H:i:s'),
-                'status'    => Dataset::STATUS_NEW,
+                'status'    => DatasetStatus::STATUS_NEW,
                 'user_id'   => (int) $app['user']->getId()
             ));
             $datasetId = $db->lastInsertId();
