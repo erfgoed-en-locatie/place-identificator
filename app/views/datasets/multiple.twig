@@ -78,9 +78,12 @@
 
         {% if possibilities.data is defined %}
 
-        var placesLayer = L.geoJson().addTo(map);
+        var group = new L.featureGroup();
 
         {% for opt in possibilities.data %}
+
+        var placesLayer = L.geoJson().addTo(map);
+        
 
         {% for src,pit in opt %}
             var geojsonFeature = {
@@ -91,13 +94,25 @@
                 },
                 "geometry": {{ pit.geometry|json_encode|raw }}
             };
-            placesLayer.addData(geojsonFeature);
+
+            var geom = placesLayer.addData(geojsonFeature);
+            
+            {% set type = pit.type|replace({'hg:': ''}) %}
+            console.log('{{ pit.name }}');
+            
+            geom.bindPopup('' +
+                            '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }}, {{ src }})</p>' +
+                            '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
+                    );
+
+            group.addLayer(geom);
+
         {% endfor %}
 
 
         {% endfor %}
 
-        var group = new L.featureGroup(placesLayer);
+        
         map.fitBounds(group);
 
         jQuery(function () {

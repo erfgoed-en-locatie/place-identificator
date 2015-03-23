@@ -8,9 +8,7 @@ body{
 	background-color: #eeeeee;
 }
 ul{
-	padding-left: 20px;
-	list-style-type: none;
-}
+	padding-left: 20px;}
 h1,h2,h3{
 	font-family: 'Roboto Slab', serif;
 }
@@ -96,6 +94,8 @@ p{margin-top: 8px;}
 }
 .possibilities{
 	padding-left: 0;
+	list-style-type: none;
+
 
 }
 .possibilities li{
