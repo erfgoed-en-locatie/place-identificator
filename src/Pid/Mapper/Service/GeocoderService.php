@@ -22,9 +22,9 @@ class GeocoderService {
     const SEARCH_STREETS                    = 90;
 
     /** @var string The field that the API uses to determine the type of feature */
-    const API_PLACE_TYPE        = 'hg:Place';
-    const API_MUNICIPALITY_TYPE = 'hg:Municipality';
-    const API_STREET_TYPE       = 'hg:Street';
+    const API_PLACE_TYPE        = 'hg:Plaats';
+    const API_MUNICIPALITY_TYPE = 'hg:Gemeente';
+    const API_STREET_TYPE       = 'hg:Straat';
 
     /** @var array SearchType options for the geocoder */
     public static $searchOptions = array(
@@ -228,7 +228,7 @@ class GeocoderService {
      * @return array The array contains hits|data keys
      */
     private function handleResponse($json)
-    {
+    {   
         if (!property_exists($json, 'features')) {
             return array('hits' => 0);
         } else {
