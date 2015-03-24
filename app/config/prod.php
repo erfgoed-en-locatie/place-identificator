@@ -16,8 +16,8 @@ $app["db.options"] = array(
     'driver'   => 'pdo_mysql',
     'host'     => 'localhost',
     'user'     => 'root',
-    'password' => 'root',
-    'dbname'   => 'erfgoedenlocatie_pid',
+    'password' => 'silly rocket vast damage',
+    'dbname'   => 'locatienaaruri',
     'charset'   => 'utf8',
 );
 
@@ -26,7 +26,7 @@ $app['swiftmailer.options'] = array(
     'host' => 'smtp.gmail.com',
     'port' => 465,
     'username' => 'histograph.io@gmail.com',
-    'password' => 'xxx',
+    'password' => 'BertReinRutger',
     'encryption' => 'ssl',
     'auth_mode' => 'login'
 );

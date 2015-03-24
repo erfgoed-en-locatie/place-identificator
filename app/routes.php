@@ -5,9 +5,6 @@
  *
  */
 
-
-use SimpleUser\User;
-
 // homepage
 $app->get('/', 'Pid\Demo\Controller\\Home::page');
 
