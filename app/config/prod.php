@@ -15,9 +15,9 @@ $app['session.default_locale'] = $app['locale'];
 $app["db.options"] = array(
     'driver'   => 'pdo_mysql',
     'host'     => 'localhost',
-    'user'     => 'root',
-    'password' => 'silly rocket vast damage',
-    'dbname'   => 'locatienaaruri',
+    'user'     => 'xxx',
+    'password' => 'xxx',
+    'dbname'   => 'xxx',
     'charset'   => 'utf8',
 );
 
@@ -26,7 +26,7 @@ $app['swiftmailer.options'] = array(
     'host' => 'smtp.gmail.com',
     'port' => 465,
     'username' => 'histograph.io@gmail.com',
-    'password' => 'BertReinRutger',
+    'password' => 'xxx',
     'encryption' => 'ssl',
     'auth_mode' => 'login'
 );
