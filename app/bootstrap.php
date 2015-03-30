@@ -5,7 +5,6 @@
  */
 
 // CUSTOM services
-use Monolog\Logger;
 use Knp\Provider\ConsoleServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 
