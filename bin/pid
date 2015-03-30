@@ -12,7 +12,7 @@ $loader = require __DIR__ . '/../vendor/autoload.php';
 $app = new Silex\Application();
 
 require_once __DIR__ . '/../app/bootstrap.php';
-require_once __DIR__ . '/../app/config/prod.php';
+require_once __DIR__ . '/../app/config/parameters.php';
 
 $application = $app['console'];
 $application->add(new \Pid\Mapper\Command\StandardizeCommand());

@@ -1,6 +1,7 @@
 .idea
 .DS_Store
 *.DS_Store
+/app/config/parameters.php
 /app/storage/cache/*
 /app/storage/doctrine/*
 /app/storage/log/*

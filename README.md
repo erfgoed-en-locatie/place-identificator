@@ -16,11 +16,11 @@ The app uses the API of the Dutch Historical Geocoder as it is being developed i
 
 3. And run `php composer.phar install`
 4. Create a database based on the file: `sql/pid.sql`
-5. Have a look at the `./app/config/prod.php` file and change the database etc setting according to your setup
+5. Rename the `./app/config/parameters.php.dist` to parameters.php and change the configuration settings for db, email etc. according to your setup
 6. Create a virtual host or point your browser to the location you set up for this site
 7. Composers post install script should have created the following dirs and made them writeable for the web server:
     app/storage/cache, app/storage/log, app/storage/uploads
 If the last step failed do this manually:
     `sudo chmod 777 app/storage/cache app/storage/log app/storage/uploads`
-
+8. On going to production; change the run mode in `/web/index.php` to use the http_cache 
 
