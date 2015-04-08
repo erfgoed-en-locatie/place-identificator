@@ -21,10 +21,18 @@ class GeocoderService {
     const SEARCH_PLACES_AND_MUNICIPALITIES  = 96;
     const SEARCH_STREETS                    = 90;
 
+    /** fuzzy or eaxcat options */
+    const TYPE_LITERAL_EXACT    = 1;
+    const TYPE_LITERAL_PART_OF  = 2;
+    const TYPE_TOKENIZED        = 3;
+
     /** @var string The field that the API uses to determine the type of feature */
     const API_PLACE_TYPE        = 'hg:Place';
     const API_MUNICIPALITY_TYPE = 'hg:Municipality';
     const API_STREET_TYPE       = 'hg:Street';
+
+    /** @var array  */
+    private $cache = null;
 
     /** @var array SearchType options for the geocoder */
     public static $searchOptions = array(
@@ -39,6 +47,9 @@ class GeocoderService {
      * @var integer Whether to search the geocoder for a specific hg:Type or not
      */
     private $searchOn = self::SEARCH_PLACES_AND_MUNICIPALITIES;
+
+
+    private $searchFuzzy = 3;
 
     /**
      * @var string $baseUri Uri of the service to call
@@ -68,7 +79,7 @@ class GeocoderService {
     protected function filterBadCharacters($name)
     {
         $bad = ':/?#[]@!$&()*+,;='; // @fixme escape some
-        return str_ireplace(str_split($bad), '', $name);
+        return preg_replace('!\s+!', ' ', str_ireplace(str_split($bad), '', $name));
     }
 
     /**
@@ -92,12 +103,7 @@ class GeocoderService {
             $name = $row[$key];
 
             try {
-                $response = $this->client->get(
-                    $this->search($name),
-                    array(
-                        'timeout' => self::API_TIMEOUT, // Response timeout
-                        'connect_timeout' => self::API_CONNECT_TIMEOUT, // Connection timeout
-                    ));
+                $response = $this->callAPI($name);
                 if ($response->getStatusCode() === 200) {
                     $row['response'] = $this->handleResponse($response->json(array('object' => true)));
                 }
@@ -107,8 +113,38 @@ class GeocoderService {
             }
 
         }
-
+        // empty the cache
+        $this->cache = null;
         return $rows;
+    }
+
+
+    /**
+     * Call the API but check cache first
+     *
+     * @param $name
+     * @return mixed
+     */
+    private function callAPI($name)
+    {
+        if (isset($this->cache[$name])) {
+            $this->app['monolog']->addInfo('Fetched from cache: "' . $name .'"');
+            return $this->cache[$name];
+        }
+
+        $name = $this->filterBadCharacters($name);
+        $uri = $this->searchExact($name);
+        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
+
+        $response = $this->client->get(
+            $uri,
+            array(
+                'timeout' => self::API_TIMEOUT, // Response timeout
+                'connect_timeout' => self::API_CONNECT_TIMEOUT, // Connection timeout
+            ));
+
+        $this->cache[$name] = $response;
+        return $response;
     }
 
     /**
@@ -119,12 +155,7 @@ class GeocoderService {
      */
     public function mapOne($name)
     {
-        $response = $this->client->get(
-            $this->searchExact($name),
-            array(
-                'timeout' => self::API_TIMEOUT, // Response timeout
-                'connect_timeout' => self::API_CONNECT_TIMEOUT, // Connection timeout
-            ));
+        $response = $this->callAPI($name);
         if ($response->getStatusCode() === 200) {
             return $this->handleMapOneResponse($response->json(array('object' => true)));
         }
@@ -183,7 +214,6 @@ class GeocoderService {
         // todo create wild card searches and non literal string searches
         // todo make the fuzzy_search options settable and select between searchExact, searchExactPhrase etc
         $uri = $this->searchExact($name) . $searchOnType;
-        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
 
         return $uri;
     }
@@ -196,7 +226,7 @@ class GeocoderService {
      * @return string
      */
     private function searchExact($name) {
-        return $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"&exact=true';
+        return $this->baseUri . '/search?name="' . $name . '"&exact=true';
     }
 
     /**
@@ -208,7 +238,7 @@ class GeocoderService {
      * @return string
      */
     private function searchExactPhrase($name) {
-        return $this->baseUri . '/search?name="' . $this->filterBadCharacters($name) . '"&exact=false';
+        return $this->baseUri . '/search?name="' . $name . '"&exact=false';
     }
 
     /**
@@ -218,7 +248,7 @@ class GeocoderService {
      * @return string
      */
     private function searchExactWord($name) {
-        return $this->baseUri . '/search?name=' . $this->filterBadCharacters($name) . '&exact=true';
+        return $this->baseUri . '/search?name=' . $name . '&exact=true';
     }
 
     /**
