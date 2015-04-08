@@ -94,18 +94,19 @@ $app['user.options'] = array(
     'mailer' => array(
         'enabled' => true, // When false, email notifications are not sent (they're silently discarded).
         'fromEmail' => array(
-            'address' => 'do-not-reply@' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : gethostname()),
-            'name' => null,
+            //'address' => 'do-not-reply@' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : gethostname()),
+            'address' => 'histograph.io@gmail.com',
+            'name' => 'LocatieNaarUri website',
         ),
     ),
 
     'emailConfirmation' => array(
         'required' => false, // Whether to require email confirmation before enabling new accounts.
-        'template' => '@user/email/confirm-email.twig',
+        'template' => 'simple-user/email/confirm-email.twig',
     ),
 
     'passwordReset' => array(
-        'template' => '@user/email/reset-password.twig',
+        'template' => 'simple-user/email/reset-password.twig',
         'tokenTTL' => 86400, // How many seconds the reset token is valid for. Default: 1 day.
     ),
 
@@ -136,7 +137,7 @@ $app['security.firewalls'] = array(
 
 
 $app['security.access_rules'] = array(
-    array('^/user/list/.*$', 'ROLE_ADMIN'), // fixme Why is this not closed for non-admins?
+    array('^/user/list/.*$', 'ROLE_ADMIN'),
     array('^/import/.*$', 'ROLE_USER'),
     array('^/datasets/.*$', 'ROLE_USER'),
     array('^/api/.*$', 'ROLE_USER'),
