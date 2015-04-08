@@ -73,7 +73,7 @@ class ImportControllerProvider implements ControllerProviderInterface {
                 'constraints' =>  array(
                     new Assert\NotBlank(),
                     new Assert\File(array(
-                        'maxSize'       => '4096k',
+                        'maxSize'       => '40M',
                         'mimeTypes'     => array('text/csv', 'text/plain'),
                     )),
                     new Assert\Type('file')
