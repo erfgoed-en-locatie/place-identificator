@@ -270,6 +270,8 @@ class ImportControllerProvider implements ControllerProviderInterface {
         $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
 
         $csv = \League\Csv\Reader::createFromPath($file);
+        // detect delimiter:
+        $csv->setDelimiter(current($csv->detectDelimiterList(2)));
         $columnNames = $csv->fetchOne();
 
         // see if we already have a mapping..

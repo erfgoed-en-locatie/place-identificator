@@ -39,6 +39,8 @@ class StandardizeCommand extends Command {
             return $app['monolog']->addError('CLI error: het csv-bestand (' . $dataset['filename'] . ') kon niet gelezen worden.');
         }
         $csv = \League\Csv\Reader::createFromPath($file);
+        // detect delimiter:
+        $csv->setDelimiter(current($csv->detectDelimiterList(2)));
 
         $rows =
             $csv->setOffset(0)
