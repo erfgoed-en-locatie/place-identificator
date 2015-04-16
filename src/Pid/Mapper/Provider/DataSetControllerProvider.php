@@ -317,10 +317,11 @@ class DataSetControllerProvider implements ControllerProviderInterface
      *
      * @param Application $app
      * @param $id
+     * @return string
      */
-    public function doDownload(Application $app, $id)
+    public function doDownload(Application $app, Request $request, $id)
     {
-        $dataset = $app['dataset_service']->fetchDataset($id);
+        $dataset = $app['dataset_service']->fetchDatasetDetails($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }
@@ -328,10 +329,11 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $csv = Writer::createFromFileObject(new SplTempFileObject());
         
         $fieldnames = array('original_name');
+        var_dump($dataset); die;
         
         // TODO: get user's placename identifier (if user told us we should include one)
-
-        foreach ($_POST as $key => $value) {
+        $postData = $request->request->all();
+        foreach ($postData as $key => $value) {
             $fieldnames[] = $key;
         }
         $csv->insertOne($fieldnames);
@@ -377,7 +379,8 @@ class DataSetControllerProvider implements ControllerProviderInterface
             foreach ($fieldnames as $field) {
                 $wanted[$field] = $records[$i][$field];
             }
-            
+
+            var_dump($wanted); die;
             $csv->insertOne($wanted);
         }
 

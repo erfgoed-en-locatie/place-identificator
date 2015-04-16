@@ -68,6 +68,8 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($id);
 
         $placeColumn = (int) $fieldMapping['placename'];
+        $idColumn = (int) $fieldMapping['identifier'];
+
         $searchOn = (int) $fieldMapping['search_option'];
 
         /** @var GeocoderService $geocoder */
@@ -76,7 +78,7 @@ class StandardizeControllerProvider implements ControllerProviderInterface
 
         try {
             $mappedRows = $geocoder->map($rows, $placeColumn);
-            $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $id);
+            $app['dataset_service']->storeMappedRecords($mappedRows, $id, $placeColumn, $idColumn);
         } catch (\Exception $e) {
             $app->abort(404, 'The histograph API returned an error. It might be down.');
         }

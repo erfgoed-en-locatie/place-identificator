@@ -57,6 +57,7 @@ class StandardizeCommand extends Command {
         $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($datasetId);
 
         $placeColumn = (int) $fieldMapping['placename'];
+        $idColumn = (int) $fieldMapping['identifier'];
         $searchOn = (int) $fieldMapping['search_option'];
 
         /** @var GeocoderService $geocoder */
@@ -67,7 +68,7 @@ class StandardizeCommand extends Command {
 
             $mappedRows = $geocoder->map($rows, $placeColumn);
 
-            $app['dataset_service']->storeMappedRecords($mappedRows, $placeColumn, $datasetId);
+            $app['dataset_service']->storeMappedRecords($mappedRows, $datasetId, $placeColumn, $idColumn);
 
             // get user via dataset user_id
             $user = $app['dataset_service']->getUser($dataset['user_id']);

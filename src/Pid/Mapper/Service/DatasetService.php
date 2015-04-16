@@ -55,7 +55,8 @@ class DatasetService {
      */
     public function fetchDatasetDetails($id)
     {
-        $stmt = $this->db->executeQuery('SELECT d.*, f.fuzzy_search, f.search_option FROM datasets d
+        $stmt = $this->db->executeQuery('SELECT d.*, f.fuzzy_search, f.search_option, f.identifier
+          FROM datasets d
           INNER JOIN field_mapping f ON f.dataset_id = d.id
           WHERE d.id = :id', array(
             'id' => (int)$id
@@ -215,7 +216,7 @@ class DatasetService {
      */
     public function getFieldMappingForDataset($id)
     {
-        $stmt = $this->db->executeQuery('SELECT placename, search_option FROM field_mapping WHERE dataset_id = :id', array(
+        $stmt = $this->db->executeQuery('SELECT placename, search_option, identifier FROM field_mapping WHERE dataset_id = :id', array(
             'id' => (int)$id
         ));
         return $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -269,7 +270,7 @@ class DatasetService {
      * @param boolean $deleteOld Whether to delete previously standardized data
      * @return integer $datasetId
      */
-    public function storeMappedRecords($mappedRows, $placeColumn, $datasetId, $deleteOld = true)
+    public function storeMappedRecords($mappedRows, $datasetId, $placeColumn, $identifierColumn = null, $deleteOld = true)
     {
         if ($deleteOld === true) {
             $this->db->delete('records', array('dataset_id' => $datasetId));
@@ -279,6 +280,9 @@ class DatasetService {
             $data = array();
             $data['original_name'] = $mapped[$placeColumn];
             $data['dataset_id'] = $datasetId;
+            if ($identifierColumn) {
+                $data['identifier'] = $mapped[$identifierColumn];
+            }
 
             if ($mapped['response']['hits'] == 1) {
                 $data['status'] = Status::MAPPED_EXACT;
