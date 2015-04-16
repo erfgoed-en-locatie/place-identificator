@@ -280,7 +280,7 @@ class DatasetService {
             $data = array();
             $data['original_name'] = $mapped[$placeColumn];
             $data['dataset_id'] = $datasetId;
-            if ($identifierColumn) {
+            if (null !== $identifierColumn) {
                 $data['identifier'] = $mapped[$identifierColumn];
             }
 

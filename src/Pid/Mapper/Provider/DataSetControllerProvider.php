@@ -329,7 +329,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $csv = Writer::createFromFileObject(new SplTempFileObject());
 
         $fieldnames = array('original_name');
-        if ($dataset['identifier']) {
+        if (null !== $dataset['identifier']) {
             $fieldnames[] = 'identifier';
         }
 
@@ -389,8 +389,6 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $csv->output();
 
         return '';
-        
     }
-
 
 }
