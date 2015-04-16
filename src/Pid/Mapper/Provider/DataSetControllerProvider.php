@@ -327,11 +327,12 @@ class DataSetControllerProvider implements ControllerProviderInterface
         }
 
         $csv = Writer::createFromFileObject(new SplTempFileObject());
-        
+
         $fieldnames = array('original_name');
-        var_dump($dataset); die;
-        
-        // TODO: get user's placename identifier (if user told us we should include one)
+        if ($dataset['identifier']) {
+            $fieldnames[] = 'identifier';
+        }
+
         $postData = $request->request->all();
         foreach ($postData as $key => $value) {
             $fieldnames[] = $key;
@@ -380,12 +381,9 @@ class DataSetControllerProvider implements ControllerProviderInterface
                 $wanted[$field] = $records[$i][$field];
             }
 
-            var_dump($wanted); die;
             $csv->insertOne($wanted);
         }
 
-        
-        
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="' . $dataset['name'] . '.csv"');
         $csv->output();
