@@ -230,6 +230,9 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $recs = $app['dataset_service']->fetchRec($recid);
         $rec = $recs[0];
 
+        $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($id);
+        $searchOn = (int) $fieldMapping['search_option'];
+        $app['geocoder_service']->setSearchOn($searchOn);
         $possibilities = $app['geocoder_service']->mapOne($rec['original_name']);
 
         //print_r($possibilities);

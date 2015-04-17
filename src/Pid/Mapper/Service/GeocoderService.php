@@ -133,7 +133,7 @@ class GeocoderService {
         }
 
         $name = $this->filterBadCharacters($name);
-        $uri = $this->searchExact($name);
+        $uri = $this->search($name);
         $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
 
         $response = $this->client->get(
@@ -210,7 +210,6 @@ class GeocoderService {
         if ($this->searchOn == self::SEARCH_STREETS) {
             $searchOnType = '&type=' . self::API_STREET_TYPE;
         }
-
         // todo create wild card searches and non literal string searches
         // todo make the fuzzy_search options settable and select between searchExact, searchExactPhrase etc
         $uri = $this->searchExact($name) . $searchOnType;
