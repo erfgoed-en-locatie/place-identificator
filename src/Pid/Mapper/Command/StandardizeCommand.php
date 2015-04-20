@@ -72,7 +72,7 @@ class StandardizeCommand extends Command {
 
             // get user via dataset user_id
             $user = $app['dataset_service']->getUser($dataset['user_id']);
-            $app['monolog']->addError('Sending an email to user, with id: ' . $dataset['user_id']);
+            $app['monolog']->addInfo('Sending an email to user, with id: ' . $dataset['user_id']);
 
             $app['dataset_service']->setMappingFinished($datasetId);
 
