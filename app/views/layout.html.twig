@@ -173,9 +173,11 @@
                     var answer =  jqXHR.responseJSON;
                     alertMessage(answer.error, 'alert-danger');
                 } else if (jqXHR.status == 404) {
-                    alertMessage('Requested page not found. [404]', 'alert-danger');
+                    alertMessage('Het item kon niet gevonden worden.[404]', 'alert-danger');
                 } else if (jqXHR.status == 500) {
-                    alertMessage('An internal server error happened...', 'alert-danger');
+                    alertMessage('De server kon het verzoek niet verwerken.', 'alert-danger');
+                } else {
+                    alertMessage('Er ging iets fout met een verbinding. Probeer het later nog eens...', 'alert-danger');
                 }
             }
 

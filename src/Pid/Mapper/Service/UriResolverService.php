@@ -35,14 +35,16 @@ class UriResolverService {
      *
      * @param string $uri
      * @return array The array contains hits|data keys
+     * @throws \Exception
      */
     public function findOne($uri)
     {
         $apiUri = $this->baseUri . '?uri=' . $uri;
         $response = $this->client->get($apiUri);
-        if ($response->getStatusCode() === 200) {
+        if ($response->getStatusCode() === 200 && $response->json()) {
             return $this->transformResponse($response->json(array('object' => true)));
         }
+        throw new \RuntimeException('The uri resolver could not resolve that location');
     }
 
     /**

@@ -97,13 +97,13 @@ class ApiControllerProvider implements ControllerProviderInterface {
 
         try {
             $record = $app['uri_resolver_service']->findOne($uri);
-
             $column = $this->discoverSourceType($uri);
             $data[$column] = $record;
             if ($app['dataset_service']->storeManualMapping($data, $id)){
                 return $app->json(array('id' => $id));
             }
-
+        } catch (\RuntimeException$e) {
+            return $app->json(array('id' => $id), 404);
         } catch (\Exception $e) {
             return $app->json(array('id' => $id), 503);
         }
