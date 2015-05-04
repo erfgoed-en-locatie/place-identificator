@@ -65,14 +65,7 @@
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        var mapIcon = L.icon({
-            iconUrl: '/images/map-marker-128x128.png',
-            iconSize:     [32, 32], // size of the icon
-            shadowSize:   [50, 64], // size of the shadow
-            iconAnchor:   [16, 32], // point of the icon which will correspond to marker's location
-            shadowAnchor: [4, 62],  // the same for the shadow
-            popupAnchor:  [-3, -26] // point from which the popup should open relative to the iconAnchor
-        });
+        var mapIcon = L.divIcon({className: 'fa fa-map-marker fa-4x pdx-marker blue'});
 
         var pits = new Array();
 
@@ -83,7 +76,13 @@
             {% for opt in possibilities.data %}
 
                 var placesLayer = L.geoJson().addTo(map);
-
+        /*var placesLayer = L.geoJson(
+                null, {
+                    pointToLayer: function (feature, latlng) {
+                        return L.Marker(latlng, { icon: mapIcon });
+                    }
+                }
+        ).addTo(map);*/
                 {% for src,pit in opt %}
                     var geojsonFeature = {
                         "type": "Feature",
