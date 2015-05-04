@@ -127,6 +127,22 @@ CREATE TABLE IF NOT EXISTS `user_custom_fields` (
 -- Constraints for dumped tables
 --
 
+CREATE TABLE IF NOT EXISTS `crowd_mapping` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dataset_id` int(11) DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `original_name` varchar(255) NOT NULL,
+  `geonames` text,
+  `tgn` text,
+  `bag` text,
+  `gg` text,
+  `erfgeo` text,
+  `created_on` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `record_dataset` (`dataset_id`),
+  KEY `dataset_user` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 --
 -- Constraints for table `datasets`
 --
