@@ -246,6 +246,7 @@ class DatasetService {
 
     /**
      * Save the manually mapped record
+     * Will now update all records with the same original name
      *
      * @param array $data
      * @param integer $id
@@ -258,13 +259,18 @@ class DatasetService {
         $data['status'] = Status::MAPPED_MANUALLY;
         $data['hits'] = 0;
 
-        return $this->db->update('records', $data, array('id' => $id));
+        $stmt = $this->db->executeQuery('SELECT original_name FROM records WHERE id = :id', array(
+            'id' => (int) $id
+        ));
+        $name = $stmt->fetchColumn(0);
+
+        return $this->db->update('records', $data, array('original_name' => $name));
     }
 
     /**
      * Transform the result from the API into storable data and store that data
      *
-     * If the dataset was standardize before, als delete all old mappings
+     * If the data set was standardized before, als delete all old mappings
      * @param array $mappedRows
      * @param string $placeColumn
      * @param boolean $deleteOld Whether to delete previously standardized data

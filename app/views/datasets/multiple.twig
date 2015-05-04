@@ -78,57 +78,50 @@
 
         {% if possibilities.data is defined %}
 
-        var group = new L.featureGroup();
+            var group = new L.featureGroup();
 
-        {% for opt in possibilities.data %}
+            {% for opt in possibilities.data %}
 
-        var placesLayer = L.geoJson().addTo(map);
-        
+                var placesLayer = L.geoJson().addTo(map);
 
-        {% for src,pit in opt %}
-            var geojsonFeature = {
-                "type": "Feature",
-                "properties": {
-                    "name": "{{ pit.name }}",
-                    "popupContent": "Hier moet de popup button in"
-                },
-                "geometry": {{ pit.geometry|json_encode|raw }}
-            };
+                {% for src,pit in opt %}
+                    var geojsonFeature = {
+                        "type": "Feature",
+                        "properties": {
+                            "name": "{{ pit.name }}",
+                            "popupContent": "Hier moet de popup button in"
+                        },
+                        "geometry": {{ pit.geometry|json_encode|raw }}
+                    };
+                    var geom = placesLayer.addData(geojsonFeature);
 
-            var geom = placesLayer.addData(geojsonFeature);
-            
-            {% set type = pit.type|replace({'hg:': ''}) %}
-            console.log('{{ pit.name }}');
-            
-            geom.bindPopup('' +
-                            '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }}, {{ src }})</p>' +
-                            '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
-                    );
+                    {% set type = pit.type|replace({'hg:': ''}) %}
 
-            group.addLayer(geom);
+                    geom.bindPopup('' +
+                                    '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }}, {{ src }})</p>' +
+                                    '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
+                            );
+                    group.addLayer(geom);
+                {% endfor %}
 
-        {% endfor %}
+            {% endfor %}
 
+            map.fitBounds(group);
 
-        {% endfor %}
+            jQuery(function () {
+                // reset a mapped record
+                $(document).on( "click", ".choose", function(e) {
+                    e.preventDefault();
+                    var data = $(this).attr('data-klont');
+                    var uri = $(this).attr('href');
+                    askAPI('POST', uri, data, forwardUser);
+                });
 
-        
-        map.fitBounds(group);
-
-        jQuery(function () {
-            // reset a mapped record
-            $(document).on( "click", ".choose", function(e) {
-                e.preventDefault();
-                var data = $(this).attr('data-klont');
-                var uri = $(this).attr('href');
-                askAPI('POST', uri, data, forwardUser);
+                function forwardUser(json) {
+                    alertMessage('De plaats is gestandaardiseerd.');
+                    window.location.href = '{{ path('dataset-multiples', {'id': dataset.id }) }}';
+                }
             });
-
-            function forwardUser(json) {
-                alertMessage('De plaats is gestandaardiseerd.');
-                window.location.href = '{{ path('dataset-multiples', {'id': dataset.id }) }}';
-            }
-        });
 
         {% endif %}
     </script>
