@@ -32,24 +32,36 @@
                 {% set cur = 'unmappables' %}
                 {% include 'datasets/tabnavs.twig' %}
             </div>
-            
+
             <p></p>
 
             {% if unmappables is not empty %}
-            <table class="table table-condensed">
-                <tr>
-                    <th>plaatsnaam</th>
-                    <th>toch nog de juiste URI gevonden?</th>
-                    <th></th>
-                </tr>
-                {% for rec in unmappables %}
-                <tr id="row_{{ rec.id }}">
-                    <td>{{ rec.original_name }}</td>
-                    <td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
-                    <td><button class="btn btn-primary btn-sm" onclick="setUri({{ rec.id }})">sla op</button></td>
-                </tr>
-                {% endfor %}
-            </table>
+                <table class="table table-condensed" id="pdxtable">
+                    <thead>
+                    <tr>
+                        <th>plaatsnaam</th>
+                        <th>toch nog de juiste URI gevonden?</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>plaatsnaam</th>
+                        <th>toch nog de juiste URI gevonden?</th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+
+                    <tbody>
+                    {% for rec in unmappables %}
+                        <tr id="row_{{ rec.id }}">
+                            <td>{{ rec.original_name }}</td>
+                            <td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
+                            <td><button class="btn btn-primary btn-sm" onclick="setUri({{ rec.id }})">sla op</button></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
 
         </div>

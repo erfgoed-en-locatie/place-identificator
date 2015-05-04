@@ -9,48 +9,62 @@
                 {% set cur = 'standardized' %}
                 {% include 'datasets/tabnavs.twig' %}
             </div>
-            
+
             <p></p>
 
             {% if standardized is not empty %}
-            <table class="table table-condensed actions">
-            	<tr>
-            		<th>plaatsnaam</th>
-            		<th>Geonames</th>
-            		<th>TGN</th>
-            		<th>Gemeentegeschiedenis</th>
-            		<th>Koppeling juist?</th>
-            	</tr>
-            	{% for rec in standardized %}
-            	<tr id="row_{{ rec.id }}">
-            		<td>{{ rec.original_name }}</td>
-            		<td>{% if rec.geonames is not empty %}<a href="{{ rec.geonames.uri }}" target="_blank">{{ rec.geonames.name }}</a>{% endif %}</td>
-            		<td>{% if rec.tgn is not empty %}<a href="{{ rec.tgn.uri }}" target="_blank">{{ rec.tgn.name }}</a>{% endif %}</td>
-            		<td>{% if rec.gg is not empty %}<a href="{{ rec.gg.uri }}" target="_blank">{{ rec.gg.name }}</a>{% endif %}</td>
-					<td><a class="btn btn-danger btn-sm clear-mapping" data-id="{{ rec.id }}" data-ref="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
-            	</tr>
-            	{% endfor %}
-            </table>
+                <table class="table table-condensed actions" id="pdxtable">
+                    <thead>
+                        <tr>
+                            <th>plaatsnaam</th>
+                            <th>Geonames</th>
+                            <th>TGN</th>
+                            <th>Gemeentegeschiedenis</th>
+                            <th>Koppeling juist?</th>
+                        </tr>
+                    </thead>
+
+                    <tfoot>
+                        <tr>
+                            <th>plaatsnaam</th>
+                            <th>Geonames</th>
+                            <th>TGN</th>
+                            <th>Gemeentegeschiedenis</th>
+                            <th>Koppeling juist?</th>
+                        </tr>
+                    </tfoot>
+
+                    <tbody>
+                    {% for rec in standardized %}
+                        <tr id="row_{{ rec.id }}">
+                            <td>{{ rec.original_name }}</td>
+                            <td>{% if rec.geonames is not empty %}<a href="{{ rec.geonames.uri }}" target="_blank">{{ rec.geonames.name }}</a>{% endif %}</td>
+                            <td>{% if rec.tgn is not empty %}<a href="{{ rec.tgn.uri }}" target="_blank">{{ rec.tgn.name }}</a>{% endif %}</td>
+                            <td>{% if rec.gg is not empty %}<a href="{{ rec.gg.uri }}" target="_blank">{{ rec.gg.name }}</a>{% endif %}</td>
+                            <td><a class="btn btn-danger btn-sm clear-mapping" data-id="{{ rec.id }}" data-ref="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
         </div>
     </div>
 
+    <script type="text/javascript">
 
-	<script>
+        jQuery(function () {
+            // reset a mapped record
+            $(".actions").on( "click", "a.clear-mapping", function(e) {
+                e.preventDefault();
+                var uri = $(this).attr('data-ref');
+                askAPI('GET', uri, null, deleteRow);
+            });
 
-		jQuery(function () {
-			// reset a mapped record
-			$(".actions").on( "click", "a.clear-mapping", function(e) {
-				e.preventDefault();
-				var uri = $(this).attr('data-ref');
-				askAPI('GET', uri, null, deleteRow);
-			});
+        });
 
-		});
-
-		function deleteRow(json) {
-			var tr = '#row_'+json.id;
-			$(tr).remove();
+        function deleteRow(json) {
+            var tr = '#row_'+json.id;
+            $(tr).remove();
 
             var one = jQuery('#nr-one').html();
             one = Number(one) - 1;
@@ -58,7 +72,7 @@
             none = Number(none) + 1;
 
             setNumbers(one,null,none);
-		}
+        }
 
-	</script>
+    </script>
 {% endblock %}

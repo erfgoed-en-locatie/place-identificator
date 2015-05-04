@@ -23,6 +23,13 @@
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 
+    <!-- Datatables -->
+    {#<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.css">#}
+    <link href="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.js"></script>
+    <script src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js" type="text/javascript"></script>
+
+
     <link rel="stylesheet" href="/css/pid.css" />
 
     <style type="text/css">
@@ -116,8 +123,42 @@
             askAPI('GET', uri, null, deleteUnmappedRow);
         });
 
-    });
+        /** DataTable **/
+        if ($('#pdxtable')) {
+            tableThing = $('#pdxtable').dataTable({
+                "lengthMenu": [[100, 250, 500, -1], [100, 250, 500, "All"]],
+                "seacrhing": false,
+                "language": {
+                    "lengthMenu": "Toon _MENU_ records per pagina",
+                    "zeroRecords": "Niks gevonden - sorry",
+                    "info": "Getoond: pagina _PAGE_ van _PAGES_",
+                    "infoEmpty": "Geen records",
+                    "infoFiltered": "(gefilterd _MAX_ van in totaal records)",
+                    "search": "Zoek",
+                    "searchPlaceholder": "Filter de resultaten"
+                }
+            });
+        }
 
+        /** deletes a row from the dataTable
+         $('#pdxtable .delete-record').click(function(e) {
+                e.preventDefault();
+                var uri = $(this).attr('href');
+                var trid = $(this).parents('tr').attr('id');
+
+                $.ajax({
+                    type: "POST", //or GET
+                    url: uri,
+                    data: '',
+                    success: function(response){
+                        var trpos = tableThing.fnGetPosition( document.getElementById(trid) );
+                        tableThing.fnDeleteRow(trpos);
+                    }
+                } );
+            });
+         */
+
+    });
 
     function setNumbers(one,more,none,unmappable){
         if(one!=null){

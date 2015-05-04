@@ -2,17 +2,17 @@
 
 {% block content %}
 
-	<script type="text/javascript">
+    <script type="text/javascript">
 
-		function setUri(recid){
-			uri = jQuery('#uri-with-' + recid).val();
-			data = {"uri": uri };
-			askAPI('GET', '/api/record/map/'+recid, data, deleteRow);
-		}
+        function setUri(recid){
+            uri = jQuery('#uri-with-' + recid).val();
+            data = {"uri": uri };
+            askAPI('GET', '/api/record/map/'+recid, data, deleteRow);
+        }
 
-		function deleteRow(json) {
-			var tr = '#row_'+json.id;
-			$(tr).remove();
+        function deleteRow(json) {
+            var tr = '#row_'+json.id;
+            $(tr).remove();
 
             var one = jQuery('#nr-one').html();
             one = Number(one) + 1;
@@ -20,22 +20,22 @@
             none = Number(none) - 1;
 
             setNumbers(one,null,none,null);
-		}
+        }
 
-		function deleteUnmappedRow(json) {
-			var tr = '#row_'+json.id;
-			$(tr).remove();
+        function deleteUnmappedRow(json) {
+            var tr = '#row_'+json.id;
+            $(tr).remove();
 
-			var none = jQuery('#nr-none').html();
+            var none = jQuery('#nr-none').html();
             none = Number(none) - 1;
             var unmappables = jQuery('#nr-unmappables').html();
             unmappables = Number(unmappables) + 1;
 
-			setNumbers(null, null,none,unmappables);
-		}
+            setNumbers(null, null,none,unmappables);
+        }
 
-	</script>
-    
+    </script>
+
 
     <div class="row">
         <div class="col-md-12">
@@ -47,31 +47,43 @@
             </div>
 
             {% if noresults is not empty %}
-            <p>Hieronder de plaatsnamen waar geen enkel resultaat voor gevonden is. U kunt hier handmatig een <a href="http://vocab.getty.edu/" target="_blank">TGN</a>, <a href="http://www.gemeentegeschiedenis.nl/" target="_blank">Gemeentegeschiedenis</a> of <a href="http://www.geonames.org/">Geonames</a> URI invoeren.</p>
+                <p>Hieronder de plaatsnamen waar geen enkel resultaat voor gevonden is. U kunt hier handmatig een <a href="http://vocab.getty.edu/" target="_blank">TGN</a>, <a href="http://www.gemeentegeschiedenis.nl/" target="_blank">Gemeentegeschiedenis</a> of <a href="http://www.geonames.org/">Geonames</a> URI invoeren.</p>
 
-            <table class="table table-condensed">
-            	<tr>
-            		<th>plaatsnaam</th>
-                    <th>en de juiste uri is...</th>
-                    <th></th>
-                    <th>...niet te achterhalen?</th>
-            	</tr>
-            	{% for rec in noresults %}
-            	<tr id="row_{{ rec.id }}">
-            		<td>{{ rec.original_name }}</td>
-            		<td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
-            		<td><button type="button" class="btn btn-primary btn-sm" onclick="setUri({{ rec.id }})">sla op</button></td>
-                    <td><button type="button" class="btn-danger btn btn-sm unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button></td>
-            	</tr>
-            	{% endfor %}
-            </table>
+                <table class="table table-condensed" id="pdxtable">
+                    <thead>
+                    <tr>
+                        <th>plaatsnaam</th>
+                        <th>en de juiste uri is...</th>
+                        <th></th>
+                        <th>...niet te achterhalen?</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>plaatsnaam</th>
+                        <th>en de juiste uri is...</th>
+                        <th></th>
+                        <th>...niet te achterhalen?</th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for rec in noresults %}
+                        <tr id="row_{{ rec.id }}">
+                            <td>{{ rec.original_name }}</td>
+                            <td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
+                            <td><button type="button" class="btn btn-primary btn-sm" onclick="setUri({{ rec.id }})">sla op</button></td>
+                            <td><button type="button" class="btn-danger btn btn-sm unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             {% endif %}
 
         </div>
     </div>
 
-	<script>
+    <script>
 
 
-	</script>
+    </script>
 {% endblock %}
