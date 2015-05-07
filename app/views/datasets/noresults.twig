@@ -11,15 +11,16 @@
         }
 
         function deleteRows(json) {
+            var tot = json.length;
             $.each(json, function(key, item) {
                 var tr = '#row_'+item.id;
                 $(tr).remove();
             });
 
             var one = jQuery('#nr-one').html();
-            one = Number(one) + 1;
+            one = Number(one) + tot;
             var none = jQuery('#nr-none').html();
-            none = Number(none) - 1;
+            none = Number(none) - tot;
 
             setNumbers(one,null,none,null);
 

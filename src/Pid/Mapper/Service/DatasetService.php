@@ -159,7 +159,19 @@ class DatasetService {
         $data['bag'] = null;
         $data['gg'] = null;
         $data['hits'] = 0;
-        return $this->db->update('records', $data, array('id' => $id));
+
+        // fetch original name, so we can update all records with the same name
+        $stmt = $this->db->executeQuery('SELECT original_name as name, dataset_id FROM records WHERE id = :id', array(
+            'id' => (int) $id
+        ));
+        $stored = $stmt->fetch();
+
+        // also fetch ids with the same original name, in order to be able to delete the rows in the ajaxy interface
+        $statement = $this->db->executeQuery('SELECT id FROM records WHERE original_name = ?', array($stored['name']));
+        $ids = $statement->fetchAll();
+
+        $this->db->update('records', $data, array('original_name' => $stored['name']));
+        return $ids;
     }
 
     /**
@@ -261,6 +273,7 @@ class DatasetService {
         $data['status'] = Status::MAPPED_MANUALLY;
         $data['hits'] = 0;
 
+        // fetch original name, so we can update all records with the same name
         $stmt = $this->db->executeQuery('SELECT original_name as name, dataset_id FROM records WHERE id = :id', array(
             'id' => (int) $id
         ));

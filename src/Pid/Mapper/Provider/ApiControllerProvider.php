@@ -58,8 +58,8 @@ class ApiControllerProvider implements ControllerProviderInterface {
      */
     public function setUnmappable(Application $app, $id)
     {
-        if ($app['dataset_service']->setRecordAsUnmappable($id)){
-            return $app->json(array('id' => $id));
+        if ($ids = $app['dataset_service']->setRecordAsUnmappable($id)){
+            return $app->json($ids);
         }
 
         return $app->json(array('error' => 'Record could not be updated'), 503);
