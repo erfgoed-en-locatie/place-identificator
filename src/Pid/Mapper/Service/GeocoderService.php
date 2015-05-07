@@ -54,7 +54,7 @@ class GeocoderService {
     /**
      * @var string $baseUri Uri of the service to call
      */
-    private $baseUri = 'http://api.histograph.io';
+    private $baseUri = 'https://api.histograph.io';
 
     protected $app;
 
