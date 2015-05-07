@@ -254,17 +254,31 @@ class DatasetService {
      */
     public function storeManualMapping($data, $id)
     {
+        $crowdData = $data;
+
         $date = new \DateTime('now');
         $data['updated_on'] = $date->format('Y-m-d H:i:s');
         $data['status'] = Status::MAPPED_MANUALLY;
         $data['hits'] = 0;
 
-        $stmt = $this->db->executeQuery('SELECT original_name FROM records WHERE id = :id', array(
+        $stmt = $this->db->executeQuery('SELECT original_name as name, dataset_id FROM records WHERE id = :id', array(
             'id' => (int) $id
         ));
-        $name = $stmt->fetchColumn(0);
+        $stored = $stmt->fetch();
 
-        return $this->db->update('records', $data, array('original_name' => $name));
+        // also save the mapping into the crowd table
+        $crowdData['created_on'] = $date->format('Y-m-d H:i:s');
+        $crowdData['dataset_id'] = $stored['dataset_id'];
+        unset ($crowdData['identifier']);
+        $this->db->insert('crowd_mapping', $crowdData);
+
+        // grmbl, need to fetch the ids first, in order to be able to delete the rows in the ajaxy interface
+        $statement = $this->db->executeQuery('SELECT id FROM records WHERE original_name = ?', array($stored['name']));
+        //$ids = $statement->fetchAll(\PDO::FETCH_COLUMN);
+        $ids = $statement->fetchAll();
+
+        $this->db->update('records', $data, array('original_name' => $stored['name']));
+        return $ids;
     }
 
     /**

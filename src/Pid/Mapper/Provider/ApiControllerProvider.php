@@ -66,7 +66,7 @@ class ApiControllerProvider implements ControllerProviderInterface {
     }
 
     /**
-     * Standardize record with UNMAPPED status
+     * Save a manually set mapping
      *
      * @param Application $app
      * @param integer $id
@@ -99,8 +99,8 @@ class ApiControllerProvider implements ControllerProviderInterface {
             $record = $app['uri_resolver_service']->findOne($uri);
             $column = $this->discoverSourceType($uri);
             $data[$column] = $record;
-            if ($app['dataset_service']->storeManualMapping($data, $id)){
-                return $app->json(array('id' => $id));
+            if ($ids = $app['dataset_service']->storeManualMapping($data, $id)){
+                return $app->json($ids);
             }
         } catch (\RuntimeException$e) {
             return $app->json(array('id' => $id), 404);
@@ -162,5 +162,4 @@ class ApiControllerProvider implements ControllerProviderInterface {
             return 'erfgeo';
         }
     }
-
 }

@@ -7,12 +7,14 @@
         function setUri(recid){
             uri = jQuery('#uri-with-' + recid).val();
             data = {"uri": uri };
-            askAPI('GET', '/api/record/map/'+recid, data, deleteRow);
+            askAPI('GET', '/api/record/map/'+recid, data, deleteRows);
         }
 
-        function deleteRow(json) {
-            var tr = '#row_'+json.id;
-            $(tr).remove();
+        function deleteRows(json) {
+            $.each(json, function(key, item) {
+                var tr = '#row_'+item.id;
+                $(tr).remove();
+            });
 
             var one = jQuery('#nr-one').html();
             one = Number(one) + 1;
