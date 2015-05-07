@@ -56,7 +56,7 @@ class UriResolverService {
     {
         $data['name'] = $json->label[0];
         $data['uri'] = $json->uri;
-        $data['geomety']['type'] = 'Point';
+        $data['geometry']['type'] = 'Point';
         $data['geometry']['coordinates'] = array($json->lat, $json->lon);
         return json_encode($data);
     }
