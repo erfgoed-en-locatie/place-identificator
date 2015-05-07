@@ -274,7 +274,6 @@ class DatasetService {
 
         // grmbl, need to fetch the ids first, in order to be able to delete the rows in the ajaxy interface
         $statement = $this->db->executeQuery('SELECT id FROM records WHERE original_name = ?', array($stored['name']));
-        //$ids = $statement->fetchAll(\PDO::FETCH_COLUMN);
         $ids = $statement->fetchAll();
 
         $this->db->update('records', $data, array('original_name' => $stored['name']));
