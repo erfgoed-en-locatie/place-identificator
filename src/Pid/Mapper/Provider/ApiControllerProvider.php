@@ -24,6 +24,8 @@ class ApiControllerProvider implements ControllerProviderInterface {
     {
         $controllers = $app['controllers_factory'];
 
+        $controllers->get('/testuri', array(new self(), 'testResolver'))->bind('api-test');
+
         $controllers->get('/record/unmap/{id}', array(new self(), 'clearStandardization'))->bind('api-clear-mapping')->assert('id', '\d+');
         $controllers->get('/record/map/{id}', array(new self(), 'setStandardization'))->bind('api-set-mapping')->assert('id', '\d+');
         $controllers->get('/record/ummappable/{id}', array(new self(), 'setUnmappable'))->bind('api-unmappable')->assert('id', '\d+');
@@ -93,7 +95,7 @@ class ApiControllerProvider implements ControllerProviderInterface {
         if(preg_match("/(http:\/\/www.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
             //print_r($matches);
             $uri = $matches[1];
-        } 
+        }
 
         try {
             $record = $app['uri_resolver_service']->findOne($uri);
@@ -108,6 +110,29 @@ class ApiControllerProvider implements ControllerProviderInterface {
             return $app->json(array('id' => $id), 503);
         }
     }
+
+    public function testResolver(Application $app, Request $request)
+    {
+        $uri = $request->get('uri');
+
+        // only gg, geonames and tgn uri's!
+        if(!preg_match("/http:\/\/www.gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
+            !preg_match("/http:\/\/www.geonames.org/", $uri) &&
+            !preg_match("/http:\/\/vocab.getty.edu\/tgn/", $uri)) {
+            return $app->json(array('error' => 'Geen GG, TGN of GeoNames Uri. Er is niets opgeslagen.'), 400);
+        }
+
+        // if geonames, we do'nt want the last part they keep communicating!
+        if(preg_match("/(http:\/\/www.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
+            //print_r($matches);
+            $uri = $matches[1];
+        }
+
+        $record = $app['uri_resolver_service']->findOne($uri);
+        var_dump($record); die;
+
+    }
+
 
     /**
      * When selecting one PIT of multiple results we need to store the entire klont that get's passed in as json
