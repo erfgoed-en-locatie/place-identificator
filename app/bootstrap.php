@@ -8,7 +8,6 @@
 use Knp\Provider\ConsoleServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 
-
 $app['dataset_service'] = $app->share(function ($app) {
     return new \Pid\Mapper\Service\DatasetService($app['db']);
 });
@@ -131,7 +130,7 @@ $app['security.firewalls'] = array(
         'pattern' => '^/.*$',
         'form' => array('login_path' => '/user/login', 'check_path' => '/user/login_check'),
         'logout' => array('logout_path' => '/user/logout'),
-        'users' => $app->share(function($app) { return $app['user.manager']; }),
+        'users' => $app->share(function ($app) { return $app['user.manager']; }),
     ),
 );
 
