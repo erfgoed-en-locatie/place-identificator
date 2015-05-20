@@ -79,20 +79,19 @@ class ApiControllerProvider implements ControllerProviderInterface {
         //$data = $request->getContent();
         $uri = $request->get('uri');
 
-        // todo find out how to do this with a proper POST as json data
         if (empty($uri) || !is_string($uri)) {
             return $app->json(array('error' => 'Geen of geen valide uri ontvangen. Er is niets opgeslagen.'), 400);
         }
 
         // only gg, geonames and tgn uri's!
-        if(!preg_match("/http:\/\/www.gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
-            !preg_match("/http:\/\/www.geonames.org/", $uri) &&
-            !preg_match("/http:\/\/vocab.getty.edu\/tgn/", $uri)) {
+        if(!preg_match("/gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
+            !preg_match("/geonames.org/", $uri) &&
+            !preg_match("/vocab.getty.edu\/tgn/", $uri)) {
             return $app->json(array('error' => 'Geen GG, TGN of GeoNames Uri. Er is niets opgeslagen.'), 400);
         }
 
         // if geonames, we do'nt want the last part they keep communicating!
-        if(preg_match("/(http:\/\/www.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
+        if(preg_match("/(http:\/\/sws.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
             //print_r($matches);
             $uri = $matches[1];
         }
@@ -116,18 +115,17 @@ class ApiControllerProvider implements ControllerProviderInterface {
         $uri = $request->get('uri');
 
         // only gg, geonames and tgn uri's!
-        if(!preg_match("/http:\/\/www.gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
-            !preg_match("/http:\/\/www.geonames.org/", $uri) &&
-            !preg_match("/http:\/\/vocab.getty.edu\/tgn/", $uri)) {
+        if(!preg_match("/gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
+            !preg_match("/geonames.org/", $uri) &&
+            !preg_match("/vocab.getty.edu\/tgn/", $uri)) {
             return $app->json(array('error' => 'Geen GG, TGN of GeoNames Uri. Er is niets opgeslagen.'), 400);
         }
 
         // if geonames, we do'nt want the last part they keep communicating!
-        if(preg_match("/(http:\/\/www.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
+        if(preg_match("/(http:\/\/sws.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
             //print_r($matches);
             $uri = $matches[1];
         }
-
         $record = $app['uri_resolver_service']->findOne($uri);
         var_dump($record); die;
 
