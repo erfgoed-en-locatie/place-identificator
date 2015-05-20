@@ -127,7 +127,8 @@ class UriResolverService {
 
     public function findGeonames($uri)
     {
-        $id = str_replace("http://www.geonames.org/", "", $uri);
+        $temp = explode('/', $uri);
+        $id = end($temp);
 
         $json = $this->http_get_contents("http://ws.geonames.org/getJSON?geonameId=" . $id . "&username=mmmenno");
         // todo fix username mmmenno
