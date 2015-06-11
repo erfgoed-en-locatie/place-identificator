@@ -281,7 +281,9 @@ class DatasetService {
 
         // also save the mapping into the crowd table
         $crowdData['created_on'] = $date->format('Y-m-d H:i:s');
+        $crowdData['original_name'] = $stored['name'];
         $crowdData['dataset_id'] = $stored['dataset_id'];
+
         unset ($crowdData['identifier']);
         $this->db->insert('crowd_mapping', $crowdData);
 
