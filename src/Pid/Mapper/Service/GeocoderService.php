@@ -317,7 +317,9 @@ class GeocoderService {
             if (in_array($pit->source, $this->fieldsOfInterest)) {
                 $data[$pit->source]['name'] = $pit->name;
                 $data[$pit->source]['uri'] = $pit->uri;
-                $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
+                if($pit->geometryIndex > -1){
+                    $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
+                }
                 $data[$pit->source]['type'] = $feature->properties->type;
             }
         }
