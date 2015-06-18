@@ -352,7 +352,9 @@ class DataSetControllerProvider implements ControllerProviderInterface
                 $geonames = json_decode($records[$i]['geonames']);
                 $records[$i]['geonames-uri'] = $geonames->uri;
                 $records[$i]['geonames-label'] = $geonames->name;
-                $records[$i]['geonames-geometry'] = json_encode($geonames->geometry);
+                if (property_exists($geonames, 'geometry')) {
+                    $records[$i]['geonames-geometry'] = json_encode($geonames->geometry);
+                }
             }else{
                 $records[$i]['geonames-uri'] = "";
                 $records[$i]['geonames-label'] = "";
@@ -362,7 +364,9 @@ class DataSetControllerProvider implements ControllerProviderInterface
                 $tgn = json_decode($records[$i]['tgn']);
                 $records[$i]['tgn-uri'] = $tgn->uri;
                 $records[$i]['tgn-label'] = $tgn->name;
-                $records[$i]['tgn-geometry'] = json_encode($tgn->geometry);
+                if (property_exists($tgn, 'geometry')) {
+                    $records[$i]['tgn-geometry'] = json_encode($tgn->geometry);
+                }
             }else{
                 $records[$i]['tgn-uri'] = "";
                 $records[$i]['tgn-label'] = "";
@@ -372,7 +376,9 @@ class DataSetControllerProvider implements ControllerProviderInterface
                 $gg = json_decode($records[$i]['gg']);
                 $records[$i]['gg-uri'] = $gg->uri;
                 $records[$i]['gg-label'] = $gg->name;
-                $records[$i]['gg-geometry'] = json_encode($gg->geometry);
+                if (property_exists($gg, 'geometry')) {
+                    $records[$i]['gg-geometry'] = json_encode($gg->geometry);
+                }
             }else{
                 $records[$i]['gg-uri'] = "";
                 $records[$i]['gg-label'] = "";
