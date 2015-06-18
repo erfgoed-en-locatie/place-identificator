@@ -316,8 +316,11 @@ class GeocoderService {
         $data = array();
         foreach($feature->properties->pits as $pit) {
             if (in_array($pit->source, $this->fieldsOfInterest)) {
+
                 $data[$pit->source]['name'] = $pit->name;
-                $data[$pit->source]['uri'] = $pit->uri;
+                if (property_exists($pit, 'uri')) {
+                    $data[$pit->source]['uri'] = $pit->uri;
+                }
                 if($pit->geometryIndex > -1){
                     $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
                 }
