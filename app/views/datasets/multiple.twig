@@ -84,6 +84,7 @@
                 }
         ).addTo(map);*/
                 {% for src,pit in opt %}
+                    {% if pit.geometry is defined %}
                     var geojsonFeature = {
                         "type": "Feature",
                         "properties": {
@@ -101,6 +102,7 @@
                                     '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
                             );
                     group.addLayer(geom);
+                    {% endif %}
                 {% endfor %}
 
             {% endfor %}
