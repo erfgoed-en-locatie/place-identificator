@@ -1,6 +1,5 @@
-# PiD - Place Identificator
- 
-The tool to IdThisPlace.
+# Place Standardization tool for Histograph
+
 A frontend application, built on top of silex, to let users identify and standardize (Dutch historical) place names.
 
 The app uses the API of the Dutch Historical Geocoder as it is being developed in the "Erfgoed & Locatie" project.
