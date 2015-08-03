@@ -228,7 +228,7 @@ class DatasetService {
      */
     public function getFieldMappingForDataset($id)
     {
-        $stmt = $this->db->executeQuery('SELECT placename, search_option, identifier FROM field_mapping WHERE dataset_id = :id', array(
+        $stmt = $this->db->executeQuery('SELECT * FROM field_mapping WHERE dataset_id = :id', array(
             'id' => (int)$id
         ));
         return $stmt->fetch(\PDO::FETCH_ASSOC);
