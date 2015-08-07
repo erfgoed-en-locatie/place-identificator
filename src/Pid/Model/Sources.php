@@ -3,10 +3,10 @@
 namespace Pid\Model;
 
 /**
- * Object that holds some of the available dataset (formerly known as sources) for Histograph.
- * Hardcoded, because we don not want to facilittate all obscure ones at the moment
+ * Object that holds some of the available data set (formerly known as sources) for Histograph.
+ * Hardcoded, because we don not want to facilitate all obscure ones at the moment
  *
- * The list of avalaible sources can also be fetched from the API directly
+ * The list of available sources can also be fetched from the API directly
  *
  */
 class Sources

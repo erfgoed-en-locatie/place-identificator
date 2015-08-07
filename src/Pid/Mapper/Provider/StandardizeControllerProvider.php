@@ -20,16 +20,31 @@ use Symfony\Component\HttpFoundation\Response;
 class StandardizeControllerProvider implements ControllerProviderInterface
 {
 
-    const NUMBER_TO_TEST    = 20;
+    const NUMBER_TO_TEST = 20;
 
     public function connect(Application $app)
     {
         $controllers = $app['controllers_factory'];
 
+        $controllers->get('/view/{id}', array(new self(), 'viewAction'))->bind('standardize-view-mapping')->assert('id',
+            '\d+');
         $controllers->get('/test/{id}', array(new self(), 'testAction'))->bind('standardize-test')->assert('id', '\d+');
-        $controllers->get('/run/{id}', array(new self(), 'standardizeAction'))->bind('standardize')->assert('id', '\d+');
+        $controllers->get('/run/{id}', array(new self(), 'standardizeAction'))->bind('standardize')->assert('id',
+            '\d+');
 
         return $controllers;
+    }
+
+    /**
+     * Review the mapping settings
+     *
+     * @param Application $app
+     * @param $id
+     * @param Request $request
+     */
+    public function viewAction(Application $app, $id, Request $request)
+    {
+
     }
 
     /**

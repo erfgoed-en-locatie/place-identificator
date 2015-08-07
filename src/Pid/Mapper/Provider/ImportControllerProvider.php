@@ -223,13 +223,17 @@ class ImportControllerProvider implements ControllerProviderInterface
                 )
             ))*/
 
+            ->add('save', 'submit', array(
+                'label' => 'bewaar',
+                'attr' => array('class' => 'btn btn-success'),
+            ))
             ->add('map', 'submit', array(
-                'label' => 'test 20 records',
+                'label' => 'bewaar deze instellingen en test 20 records',
                 'attr' => array('class' => 'btn btn-primary'),
             ))
             ->add('mapall', 'submit', array(
-                'label' => 'standaardiseer alle records',
-                'attr' => array('class' => 'btn btn-primary'),
+                'label' => 'bewaar en standaardiseer alle records',
+                'attr' => array('class' => 'btn btn-danger'),
             ))
 
             ->getForm();
@@ -283,6 +287,8 @@ class ImportControllerProvider implements ControllerProviderInterface
                     // and go straight to mapping all, if clicked
                     if ($form->get('mapall')->isClicked()) {
                         return $app->redirect($app['url_generator']->generate('standardize', array('id' => $id)));
+                    } elseif ($form->get('save')->isClicked()) {
+                        return $app->redirect($app['url_generator']->generate('datasets-all'));
                     } else {
                         return $app->redirect($app['url_generator']->generate('standardize-test', array('id' => $id)));
                     }
