@@ -1,86 +1,95 @@
 <?php
 
 namespace Pid\Mapper\Service;
+use Histograph\Client\GeoJsonResponse;
+use Histograph\Client\Search;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 
 
 /**
- * Maps a set of rows and returns the result
+ * Encapsulates the calls to the Histograph API and stores the requested fields, based on the field mapping provided
  *
  * @package Pid\Mapper\Service
  */
 class GeocoderService {
 
-    const API_TIMEOUT           = 5;
-    const API_CONNECT_TIMEOUT   = 5;
-
-    const SEARCH_ALL                        = 99;
-    const SEARCH_PLACES                     = 98;
-    const SEARCH_MUNICIPALITIES             = 97;
-    const SEARCH_PLACES_AND_MUNICIPALITIES  = 96;
-    const SEARCH_STREETS                    = 90;
-
-    /** fuzzy or eaxcat options */
-    const TYPE_LITERAL_EXACT    = 1;
-    const TYPE_LITERAL_PART_OF  = 2;
-    const TYPE_TOKENIZED        = 3;
-
-    /** @var string The field that the API uses to determine the type of feature */
-    const API_PLACE_TYPE        = 'hg:Place';
-    const API_MUNICIPALITY_TYPE = 'hg:Municipality';
-    const API_STREET_TYPE       = 'hg:Street';
-
-    /** @var array  */
-    private $cache = null;
-
-    /** @var array SearchType options for the geocoder */
-    public static $searchOptions = array(
-        //self::SEARCH_ALL    => 'alles',
-        self::SEARCH_PLACES_AND_MUNICIPALITIES => 'plaatsen en gemeentes',
-        self::SEARCH_PLACES         => 'plaatsen',
-        self::SEARCH_MUNICIPALITIES => 'gemeentes',
-        //self::SEARCH_STREETS => 'straten'
-    );
-
-    /**
-     * @var integer Whether to search the geocoder for a specific hg:Type or not
-     */
-    private $searchOn = self::SEARCH_PLACES_AND_MUNICIPALITIES;
-
-
-    private $searchFuzzy = 3;
-
-    /**
-     * @var string $baseUri Uri of the service to call
-     */
-    //private $baseUri = 'https://api.histograph.io';
-    private $baseUri = 'http://api.erfgeo.nl';
-
     protected $app;
-
-    /**
-     * @var array Fields in the API result that hold the data we want to store
-     */
-    private $fieldsOfInterest = array(
-        'geonames', 'tgn', 'bag', 'gemeentegeschiedenis'
-    );
 
     public function __construct($app)
     {
         $this->app = $app;
-        $this->client = new \GuzzleHttp\Client();
+        $this->client = new Search($app['monolog']);
     }
 
     /**
-     * Escape characters before they're send to the API
-     * @param $name
-     * @return string
+     * Maps an array of rows with at least a placename against the geocoder
+     *
+     * @param array $rows
+     * @param array $fieldMapping
      */
-    protected function filterBadCharacters($name)
+    public function map($rows, $fieldMapping)
     {
-        $bad = ':/?#[]@!$&()*+,;='; // @fixme escape some
-        return preg_replace('!\s+!', ' ', str_ireplace(str_split($bad), '', $name));
+        // todo create batches!
+        if (empty($rows)) {
+            throw new RuntimeException('No rows to process.');
+        }
+
+        $placeColumn = (int) $fieldMapping['placename'];
+        if (!$rows[0][$placeColumn]) {
+            throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
+        }
+
+        // client settings valid for all rows
+        $this->client->setGeometry($fieldMapping['geometry'])
+            ->setExact(true)
+            ->setQuoted(true)
+            ->setSearchType($fieldMapping['hg_type']);
+
+        // settings for each row
+        foreach ($rows as $row) {
+            $name = $this->client->cleanupSearchString($row[(int)($fieldMapping['placename'])]);
+            if (empty($name)) {
+                continue;
+            }
+
+            // set bounding param if one was given
+            if (!empty($fieldMapping['liesin'])) {
+                $within = $this->client->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
+                if (!empty($within)) {
+                    $this->client->setLiesIn($within);
+                }
+            }
+
+            /** @var GeoJsonResponse $histographResponse */
+            $histographResponse = $this->client->search($name);
+
+            if ($this->hits = $histographResponse->getHits() > 0) {;
+
+                $features = $histographResponse
+                    // fetch only results of a certain type:
+                    ->setPitSourceFilter(array($fieldMapping['hg_dataset']))
+                    ->getFilteredResponse()
+                    //->getResponse()
+                ;
+
+                if ($features) {
+                    foreach ($features as $feature) {
+
+                        foreach ($feature->properties->pits as $pit) {
+
+                            print '++ ' . $pit->name . ' -+- ' . $pit->hgid . '<br/>';
+                        };
+                    }
+
+                }
+            }
+        }
+    }
+
+    protected function storeMappedRow($datasetId, $originalName, $data)
+    {
+
     }
 
     /**
@@ -90,7 +99,7 @@ class GeocoderService {
      * @param integer $key Index key of the row that holds the placename
      * @return mixed
      */
-    public function map($rows, $key)
+    public function oldmap($rows, $key)
     {
         if (!$rows[0][$key]) {
             throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
@@ -119,34 +128,6 @@ class GeocoderService {
         return $rows;
     }
 
-
-    /**
-     * Call the API but check cache first
-     *
-     * @param $name
-     * @return mixed
-     */
-    private function callAPI($name)
-    {
-        if (isset($this->cache[$name])) {
-            $this->app['monolog']->addInfo('Fetched from cache: "' . $name .'"');
-            return $this->cache[$name];
-        }
-
-        $name = $this->filterBadCharacters($name);
-        $uri = $this->search($name);
-        $this->app['monolog']->addInfo('Calling histograph API with: "' . $uri .'"');
-
-        $response = $this->client->get(
-            $uri,
-            array(
-                'timeout' => self::API_TIMEOUT, // Response timeout
-                'connect_timeout' => self::API_CONNECT_TIMEOUT, // Connection timeout
-            ));
-
-        $this->cache[$name] = $response;
-        return $response;
-    }
 
     /**
      * Call API for one place name and try to find as much info as possible
@@ -191,64 +172,6 @@ class GeocoderService {
             return $output;
         }
 
-    }
-
-    /**
-     * Wrapper around setting all the settable parameters for calling the API
-     *
-     * @param string $name
-     * @return string
-     */
-    protected function search($name)
-    {
-        $searchOnType = '';
-        if ($this->searchOn == self::SEARCH_PLACES) {
-            $searchOnType = '&type=' . self::API_PLACE_TYPE;
-        }
-        if ($this->searchOn == self::SEARCH_MUNICIPALITIES) {
-            $searchOnType = '&type=' . self::API_MUNICIPALITY_TYPE;
-        }
-        if ($this->searchOn == self::SEARCH_STREETS) {
-            $searchOnType = '&type=' . self::API_STREET_TYPE;
-        }
-        // todo create wild card searches and non literal string searches
-        // todo make the fuzzy_search options settable and select between searchExact, searchExactPhrase etc
-        $uri = $this->searchExact($name) . $searchOnType;
-
-        return $uri;
-    }
-
-    /**
-     * Searches the API on a literal (quoted) string, and returns only exact matches (not part of)
-     * Example: http://api.histograph.io/search?name="Bergen op Zoom"&exact=true
-     *
-     * @param $name
-     * @return string
-     */
-    private function searchExact($name) {
-        return $this->baseUri . '/search?name="' . $name . '"&exact=true';
-    }
-
-    /**
-     * Searches the API on a literal string, and returns also matches that were partially found
-     * (Bergen op zoomstraat)
-     * Example: http://api.histograph.io/search?name="Bergen op Zoom"&exact=false
-     *
-     * @param $name
-     * @return string
-     */
-    private function searchExactPhrase($name) {
-        return $this->baseUri . '/search?name="' . $name . '"&exact=false';
-    }
-
-    /**
-     * Searches the API on a (tokenized) word that is contained by the placename
-     *
-     * @param $name
-     * @return string
-     */
-    private function searchExactWord($name) {
-        return $this->baseUri . '/search?name=' . $name . '&exact=true';
     }
 
     /**
@@ -350,29 +273,6 @@ class GeocoderService {
             }
         }
         return $data;
-    }
-
-    /**
-     * Set the type of search you want to perform
-     * @return int
-     */
-    public function getSearchOn()
-    {
-        return $this->searchOn;
-    }
-
-    /**
-     * Set the type of search you want to perform
-     *
-     * @param int $searchOn
-     */
-    public function setSearchOn($searchOn)
-    {
-        if (array_key_exists($searchOn, self::$searchOptions)) {
-            $this->searchOn = $searchOn;
-        } else {
-            $this->searchOn = self::SEARCH_PLACES_AND_MUNICIPALITIES;
-        }
     }
 
 }

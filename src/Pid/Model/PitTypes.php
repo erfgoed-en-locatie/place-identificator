@@ -20,7 +20,8 @@ final class PitTypes
 
     public static function getTypes()
     {
-        return self::$types;
+        natsort(self::$types);
+        return array_combine(self::$types, self::$types);
     }
 
     public static function isValid($type)

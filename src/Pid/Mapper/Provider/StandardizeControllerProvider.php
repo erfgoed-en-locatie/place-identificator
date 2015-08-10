@@ -2,6 +2,9 @@
 
 namespace Pid\Mapper\Provider;
 
+use Histograph\Client\Client;
+use Histograph\Client\GeoJsonResponse;
+use Histograph\Client\Search;
 use Pid\Mapper\Model\Dataset;
 use Pid\Mapper\Model\Status;
 use Pid\Mapper\Service\GeocoderService;
@@ -26,25 +29,11 @@ class StandardizeControllerProvider implements ControllerProviderInterface
     {
         $controllers = $app['controllers_factory'];
 
-        $controllers->get('/view/{id}', array(new self(), 'viewAction'))->bind('standardize-view-mapping')->assert('id',
-            '\d+');
         $controllers->get('/test/{id}', array(new self(), 'testAction'))->bind('standardize-test')->assert('id', '\d+');
         $controllers->get('/run/{id}', array(new self(), 'standardizeAction'))->bind('standardize')->assert('id',
             '\d+');
 
         return $controllers;
-    }
-
-    /**
-     * Review the mapping settings
-     *
-     * @param Application $app
-     * @param $id
-     * @param Request $request
-     */
-    public function viewAction(Application $app, $id, Request $request)
-    {
-
     }
 
     /**
@@ -59,6 +48,7 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
         if (!$dataset) {
             $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
 
@@ -66,6 +56,7 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
         if (!file_exists($file)) {
             $app['session']->getFlashBag()->set('error', 'Sorry maar het csv-bestand bestaat niet meer.');
+
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
         $csv = \League\Csv\Reader::createFromPath($file);
@@ -75,28 +66,72 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         if ($dataset['skip_first_row']) {
             $limit++;
         }
-        $rows = $csv->setOffset(0)->setLimit($limit)->fetchAll();
+        $csvRows = $csv->setOffset(0)->setLimit($limit)->fetchAll();
         if ($dataset['skip_first_row']) {
-            array_shift($rows);
+            array_shift($csvRows);
         }
 
         $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($id);
+        if (!$fieldMapping) {
+            $app['session']->getFlashBag()->set('error',
+                'Sorry maar er zijn nog geen instellingen voor dat csv-bestand.');
 
-        $placeColumn = (int) $fieldMapping['placename'];
-        $idColumn = (int) $fieldMapping['identifier'];
-
-        $searchOn = (int) $fieldMapping['search_option'];
-
-        /** @var GeocoderService $geocoder */
-        $geocoder = $app['geocoder_service'];
-        $geocoder->setSearchOn($searchOn);
-
-        try {
-            $mappedRows = $geocoder->map($rows, $placeColumn);
-            $app['dataset_service']->storeMappedRecords($mappedRows, $id, $placeColumn, $idColumn);
-        } catch (\Exception $e) {
-            $app->abort(404, 'The histograph API returned an error. It might be down.');
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
+//var_dump($fieldMapping); die;
+
+        // todo start using the new Histograph client for searching
+        $client = new Search($app['monolog']);
+        // client settings valid for all rows
+        $client->setGeometry($fieldMapping['geometry'])
+            ->setExact(true)
+            ->setQuoted(true)
+            ->setSearchType($fieldMapping['hg_type']);
+
+        foreach ($csvRows as $csvRow) {
+
+            $name = $client->cleanupSearchString($csvRow[(int)($fieldMapping['placename'])]);
+            if (empty($name)) {
+                continue;
+            }
+            print 'Searching ' . $name . '<br>';
+            if (!empty($fieldMapping['liesin'])) {
+                $within = $client->cleanupSearchString($csvRow[(int)($fieldMapping['liesin'])]);
+                if (!empty($within)) {
+                    $client->setLiesIn($within);
+                }
+            }
+            /** @var GeoJsonResponse $histographResponse */
+            $histographResponse = $client->search($name);
+
+            if ($total = $histographResponse->getHits() > 0) {;
+
+                $features = $histographResponse
+                    // fetch only results of a certain type:
+                    ->setPitSourceFilter(array($fieldMapping['hg_dataset']))
+                    ->getFilteredResponse()
+                    //->getResponse()
+                    ;
+
+                if ($features) {
+                    foreach ($features as $feature) {
+
+                        foreach ($feature->properties->pits as $pit) {
+
+                            print '++ ' . $pit->name . ' -+- ' . $pit->hgid . '<br/>';
+                        };
+                    }
+
+                }
+            }
+        }
+die;
+        /* try {
+             $mappedRows = $geocoder->map($rows, $mapping);
+             $app['dataset_service']->storeMappedRecords($mappedRows, $id, $fieldMapping['placename']);
+         } catch (\Exception $e) {
+             $app->abort(404, 'The histograph API returned an error. It might be down.');
+         }*/
 
         return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
     }
@@ -114,11 +149,13 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
         if (!$dataset) {
             $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
 
-        exec('php ../bin/pid standardize ' .  $id . ' > /dev/null &');
-        $app['session']->getFlashBag()->set('alert', 'De standaardisatie is begonnen! U krijgt een mail als het proces klaar is.');
+        exec('php ../bin/pid standardize ' . $id . ' > /dev/null &');
+        $app['session']->getFlashBag()->set('alert',
+            'De standaardisatie is begonnen! U krijgt een mail als het proces klaar is.');
 
         return $app->redirect($app['url_generator']->generate('datasets-all'));
     }

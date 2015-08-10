@@ -18,7 +18,7 @@ class Sources
     public static function getTypes()
     {
         natsort(self::$types);
-        return self::$types;
+        return array_combine(self::$types, self::$types);
     }
 
     public static function isValid($type)
