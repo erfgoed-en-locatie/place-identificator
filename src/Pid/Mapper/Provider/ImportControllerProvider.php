@@ -6,8 +6,8 @@ namespace Pid\Mapper\Provider;
 use Pid\Mapper\Model\DatasetStatus;
 use Pid\Mapper\Service\DatasetService;
 use Pid\Mapper\Service\GeocoderService;
-use Pid\Model\PitTypes;
-use Pid\Model\Sources;
+use Histograph\PitTypes;
+use Histograph\Sources;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
 
@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Class ImportControllerProvider
  *
- * @package Pid\Mapper\Provider
  */
 class ImportControllerProvider implements ControllerProviderInterface
 {
@@ -282,7 +281,7 @@ class ImportControllerProvider implements ControllerProviderInterface
                 // save the mapping
                 $data['dataset_id'] = $id;
                 if ($app['dataset_service']->storeFieldMapping($data)) { // ok
-                    $app['session']->getFlashBag()->set('alert', 'De mapping is bewaard.');
+                    $app['session']->getFlashBag()->set('alert', 'De instellingen zijn aangepast en opgeslagen.');
 
                     // and go straight to mapping all, if clicked
                     if ($form->get('mapall')->isClicked()) {
@@ -293,7 +292,7 @@ class ImportControllerProvider implements ControllerProviderInterface
                         return $app->redirect($app['url_generator']->generate('standardize-test', array('id' => $id)));
                     }
                 } else {
-                    $app['session']->getFlashBag()->set('error', 'Sorry maar de velden konden niet bewaard worden.');
+                    $app['session']->getFlashBag()->set('error', 'Sorry maar de instellingen konden niet opgeslagen worden.');
 
                     return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
                 }
