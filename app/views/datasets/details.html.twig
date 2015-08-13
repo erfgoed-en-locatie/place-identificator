@@ -34,10 +34,15 @@
                 </tr>
                 <tr>
                     <th>
-                        Zoekopties
+                        Ingestelde zoekopties
                     </th>
                     <td>
-                        {{ dataset.search_option|formatSearchOption }}
+                        <uL>
+                            <li><strong>Type</strong> {{ dataset.hg_type }}</li>
+                            <li><strong>Standaardiseren naar</strong> {{ dataset.hg_dataset }}</li>
+
+                            <li><strong>Met geometrie</strong> {% if dataset.geometry == 1 %} Ja {% else %} Nee {% endif %}</li>
+                        </uL>
                     </td>
                 </tr>
                 <tr>
