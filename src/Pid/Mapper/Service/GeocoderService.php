@@ -1,6 +1,7 @@
 <?php
 
 namespace Pid\Mapper\Service;
+
 use Histograph\Client\GeoJsonResponse;
 use Histograph\Client\Search;
 use Pid\Mapper\Model\Status;
@@ -13,7 +14,8 @@ use Symfony\Component\PropertyAccess\Exception\RuntimeException;
  *
  * @package Pid\Mapper\Service
  */
-class GeocoderService {
+class GeocoderService
+{
 
     protected $app;
 
@@ -37,13 +39,13 @@ class GeocoderService {
             throw new RuntimeException('No rows to process.');
         }
 
-        $placeColumn = (int) $fieldMapping['placename'];
+        $placeColumn = (int)$fieldMapping['placename'];
         if (!$rows[0][$placeColumn]) {
             throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
         }
 
         $client = new Search($this->app['monolog']);
-        $client->setBaseUri('http://pid.silex/server/serve.php?');
+        //$client->setBaseUri('http://pid.silex/server/serve.php?');
 
         // client settings valid for all rows
         $client->setGeometry($fieldMapping['geometry'])
@@ -69,22 +71,37 @@ class GeocoderService {
             /** @var GeoJsonResponse $histographResponse */
             $histographResponse = $client->search($name);
 
-            if ($this->hits = $histographResponse->getHits() > 0) {;
+            if ($this->hits = $histographResponse->getHits() > 0) {
+                ;
 
                 $features = $histographResponse
                     // fetch only results of a certain type:
                     ->setPitSourceFilter(array($fieldMapping['hg_dataset']))
-                    ->getFilteredResponse()
-                    //->getResponse()
-                ;
+                    ->getFilteredResponse();
 
-                if ($features) {
-                    $data = $this->transformPiTs2Rows($name, $datasetId, $features, $fieldMapping['hg_dataset']);
+                $hits = count($features);
 
+// todo petra if count = 1, dan gestandaardiseerd, anders multiple of none
+
+                if ($hits === 1) {
+                    /** @var DatasetService $dataService */
                     $dataService = $this->app['dataset_service'];
+                    $data = $this->transformPiTs2Rows($name, $datasetId, $features, $fieldMapping['hg_dataset']);
+                    $data['hits'] = 1;
                     $dataService->storeGeocodedRecords($data);
+                } elseif ($hits > 1) {
+                    $data['hits'] =  $hits;
+                    $data['status'] = Status::MAPPED_EXACT_MULTIPLE;
+                    // todo and then call storeMappedRecord
 
+                } else {
+                    // todo petra also store records that were not found
+                    $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
+                    print 'Nothing found..';
                 }
+            } else {
+                // todo petra also store records that were not found
+                print 'Nothing found..';
             }
         }
 
@@ -100,20 +117,26 @@ class GeocoderService {
      * @param string $hgSource The HG source (or dataset) the response was filtered on
      * @return array
      */
-    protected function transformPiTs2Rows($originalName, $datasetId, $features, $hgSource, $status = Status::MAPPED_EXACT)
-    {
+    protected function transformPiTs2Rows(
+        $originalName,
+        $datasetId,
+        $features,
+        $hgSource,
+        $status = Status::MAPPED_EXACT
+    ) {
         $data = [];
         foreach ($features as $feature) {
-            $row = [];
+
             foreach ($feature->properties->pits as $pit) {
+                $row = [];
                 $row['hg_id'] = $pit->hgid;
                 $row['hg_name'] = $pit->name;
                 $row['hg_type'] = $pit->type;
                 if (property_exists($pit, 'uri')) {
                     $row['hg_uri'] = $pit->uri;
                 }
-                if (property_exists($pit , 'geometryIndex') && $pit->geometryIndex > -1) {
-                    $row['hg_geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
+                if (property_exists($pit, 'geometryIndex') && $pit->geometryIndex > -1) {
+                    $row['hg_geometry'] = json_encode($feature->geometry->geometries[$pit->geometryIndex]);
                 }
 
                 // hg info
@@ -124,6 +147,7 @@ class GeocoderService {
                 $data[] = $row;
             };
         }
+        var_dump($data);
 
         return $data;
     }
@@ -166,11 +190,11 @@ class GeocoderService {
      * @return array The array contains hits|data keys
      */
     private function handleResponse($json)
-    {   
+    {
         if (!property_exists($json, 'features')) {
             return array('hits' => 0);
         } else {
-            if (empty($json->features)){
+            if (empty($json->features)) {
                 return array('hits' => 0);
             }
 
@@ -185,28 +209,34 @@ class GeocoderService {
                     }
                 }
                 $output['hits'] = $hitCount;
-            } else if ($this->searchOn == self::SEARCH_MUNICIPALITIES) {
-                $hitCount = 0;
-                // look for only municipalities
-                foreach ($json->features as $feature) {
-                    if ($feature->properties->type == self::API_MUNICIPALITY_TYPE) {
-                        $hitCount++;
-                        $output['data'] = $this->getStandardizedDataForSaving($feature);
+            } else {
+                if ($this->searchOn == self::SEARCH_MUNICIPALITIES) {
+                    $hitCount = 0;
+                    // look for only municipalities
+                    foreach ($json->features as $feature) {
+                        if ($feature->properties->type == self::API_MUNICIPALITY_TYPE) {
+                            $hitCount++;
+                            $output['data'] = $this->getStandardizedDataForSaving($feature);
+                        }
+                    }
+                    $output['hits'] = $hitCount;
+                } else {
+                    if ($this->searchOn == self::SEARCH_PLACES_AND_MUNICIPALITIES) {
+                        $output['data'] = [];
+                        $hitCount = 0;
+                        foreach ($json->features as $feature) {
+                            // @fixme later: for now we are really only handling places or municipalities!!
+                            if ($feature->properties->type == self::API_MUNICIPALITY_TYPE || $feature->properties->type == self::API_PLACE_TYPE) {
+                                $hitCount++;
+                                $output['data'] = array_merge($output['data'],
+                                    $this->getStandardizedDataForSaving($feature));
+                            }
+                        }
+                        $output['hits'] = $hitCount;
                     }
                 }
-                $output['hits'] = $hitCount;
-            } else if ($this->searchOn == self::SEARCH_PLACES_AND_MUNICIPALITIES) {
-                $output['data'] = [];
-                $hitCount = 0;
-                foreach ($json->features as $feature) {
-                    // @fixme later: for now we are really only handling places or municipalities!!
-                    if ($feature->properties->type == self::API_MUNICIPALITY_TYPE || $feature->properties->type == self::API_PLACE_TYPE) {
-                        $hitCount++;
-                        $output['data'] = array_merge($output['data'], $this->getStandardizedDataForSaving($feature));
-                    }
-                }
-                $output['hits'] = $hitCount;
             }
+
             //var_dump($output); die;
             return $output;
         }
@@ -222,19 +252,20 @@ class GeocoderService {
     private function getStandardizedDataForDisplaying($feature)
     {
         $data = array();
-        foreach($feature->properties->pits as $pit) {
+        foreach ($feature->properties->pits as $pit) {
             if (in_array($pit->source, $this->fieldsOfInterest)) {
 
                 $data[$pit->source]['name'] = $pit->name;
                 if (property_exists($pit, 'uri')) {
                     $data[$pit->source]['uri'] = $pit->uri;
                 }
-                if($pit->geometryIndex > -1){
+                if ($pit->geometryIndex > -1) {
                     $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
                 }
                 $data[$pit->source]['type'] = $feature->properties->type;
             }
         }
+
         return $data;
     }
 
@@ -247,7 +278,7 @@ class GeocoderService {
     private function getStandardizedDataForSaving($feature)
     {
         $data = array();
-        foreach($feature->properties->pits as $pit) {
+        foreach ($feature->properties->pits as $pit) {
             if (in_array($pit->source, $this->fieldsOfInterest)) {
                 $data[$pit->source]['name'] = $pit->name;
                 $data[$pit->source]['uri'] = $pit->uri;
@@ -257,6 +288,7 @@ class GeocoderService {
 
             }
         }
+
         return $data;
     }
 

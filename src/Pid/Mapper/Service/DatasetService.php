@@ -136,7 +136,8 @@ class DatasetService {
      */
     public function clearRecord($id)
     {
-        //$data['status'] = Status::UNMAPPED;
+        // todo petra refactor
+
         $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
         $data['geonames'] = null;
         $data['tgn'] = null;
@@ -154,6 +155,8 @@ class DatasetService {
      */
     public function setRecordAsUnmappable($id)
     {
+        // todo petra refactor
+
         $data['status'] = Status::UNMAPPABLE;
         $data['geonames'] = null;
         $data['tgn'] = null;
@@ -297,19 +300,26 @@ class DatasetService {
     }
 
     /**
+     * Clear records for a dataset, AND wit ha specific status if provided
+     *
+     * @param $datasetId
+     * @param null $status
+     * @return int
+     */
+    public function clearRecordsForDataset($datasetId, $status = null)
+    {
+        return $this->db->delete('records', array('dataset_id' => $datasetId));
+    }
+
+    /**
      * Store the geocoded result
      *
      * If the data set was standardized before, als delete all old mappings
      * @param array $data
-     * @param boolean $deleteOld Whether to delete previously standardized data
      * @return bool
      */
-    public function storeGeocodedRecords($data, $deleteOld = true)
+    public function storeGeocodedRecords($data)
     {
-        if ($deleteOld === true) {
-            $this->db->delete('records', array('dataset_id' => $data[0]['dataset_id']));
-        }
-
         foreach($data as $row) {
             $this->storeMappedRecord($row);
         }

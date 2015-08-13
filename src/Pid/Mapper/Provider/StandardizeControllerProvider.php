@@ -7,6 +7,7 @@ use Histograph\Client\GeoJsonResponse;
 use Histograph\Client\Search;
 use Pid\Mapper\Model\Dataset;
 use Pid\Mapper\Model\Status;
+use Pid\Mapper\Service\DatasetService;
 use Pid\Mapper\Service\GeocoderService;
 use Silex\Application;
 use Silex\ControllerProviderInterface;
@@ -78,17 +79,25 @@ class StandardizeControllerProvider implements ControllerProviderInterface
 
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
-//var_dump($fieldMapping); die;
 
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
 
         try {
-             $geocoder->map($csvRows, $fieldMapping, $id);
+            /** @var DatasetService $dataService */
+            $dataService = $app['dataset_service'];
+            // todo petra implement deleteOld or different status/match types 'exact" etc
 
-         } catch (\Exception $e) {
-             $app->abort(404, 'The histograph API returned an error. It might be down.');
-         }
+            $dataService->clearRecordsForDataset($id);
+            $geocoder->map($csvRows, $fieldMapping, $id);
+die;
+        } catch (\Exception $e) {
+            $app['monolog']->error($e->getMessage());
+            $app['session']->getFlashBag()->set('error',
+                'Sorry, maar er is iets mis met de Histograph API. Probeer het svp wat later nog eens.');
+
+            //$app->abort(404, 'The histograph API returned an error. It might be down.');
+        }
 
         return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
     }
