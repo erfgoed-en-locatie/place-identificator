@@ -80,58 +80,15 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         }
 //var_dump($fieldMapping); die;
 
-        // todo start using the new Histograph client for searching
-        $client = new Search($app['monolog']);
-        // client settings valid for all rows
-        $client->setGeometry($fieldMapping['geometry'])
-            ->setExact(true)
-            ->setQuoted(true)
-            ->setSearchType($fieldMapping['hg_type']);
+        /** @var GeocoderService $geocoder */
+        $geocoder = $app['geocoder_service'];
 
-        foreach ($csvRows as $csvRow) {
+        try {
+             $geocoder->map($csvRows, $fieldMapping, $id);
 
-            $name = $client->cleanupSearchString($csvRow[(int)($fieldMapping['placename'])]);
-            if (empty($name)) {
-                continue;
-            }
-            print 'Searching ' . $name . '<br>';
-            if (!empty($fieldMapping['liesin'])) {
-                $within = $client->cleanupSearchString($csvRow[(int)($fieldMapping['liesin'])]);
-                if (!empty($within)) {
-                    $client->setLiesIn($within);
-                }
-            }
-            /** @var GeoJsonResponse $histographResponse */
-            $histographResponse = $client->search($name);
-
-            if ($total = $histographResponse->getHits() > 0) {;
-
-                $features = $histographResponse
-                    // fetch only results of a certain type:
-                    ->setPitSourceFilter(array($fieldMapping['hg_dataset']))
-                    ->getFilteredResponse()
-                    //->getResponse()
-                    ;
-
-                if ($features) {
-                    foreach ($features as $feature) {
-
-                        foreach ($feature->properties->pits as $pit) {
-
-                            print '++ ' . $pit->name . ' -+- ' . $pit->hgid . '<br/>';
-                        };
-                    }
-
-                }
-            }
-        }
-die;
-        /* try {
-             $mappedRows = $geocoder->map($rows, $mapping);
-             $app['dataset_service']->storeMappedRecords($mappedRows, $id, $fieldMapping['placename']);
          } catch (\Exception $e) {
              $app->abort(404, 'The histograph API returned an error. It might be down.');
-         }*/
+         }
 
         return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
     }

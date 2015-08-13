@@ -55,7 +55,8 @@ class DatasetService {
      */
     public function fetchDatasetDetails($id)
     {
-        $stmt = $this->db->executeQuery('SELECT d.*, f.fuzzy_search, f.search_option, f.identifier
+        $stmt = $this->db->executeQuery('
+          SELECT d.*, f.hg_type, f.hg_dataset, f.geometry
           FROM datasets d
           INNER JOIN field_mapping f ON f.dataset_id = d.id
           WHERE d.id = :id', array(
@@ -296,53 +297,21 @@ class DatasetService {
     }
 
     /**
-     * Transform the result from the API into storable data and store that data
+     * Store the geocoded result
      *
      * If the data set was standardized before, als delete all old mappings
-     * @param array $mappedRows
-     * @param string $placeColumn
+     * @param array $data
      * @param boolean $deleteOld Whether to delete previously standardized data
-     * @return integer $datasetId
+     * @return bool
      */
-    public function storeMappedRecords($mappedRows, $datasetId, $placeColumn, $identifierColumn = null, $deleteOld = true)
+    public function storeGeocodedRecords($data, $deleteOld = true)
     {
         if ($deleteOld === true) {
-            $this->db->delete('records', array('dataset_id' => $datasetId));
+            $this->db->delete('records', array('dataset_id' => $data[0]['dataset_id']));
         }
 
-        foreach($mappedRows as $mapped) {
-            $data = array();
-            $data['original_name'] = $mapped[$placeColumn];
-            $data['dataset_id'] = $datasetId;
-            if (null !== $identifierColumn) {
-                $data['identifier'] = $mapped[$identifierColumn];
-            }
-
-            if ($mapped['response']['hits'] == 1) {
-                $data['status'] = Status::MAPPED_EXACT;
-                $data['hits'] = 1;
-                if (isset($mapped['response']['data']['geonames'])) {
-                    $data['geonames'] = json_encode($mapped['response']['data']['geonames']);
-                }
-                if (isset($mapped['response']['data']['tgn'])) {
-                    $data['tgn'] = json_encode($mapped['response']['data']['tgn']);
-                }
-                if (isset($mapped['response']['data']['bag'])) {
-                    $data['bag'] = json_encode($mapped['response']['data']['bag']);
-                }
-                if (isset($mapped['response']['data']['gemeentegeschiedenis'])) {
-                    $data['gg'] = json_encode($mapped['response']['data']['gemeentegeschiedenis']);
-                }
-            } elseif ($mapped['response']['hits'] == 0) {
-                $data['hits'] =  $mapped['response']['hits'];
-                $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
-
-            } else {
-                $data['hits'] =  $mapped['response']['hits'];
-                $data['status'] = Status::MAPPED_EXACT_MULTIPLE;
-            }
-
-            $this->storeMappedRecord($data);
+        foreach($data as $row) {
+            $this->storeMappedRecord($row);
         }
 
         return true;

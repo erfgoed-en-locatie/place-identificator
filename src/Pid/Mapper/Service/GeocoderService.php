@@ -3,6 +3,7 @@
 namespace Pid\Mapper\Service;
 use Histograph\Client\GeoJsonResponse;
 use Histograph\Client\Search;
+use Pid\Mapper\Model\Status;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 
@@ -19,7 +20,6 @@ class GeocoderService {
     public function __construct($app)
     {
         $this->app = $app;
-        $this->client = new Search($app['monolog']);
     }
 
     /**
@@ -27,8 +27,10 @@ class GeocoderService {
      *
      * @param array $rows
      * @param array $fieldMapping
+     * @param integer $datasetId
+     * @return bool
      */
-    public function map($rows, $fieldMapping)
+    public function map($rows, $fieldMapping, $datasetId)
     {
         // todo create batches!
         if (empty($rows)) {
@@ -40,29 +42,32 @@ class GeocoderService {
             throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
         }
 
+        $client = new Search($this->app['monolog']);
+        $client->setBaseUri('http://pid.silex/server/serve.php?');
+
         // client settings valid for all rows
-        $this->client->setGeometry($fieldMapping['geometry'])
+        $client->setGeometry($fieldMapping['geometry'])
             ->setExact(true)
             ->setQuoted(true)
             ->setSearchType($fieldMapping['hg_type']);
 
         // settings for each row
         foreach ($rows as $row) {
-            $name = $this->client->cleanupSearchString($row[(int)($fieldMapping['placename'])]);
+            $name = $client->cleanupSearchString($row[(int)($fieldMapping['placename'])]);
             if (empty($name)) {
                 continue;
             }
 
             // set bounding param if one was given
             if (!empty($fieldMapping['liesin'])) {
-                $within = $this->client->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
+                $within = $client->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
                 if (!empty($within)) {
-                    $this->client->setLiesIn($within);
+                    $client->setLiesIn($within);
                 }
             }
 
             /** @var GeoJsonResponse $histographResponse */
-            $histographResponse = $this->client->search($name);
+            $histographResponse = $client->search($name);
 
             if ($this->hits = $histographResponse->getHits() > 0) {;
 
@@ -74,73 +79,53 @@ class GeocoderService {
                 ;
 
                 if ($features) {
-                    foreach ($features as $feature) {
+                    $data = $this->transformPiTs2Rows($name, $datasetId, $features, $fieldMapping['hg_dataset']);
 
-                        foreach ($feature->properties->pits as $pit) {
-
-                            print '++ ' . $pit->name . ' -+- ' . $pit->hgid . '<br/>';
-                        };
-                    }
+                    $dataService = $this->app['dataset_service'];
+                    $dataService->storeGeocodedRecords($data);
 
                 }
             }
         }
-    }
 
-    protected function storeMappedRow($datasetId, $originalName, $data)
-    {
-
+        return true;
     }
 
     /**
-     * Maps an array of rows with at least a placename against the geocoder
+     * Transform the result from the API into storable data
      *
-     * @param array $rows
-     * @param integer $key Index key of the row that holds the placename
-     * @return mixed
+     * @param string $originalName The search string
+     * @param int $datasetId Id of the dataset
+     * @param array $features Response GeoJson Features
+     * @param string $hgSource The HG source (or dataset) the response was filtered on
+     * @return array
      */
-    public function oldmap($rows, $key)
+    protected function transformPiTs2Rows($originalName, $datasetId, $features, $hgSource, $status = Status::MAPPED_EXACT)
     {
-        if (!$rows[0][$key]) {
-            throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
-        }
-
-        if (empty($rows)) {
-            throw new RuntimeException('No rows to process.');
-        }
-
-        foreach($rows as &$row) {
-            $name = $row[$key];
-
-            try {
-                $response = $this->callAPI($name);
-                if ($response->getStatusCode() === 200) {
-                    $row['response'] = $this->handleResponse($response->json(array('object' => true)));
+        $data = [];
+        foreach ($features as $feature) {
+            $row = [];
+            foreach ($feature->properties->pits as $pit) {
+                $row['hg_id'] = $pit->hgid;
+                $row['hg_name'] = $pit->name;
+                $row['hg_type'] = $pit->type;
+                if (property_exists($pit, 'uri')) {
+                    $row['hg_uri'] = $pit->uri;
                 }
-            } catch (\GuzzleHttp\Exception\RequestException $e) {
-                $this->app['monolog']->addError('Histograph API did not return a response within ' . self::API_TIMEOUT . ' seconds');
-                continue;
-            }
+                if (property_exists($pit , 'geometryIndex') && $pit->geometryIndex > -1) {
+                    $row['hg_geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
+                }
 
+                // hg info
+                $row['original_name'] = $originalName;
+                $row['dataset_id'] = $datasetId;
+                $row['hg_dataset'] = $hgSource;
+                $row['status'] = $status;
+                $data[] = $row;
+            };
         }
-        // empty the cache
-        $this->cache = null;
-        return $rows;
-    }
 
-
-    /**
-     * Call API for one place name and try to find as much info as possible
-     *
-     * @param string $name
-     * @return array The array contains hits|data keys
-     */
-    public function mapOne($name)
-    {
-        $response = $this->callAPI($name);
-        if ($response->getStatusCode() === 200) {
-            return $this->handleMapOneResponse($response->json(array('object' => true)));
-        }
+        return $data;
     }
 
     /**
