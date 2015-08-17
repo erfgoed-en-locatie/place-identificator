@@ -136,14 +136,13 @@ class DatasetService {
      */
     public function clearRecord($id)
     {
-        // todo petra refactor
-
         $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
-        $data['geonames'] = null;
-        $data['tgn'] = null;
-        $data['bag'] = null;
-        $data['gg'] = null;
+        $data['hg_id'] = null;
+        $data['hg_uri'] = null;
+        $data['hg_name'] = null;
+        $data['hg_geometry'] = null;
         $data['hits'] = 0;
+
         return $this->db->update('records', $data, array('id' => $id));
     }
 
