@@ -70,7 +70,8 @@ class UriResolverService {
         if ($response) {
             return $this->transformResponse($response);
         }
-        throw new \RuntimeException('The uri resolver could not resolve that location');
+        return false;
+        //throw new \RuntimeException('The uri resolver could not resolve that location');
     }
 
     public function findTGN($uri)
@@ -177,13 +178,13 @@ class UriResolverService {
     public function transformResponse($response)
     {
         // todo fix geometry for gg ... but which one to store?? We get one for every year a border changed
-        $data['name'] = $response['label'][0];
-        $data['uri'] = $response['uri'];
+        $data['hg_name'] = $response['label'][0];
+        $data['hg_uri'] = $response['uri'];
         if (isset($response['lat']) && isset($response['lon'])) {
-            $data['geometry']['type'] = 'Point';
-            $data['geometry']['coordinates'] = array($response['lat'], $response['lon']);
+            $data['hg_geometry']['type'] = 'Point';
+            $data['hg_geometry']['coordinates'] = array($response['lat'], $response['lon']);
         }
-        return json_encode($data);
+        return $data;
     }
 
 }

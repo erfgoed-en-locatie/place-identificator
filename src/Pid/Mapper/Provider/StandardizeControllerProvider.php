@@ -90,12 +90,11 @@ class StandardizeControllerProvider implements ControllerProviderInterface
 
             $dataService->clearRecordsForDataset($id);
             $geocoder->map($csvRows, $fieldMapping, $id);
-die;
+
         } catch (\Exception $e) {
             $app['monolog']->error($e->getMessage());
             $app['session']->getFlashBag()->set('error',
                 'Sorry, maar er is iets mis met de Histograph API. Probeer het svp wat later nog eens.');
-
             //$app->abort(404, 'The histograph API returned an error. It might be down.');
         }
 
