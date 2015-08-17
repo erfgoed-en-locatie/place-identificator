@@ -72,7 +72,7 @@ class GeocoderService
             $histographResponse = $client->search($name);
 
             if ($this->hits = $histographResponse->getHits() > 0) {
-                ;
+
 
                 $features = $histographResponse
                     // fetch only results of a certain type:
@@ -83,11 +83,10 @@ class GeocoderService
 
 // todo petra if count = 1, dan gestandaardiseerd, anders multiple of none
 
-                if ($hits === 1) {
+                if ($hits == 1) {
                     /** @var DatasetService $dataService */
                     $dataService = $this->app['dataset_service'];
                     $data = $this->transformPiTs2Rows($name, $datasetId, $features, $fieldMapping['hg_dataset']);
-                    $data['hits'] = 1;
                     $dataService->storeGeocodedRecords($data);
                 } elseif ($hits > 1) {
                     $data['hits'] =  $hits;
@@ -97,11 +96,11 @@ class GeocoderService
                 } else {
                     // todo petra also store records that were not found
                     $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
-                    print 'Nothing found..';
+                    print 'No features found..';
                 }
             } else {
                 // todo petra also store records that were not found
-                print 'Nothing found..';
+                print 'No hits found..';
             }
         }
 
@@ -125,6 +124,7 @@ class GeocoderService
         $status = Status::MAPPED_EXACT
     ) {
         $data = [];
+        // pffht this should also be just 1 record... duh
         foreach ($features as $feature) {
 
             foreach ($feature->properties->pits as $pit) {
@@ -144,10 +144,10 @@ class GeocoderService
                 $row['dataset_id'] = $datasetId;
                 $row['hg_dataset'] = $hgSource;
                 $row['status'] = $status;
+                $row['hits'] = 1;
                 $data[] = $row;
             };
         }
-        var_dump($data);
 
         return $data;
     }
