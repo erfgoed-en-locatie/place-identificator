@@ -3,6 +3,9 @@
 {% block content %}
 
     <h1>Configuratie voor dataset "{{ dataset.name }}"</h1>
+
+    {{ form_start(form) }}
+
     <div class="row">
         <div class="col-md-6">
             <h2>Van...</h2>
@@ -12,22 +15,18 @@
 
             {% form_theme form 'bootstrap_3_layout.html.twig' %}
 
-            {{ form_start(form) }}
-
+            
             {{ form_row(form.placename) }}
-            <p class="alert-danger">uitlegregeltje dat je hier de te standaardiseren term moet uitkiezen</p>
+            <p class="alert-warning">Kies hier het veld dat de naam bevat die je wilt standaardiseren</p>
 
             {{ form_row(form.liesin) }}
-            <p class="alert-danger">uitlegregeltje dat je hier alleen iets hoeft in te vullen als je een tweede kolom
-                hebt ....</p>
+            <p class="alert-warning">Gebruik deze optie alleen als je een veld in je csv hebt waar de 'bredere term' in zit. Bijvoorbeeld de provincie waar de plaatsen uit het vorige veld in liggen</p>
 
 
             {{ form_row(form.hg_type) }}
-            <p class="alert-danger">uitleg:.... Bijvoorbeeld van welke combinaties mogelijk zijn en dat sommig
-                ecombinatie natuurlijk
-                niets gaan opleveren. bv hier kiezen voor straten en dan zeggen dat je in geonames geinteresseerd bent.
-                Of kiezen voor gemeentes en dna verderop nwb kiezen.
-                Misschien ook het verschil tussen straten en adressen uitleggen en in welke dataset wat zit?</p>
+            <p class="alert-warning">
+                Kies hier het type waar de toponiemen op slaan (kies hg:Place voor plaatsen, hg:Municipalities voor gemeentes, hg:Streets voor straten, etc.). <br />
+                Mocht de dataset meerdere typen bevatten, dan dient die voor elk type apart door de standaardiseertool gehaald te worden.</p>
 
         </div>
 
@@ -35,44 +34,46 @@
 
             <h2>Naar...</h2>
 
+            <p>Geef hieronder aan naar welke dataset je wilt standaardiseren en of je behalve gestandaardiseerde naam, hgid en - indien aanwezig - uri ook de geometrieën terug wilt hebben.</p>
+
             {{ form_row(form.hg_dataset) }}
-            <p>uitleg nodig?...</p>
+            <p class="alert-warning">Naar welke dataset wil je standaardiseren? Kies GeoNames of TGN voor plaatsen, GeoNames voor huidige- en Gemeentegeschiedenis ook voor historische gemeentes, BAG voor adressen of gebouwen en het Nationaal Wegen Bestand voor straten.</p>
 
             {{ form_row(form.geometry) }}
-            <p>Wilt u een geometrie? Het zoeken gaat een stuk sneller, zonder.</p>
+            <p class="alert-warning">Wil je een geometrie? Het zoeken gaat een stuk sneller zonder.</p>
 
-            <div class="row">
-                {{ form_widget(form.save) }}
-                <div class="alert alert-warning">
-                    <p>Bewaar alleen de instellingen en test of standaardiseer later.</p>
-                </div>
-            </div>
-
-            <div class="row">
-                {{ form_widget(form.map) }}
-                <div class="alert alert-warning">
-                    <p>Deze optie standaardiseert de eerste 20 records. Dit is handig om te kijken of alles goed
-                        gaat alvorens het hele bestand te verwerken.
-                    </p>
-                </div>
-            </div>
-
-
-            <div class="row">
-                {{ form_widget(form.mapall) }}
-                <div class="alert alert-warning">
-                    <p>Deze optie standaardiseert alle records. Dit proces kan enige tijd duren.</p>
-
-                    <p>
-                        <strong>Let op:</strong> eventueel eerder opgehaalde data bij dit
-                        bestand wordt eerst verwijderd!
-                    </p>
-                </div>
-            </div>
         </div>
-
-        {{ form_end(form) }}
+        
 
     </div>
+
+    <div class="row" style="margin-top:24px;">
+        <div class="col-md-4">
+            {{ form_widget(form.save) }}
+
+            <p class="alert-warning">Bewaar alleen de instellingen en test of standaardiseer later.</p>
+        </div>
+        <div class="col-md-4">
+            {{ form_widget(form.map) }}
+
+            <p class="alert-warning">Deze optie standaardiseert de eerste 20 records. Dit is handig om te kijken of alles goed
+            gaat alvorens het hele bestand te verwerken.
+            </p>
+        </div>
+        <div class="col-md-4">
+            {{ form_widget(form.mapall) }}
+
+
+            <p class=" alert-warning">Deze optie standaardiseert alle records. Dit proces kan enige tijd duren.
+            </p>
+
+            <p class=" alert-danger">
+                <strong>Let op:</strong> eventueel eerder opgehaalde data bij dit
+            bestand wordt eerst verwijderd!
+            </p>
+        </div>
+    </div>
+
+    {{ form_end(form) }}
 
 {% endblock %}

@@ -207,7 +207,8 @@ class ImportControllerProvider implements ControllerProviderInterface
             ->add('geometry', 'choice', array(
                 'label' => 'Geïnteresseerd in de geometrie?',
                 'required' => true,
-                'choices' => array(1 => 'Ja', 0 => 'Nee'),
+                'choices' => array(1 => 'Ja',0 => 'Nee'),
+                'data' => 1,
                 'constraints' => array(
                     new Assert\Type('integer')
                 )
@@ -223,7 +224,7 @@ class ImportControllerProvider implements ControllerProviderInterface
             ))*/
 
             ->add('save', 'submit', array(
-                'label' => 'bewaar',
+                'label' => 'bewaar deze instellingen',
                 'attr' => array('class' => 'btn btn-success'),
             ))
             ->add('map', 'submit', array(
