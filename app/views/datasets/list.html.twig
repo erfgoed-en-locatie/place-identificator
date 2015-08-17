@@ -38,9 +38,10 @@
                                 <span class="label {{ statClass }}">{{ set.status|formatDatasetStatus }}</span>
                             </td>
                             <td>
-                                <a href="{{ path('import-mapcsv', {'id': set.id }) }}" title="Bekijk of bewerk de instellingen" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i> </a>
+                                <a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="Details van deze set"><i class="fa fa-search-plus"></i> </a>
+                                <a href="{{ path('import-mapcsv', {'id': set.id }) }}" title="Wijzig de instellingen" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i> </a>
                                 <a href="{{ path('standardize-test', {'id': set.id }) }}" title="Test de instellingen met 20 records" class="btn btn-xs btn-primary"> test </a>
-                                <a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="Bekijk de resultaten van de standaardisatie (test)"><i class="fa fa-search-plus"></i> </a>
+                                <a href="{{ path('dataset-standardized', {'id': set.id }) }}" class="btn btn-xs btn-info" title="Bekijk de resultaten van de standaardisatie (test)">resultaten! </a>
                                 <a href="{{ path('dataset-delete', {'id': set.id }) }}" title="Verwijder de gehele dataset" class="btn btn-xs btn-danger delete"><i class="fa fa-trash"></i> </a>
                             </td>
                         </tr>

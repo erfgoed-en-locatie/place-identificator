@@ -155,13 +155,11 @@ class DatasetService {
      */
     public function setRecordAsUnmappable($id)
     {
-        // todo petra refactor
-
         $data['status'] = Status::UNMAPPABLE;
-        $data['geonames'] = null;
-        $data['tgn'] = null;
-        $data['bag'] = null;
-        $data['gg'] = null;
+        $data['hg_id'] = null;
+        $data['hg_uri'] = null;
+        $data['hg_name'] = null;
+        $data['hg_geometry'] = null;
         $data['hits'] = 0;
 
         // fetch original name, so we can update all records with the same name
