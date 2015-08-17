@@ -44,8 +44,8 @@ class GeocoderService
             throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
         }
 
+        // new Histograph Search Client, should be injected maybe...
         $client = new Search($this->app['monolog']);
-        //$client->setBaseUri('http://pid.silex/server/serve.php?');
 
         // client settings valid for all rows
         $client->setGeometry($fieldMapping['geometry'])
