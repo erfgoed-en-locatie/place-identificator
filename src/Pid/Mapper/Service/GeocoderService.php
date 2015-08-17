@@ -55,8 +55,8 @@ class GeocoderService
 
         // settings for each row
         foreach ($rows as $row) {
-            $name = $client->cleanupSearchString($row[(int)($fieldMapping['placename'])]);
-            if (empty($name)) {
+            $originalName = $client->cleanupSearchString($row[(int)($fieldMapping['placename'])]);
+            if (empty($originalName)) {
                 continue;
             }
 
@@ -69,10 +69,10 @@ class GeocoderService
             }
 
             /** @var GeoJsonResponse $histographResponse */
-            $histographResponse = $client->search($name);
+            $histographResponse = $client->search($originalName);
+            $data = [];
 
             if ($this->hits = $histographResponse->getHits() > 0) {
-
 
                 $features = $histographResponse
                     // fetch only results of a certain type:
@@ -81,26 +81,33 @@ class GeocoderService
 
                 $hits = count($features);
 
-// todo petra if count = 1, dan gestandaardiseerd, anders multiple of none
-
                 if ($hits == 1) {
                     /** @var DatasetService $dataService */
                     $dataService = $this->app['dataset_service'];
-                    $data = $this->transformPiTs2Rows($name, $datasetId, $features, $fieldMapping['hg_dataset']);
+                    $data = $this->transformPiTs2Rows($originalName, $datasetId, $features, $fieldMapping['hg_dataset']);
                     $dataService->storeGeocodedRecords($data);
                 } elseif ($hits > 1) {
                     $data['hits'] =  $hits;
                     $data['status'] = Status::MAPPED_EXACT_MULTIPLE;
-                    // todo and then call storeMappedRecord
-
+                    $data['original_name'] = $originalName;
+                    $data['dataset_id'] = $datasetId;
+                    $data['hg_dataset'] = $fieldMapping['hg_dataset'];
+                    $this->app['dataset_service']->storeMappedRecord($data);
                 } else {
-                    // todo petra also store records that were not found
+                    $data['original_name'] = $originalName;
+                    $data['dataset_id'] = $datasetId;
+                    $data['hg_dataset'] = $fieldMapping['hg_dataset'];
                     $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
-                    print 'No features found..';
+                    $data['hits'] = 0;
+                    $this->app['dataset_service']->storeMappedRecord($data);
                 }
             } else {
-                // todo petra also store records that were not found
-                print 'No hits found..';
+                $data['original_name'] = $originalName;
+                $data['dataset_id'] = $datasetId;
+                $data['hg_dataset'] = $fieldMapping['hg_dataset'];
+                $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
+                $data['hits'] = 0;
+                $this->app['dataset_service']->storeMappedRecord($data);
             }
         }
 
@@ -150,37 +157,6 @@ class GeocoderService
         }
 
         return $data;
-    }
-
-    /**
-     * Loops through the clumps and tries to find PITs
-     *
-     * @param $json
-     * @return array The array contains hits|data keys
-     */
-    private function handleMapOneResponse($json)
-    {
-        if (!property_exists($json, 'features')) {
-            return array('hits' => 0);
-        } else {
-            $output = array();
-
-            $hitCount = 0;
-            foreach ($json->features as $feature) {
-                // @fixme later: for now we are really only handling places or municipalities!!
-                if ($feature->properties->type == self::API_MUNICIPALITY_TYPE || $feature->properties->type == self::API_PLACE_TYPE) {
-                    $hitCount++;
-                    $klont = $this->getStandardizedDataForDisplaying($feature);
-                    if (count($klont)) {
-                        $output['data'][] = $klont;
-                    }
-                }
-            }
-            $output['hits'] = $hitCount;
-
-            return $output;
-        }
-
     }
 
     /**
