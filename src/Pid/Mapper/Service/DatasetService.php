@@ -275,7 +275,7 @@ class DatasetService {
         $date = new \DateTime('now');
         $data['updated_on'] = $date->format('Y-m-d H:i:s');
         $data['status'] = Status::MAPPED_MANUALLY;
-        $data['hits'] = 0;
+        $data['hits'] = 1;
 
         // fetch original name, so we can update all records with the same name
         $stmt = $this->db->executeQuery('SELECT original_name as name, dataset_id FROM records WHERE id = :id', array(
@@ -288,7 +288,6 @@ class DatasetService {
         $crowdData['original_name'] = $stored['name'];
         $crowdData['dataset_id'] = $stored['dataset_id'];
 
-        unset ($crowdData['identifier']);
         $this->db->insert('crowd_mapping', $crowdData);
 
         // grmbl, need to fetch the ids first, in order to be able to delete the rows in the ajaxy interface

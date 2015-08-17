@@ -2,6 +2,7 @@
 
 namespace Pid\Mapper\Provider;
 
+use Histograph\Sources;
 use Pid\Mapper\Model\Dataset;
 use Pid\Mapper\Model\Status;
 use Pid\Mapper\Service\GeocoderService;
@@ -18,7 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @package Pid\Mapper\Provider
  */
-class ApiControllerProvider implements ControllerProviderInterface {
+class ApiControllerProvider implements ControllerProviderInterface
+{
 
     public function connect(Application $app)
     {
@@ -26,11 +28,16 @@ class ApiControllerProvider implements ControllerProviderInterface {
 
         $controllers->get('/testuri', array(new self(), 'testResolver'))->bind('api-test');
 
-        $controllers->get('/record/unmap/{id}', array(new self(), 'clearStandardization'))->bind('api-clear-mapping')->assert('id', '\d+');
-        $controllers->get('/record/map/{id}', array(new self(), 'setStandardization'))->bind('api-set-mapping')->assert('id', '\d+');
-        $controllers->get('/record/ummappable/{id}', array(new self(), 'setUnmappable'))->bind('api-unmappable')->assert('id', '\d+');
+        $controllers->get('/record/unmap/{id}',
+            array(new self(), 'clearStandardization'))->bind('api-clear-mapping')->assert('id', '\d+');
+        $controllers->get('/record/map/{id}',
+            array(new self(), 'setStandardization'))->bind('api-set-mapping')->assert('id', '\d+');
+        $controllers->get('/record/ummappable/{id}',
+            array(new self(), 'setUnmappable'))->bind('api-unmappable')->assert('id', '\d+');
 
-        $controllers->post('/record/choose-pit/{id}', array(new self(), 'choosePit'))->bind('api-choose-pit')->assert('id', '\d+');
+        $controllers->post('/record/choose-pit/{id}',
+            array(new self(), 'choosePit'))->bind('api-choose-pit')->assert('id', '\d+');
+
         return $controllers;
     }
 
@@ -43,7 +50,7 @@ class ApiControllerProvider implements ControllerProviderInterface {
      */
     public function clearStandardization(Application $app, $id)
     {
-        if ($app['dataset_service']->clearRecord($id)){
+        if ($app['dataset_service']->clearRecord($id)) {
             return $app->json(array('id' => $id));
         }
 
@@ -60,7 +67,7 @@ class ApiControllerProvider implements ControllerProviderInterface {
      */
     public function setUnmappable(Application $app, $id)
     {
-        if ($ids = $app['dataset_service']->setRecordAsUnmappable($id)){
+        if ($ids = $app['dataset_service']->setRecordAsUnmappable($id)) {
             return $app->json($ids);
         }
 
@@ -84,28 +91,43 @@ class ApiControllerProvider implements ControllerProviderInterface {
         }
 
         // only gg, geonames and tgn uri's!
-        if(!preg_match("/gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
+        if (!preg_match("/gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
             !preg_match("/geonames.org/", $uri) &&
-            !preg_match("/vocab.getty.edu\/tgn/", $uri)) {
+            !preg_match("/vocab.getty.edu\/tgn/", $uri)
+        ) {
             return $app->json(array('error' => 'Geen GG, TGN of GeoNames Uri. Er is niets opgeslagen.'), 400);
         }
 
         // if geonames, we do'nt want the last part they keep communicating!
-        if(preg_match("/(http:\/\/sws.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
-            //print_r($matches);
+        if (preg_match("/(http:\/\/sws.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)) {
             $uri = $matches[1];
         }
 
         try {
-            $record = $app['uri_resolver_service']->findOne($uri);
-            $column = $this->discoverSourceType($uri);
-            $data[$column] = $record;
-            if ($ids = $app['dataset_service']->storeManualMapping($data, $id)){
-                return $app->json($ids);
+            $uriData = $app['uri_resolver_service']->findOne($uri);
+
+            if (false === $uriData) { // probably means uri could not be found, so we will not be storing the geometry
+                $data['hg_dataset'] = Sources::discoverSourceType($uri);
+                $data['uri'] = $uri;
+
+                if ($ids = $app['dataset_service']->storeManualMapping($data, $id)) {
+                    return $app->json($ids);
+                }
+            } else {
+                $data = $uriData;
+
+                $data['hg_geometry'] = json_encode($data['geometry']);
+                $data['hg_dataset'] = Sources::discoverSourceType($uri);
+
+                if ($ids = $app['dataset_service']->storeManualMapping($data, $id)) {
+                    return $app->json($ids);
+                }
             }
+
         } catch (\RuntimeException$e) {
             return $app->json(array('id' => $id), 404);
         } catch (\Exception $e) {
+            $app['monolog']->error($e->getMessage());
             return $app->json(array('id' => $id), 503);
         }
     }
@@ -115,22 +137,22 @@ class ApiControllerProvider implements ControllerProviderInterface {
         $uri = $request->get('uri');
 
         // only gg, geonames and tgn uri's!
-        if(!preg_match("/gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
+        if (!preg_match("/gemeentegeschiedenis.nl\/gemeentenaam/", $uri) &&
             !preg_match("/geonames.org/", $uri) &&
-            !preg_match("/vocab.getty.edu\/tgn/", $uri)) {
+            !preg_match("/vocab.getty.edu\/tgn/", $uri)
+        ) {
             return $app->json(array('error' => 'Geen GG, TGN of GeoNames Uri. Er is niets opgeslagen.'), 400);
         }
 
         // if geonames, we do'nt want the last part they keep communicating!
-        if(preg_match("/(http:\/\/sws.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)){
+        if (preg_match("/(http:\/\/sws.geonames.org\/[0-9]+)(\/.*)/", $uri, $matches)) {
             //print_r($matches);
             $uri = $matches[1];
         }
         $record = $app['uri_resolver_service']->findOne($uri);
-        var_dump($record); die;
-
+        var_dump($record);
+        die;
     }
-
 
     /**
      * When selecting one PIT of multiple results we need to store the entire klont that get's passed in as json
@@ -158,31 +180,11 @@ class ApiControllerProvider implements ControllerProviderInterface {
             $data['gg'] = json_encode($jsonData->gemeentegeschiedenis);
         }
 
-        if ($app['dataset_service']->storeManualMapping($data, $id)){
+        if ($app['dataset_service']->storeManualMapping($data, $id)) {
             return $app->json(array('id' => $id));
         }
 
         return $app->json(array('id' => $id), 503);
     }
 
-    /**
-     * Find out what sort of uri it is (geonames/tgn etc)
-     *
-     * @param $uri
-     * @return string The name matches the column name of table.
-     */
-    protected function discoverSourceType($uri)
-    {
-        if (strpos($uri, 'geonames')) {
-            return 'geonames';
-        } else if (strpos($uri, 'getty')) {
-            return 'tgn';
-        } else if (strpos($uri, 'gemeentegeschiedenis')) {
-            return 'gg';
-        } else if (strpos($uri, 'kadaster')) {
-            return 'bag';
-        } else {
-            return 'erfgeo';
-        }
-    }
 }
