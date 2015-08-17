@@ -16,20 +16,20 @@
                 <table class="table table-condensed actions" id="pdxtable">
                     <thead>
                         <tr>
-                            <th>plaatsnaam</th>
-                            <th>Geonames</th>
-                            <th>TGN</th>
-                            <th>Gemeentegeschiedenis</th>
+                            <th>Oorspronkelijke naam</th>
+                            <th>Gestandaardiseerde naam</th>
+                            <th>Type </th>
+                            <th>Gevonden uri</th>
                             <th>Koppeling juist?</th>
                         </tr>
                     </thead>
 
                     <tfoot>
                         <tr>
-                            <th>plaatsnaam</th>
-                            <th>Geonames</th>
-                            <th>TGN</th>
-                            <th>Gemeentegeschiedenis</th>
+                            <th>Oorspronkelijke naam</th>
+                            <th>Gestandaardiseerde naam</th>
+                            <th>Type </th>
+                            <th>Gevonden uri</th>
                             <th>Koppeling juist?</th>
                         </tr>
                     </tfoot>
@@ -38,9 +38,10 @@
                     {% for rec in standardized %}
                         <tr id="row_{{ rec.id }}">
                             <td>{{ rec.original_name }}</td>
-                            <td>{% if rec.geonames is not empty %}<a href="{{ rec.geonames.uri }}" target="_blank">{{ rec.geonames.name }}</a>{% endif %}</td>
-                            <td>{% if rec.tgn is not empty %}<a href="{{ rec.tgn.uri }}" target="_blank">{{ rec.tgn.name }}</a>{% endif %}</td>
-                            <td>{% if rec.gg is not empty %}<a href="{{ rec.gg.uri }}" target="_blank">{{ rec.gg.name }}</a>{% endif %}</td>
+                            <td>{% if rec.hg_name is not empty %} {{ rec.hg_name }} {% endif %}</td>
+                            <td>{% if rec.hg_type is not empty %} {{ rec.hg_type }} {% endif %}</td>
+                            {#{{  todo: linkje maken naar hg-concept via thesuarus, bij voorkeur via hgid, maar als dat er niet is, via de uri }}#}
+                            <td>{% if rec.hg_uri is not empty %}<a href="#" target="_blank">{{ rec.hg_uri }}</a>{% endif %}</td>
                             <td><a class="btn btn-danger btn-sm clear-mapping" data-id="{{ rec.id }}" data-ref="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
                         </tr>
                     {% endfor %}
