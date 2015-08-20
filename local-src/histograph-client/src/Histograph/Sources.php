@@ -14,7 +14,7 @@ class Sources
 {
 
     const TYPE_TGN = 'tgn';
-    const TYPE_GENONAMES = 'genonames';
+    const TYPE_GENONAMES = 'geonames';
     const TYPE_GG = 'gemeentegeschiedenis';
     const TYPE_NWB = 'nwb';
     const TYPE_BAG = 'bag';
