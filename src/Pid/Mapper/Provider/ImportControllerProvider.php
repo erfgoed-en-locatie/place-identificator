@@ -207,8 +207,8 @@ class ImportControllerProvider implements ControllerProviderInterface
             ->add('geometry', 'choice', array(
                 'label' => 'Geïnteresseerd in de geometrie?',
                 'required' => true,
-                'choices' => array(1 => 'Ja',0 => 'Nee'),
-                'data' => 1,
+                'choices' => array(1 => 'Ja', 0 => 'Nee'),
+                'data' => 0,
                 'constraints' => array(
                     new Assert\Type('integer')
                 )
