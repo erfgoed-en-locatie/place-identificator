@@ -3,128 +3,136 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <p>Je werkt in dataset "<a href="{{ path('datasets-show', {'id': dataset.id }) }}">{{ dataset.name }}</a>"</p>
+            <p>Je werkt in dataset "<a href="{{ path('datasets-show', {'id': dataset.id }) }}">{{ dataset.name }}</a>"
+            </p>
 
             <div id="resultnav">
                 {% set cur = 'multiples' %}
                 {% include 'datasets/tabnavs.twig' %}
             </div>
+            <script>
+                /** convert js function */
+                coordsToLatLng = function (multiCoords) {
+                    var out = [];
+                    for (coords of
+                    multiCoords
+                    )
+                    out.push([coords[1], coords[0]]);
+                    return out;
+                };
 
+                jQuery(function () {
+                    // reset a mapped record
+                    $(document).on("click", ".choose", function (e) {
+                        e.preventDefault();
+                        var data = $(this).attr('data-klont');
+                        var uri = $(this).attr('href');
+                        askAPI('POST', uri, data, forwardUser);
+                    });
+
+                    function forwardUser(json) {
+                        alertMessage('De plaats is gestandaardiseerd.');
+                        window.location.href = '{{ path('dataset-multiples', {'id': dataset.id }) }}';
+                    }
+                });
+            </script>
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-12">
                     <h3 class="no-pad">"{{ rec.original_name }}" kan zijn ...</h3>
+
                     <p>Kies het juiste resultaat hieronder of via het juiste icoon op de kaart.</p>
 
-                    {% if possibilities.data is not defined %}
-                    <p>Er zijn wel concepten gevonden maar dit zijn geen plaatsen of gemeentes... op dit moment worden die nog niet getoond.</p>
-                    {% else %}
-                    <ul class="possibilities">
-                        {% for opt in possibilities.data %}
-                            <li>
-                                <button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>
-                                {% for src,pit in opt %}
-                                    {% set type = pit.type|replace({'hg:': ''}) %}
-                                    {{ pit.name }} ({{ type|lower }}, {{ src }})</br>
-                                {% endfor %}
+                    {% if possibilities|length > 0 %}
+                        <ul class="possibilities">
+                            {% for nr, feature in possibilities %}
 
-                            </li>
-                        {% endfor %}
-                        {# <li>
-                            <button type="button" class="btn-danger btn unmappable" data-id="{{ app.request.get('recid') }}" data-ref="{{ path('api-unmappable', {'id': app.request.get('recid') }) }}">niet te achterhalen</button>
-                        </li> #}
-                    </ul>
+                                <li>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button href="/api/record/choose-pit/{{ app.request.get('recid') }}"
+                                                    class="btn btn-sm btn-primary choose"
+                                                    data-klont="{{ feature.properties|json_encode }}">kies
+                                            </button>
+                                            {# only showing one pit #}
+                                            {% set type = feature.properties.type|replace({'hg:': ''}) %}
+                                            {% set pit = feature.properties.pits[0] %}
+                                            {{ pit.name }} ({{ type|lower }})<br/>
+                                            {% if pit.uri is defined %}
+                                            {{ pit.uri }}<br/>
+                                            {% endif %}
+                                            ..meer data tonen? zoals liesIn?
+                                            {#{{ dump(pit) }}#}
+                                            {#{% if pit.relations.hg:liesIn is defined %}
+                                            {{ dump(pit.relations.hg:liesIn) }}
+                                            {% endif %}#}
+                                        </div>
+                                        <div class="col-md-6">
+
+                                            {% if feature.geometry is not empty %}
+                                            <div id="map{{ nr }}" class="mapcanvas"></div>
+                                            <script>
+                                                var map{{ nr }} = L.map('map{{ nr }}', {
+                                                    center: [52.16, 4.49],
+                                                    zoom: 9
+                                                });
+
+                                                L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+                                                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+                                                }).addTo(map{{ nr }});
+
+                                                var group{{ nr }} = new L.featureGroup();
+
+                                                var geojsonMarkerOptions{{ nr }} = {
+                                                    radius: 8,
+                                                    fillColor: "#ff7800",
+                                                    color: "#000",
+                                                    weight: 1,
+                                                    opacity: 1,
+                                                    fillOpacity: 0.8
+                                                };
+
+                                                var placesLayer{{ nr }} = L.geoJson(geojsonFeature{{ nr }}, {
+                                                    pointToLayer: function (feature, latlng) {
+                                                        return L.circleMarker(latlng, geojsonMarkerOptions{{ nr }});
+                                                    }
+                                                }).addTo(map{{ nr }});
+                                                //var placesLayer{{ nr }} = L.geoJson().addTo(map{{ nr }});
+
+                                                var geojsonFeature{{ nr }} = {
+                                                    "type": "Feature",
+                                                    "properties": {
+                                                        "name": "{{ pit.name }}",
+                                                        "popupContent": "pop"
+                                                    },
+                                                    "geometry": {{ feature.geometry.geometries[pit.geometryIndex]|json_encode|raw }}
+                                                };
+                                                var geom{{ nr }} = placesLayer{{ nr }}.addData(geojsonFeature{{ nr }});
+
+                                                geom{{ nr }}.bindPopup('' +
+                                                        '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }})</p>' +
+                                                        '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ feature.properties|json_encode }}">kies</button>'
+                                                );
+                                                group{{ nr }}.addLayer(geom{{ nr }});
+                                                map{{ nr }}.fitBounds(group{{ nr }});
+                                            </script>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                            {# <li>
+                                <button type="button" class="btn-danger btn unmappable" data-id="{{ app.request.get('recid') }}" data-ref="{{ path('api-unmappable', {'id': app.request.get('recid') }) }}">niet te achterhalen</button>
+                            </li> #}
+                        </ul>
+                    {% else %}
+                        <p>Er zijn wel concepten gevonden.</p>
                     {% endif %}
 
                 </div>
 
-                <div class="col-md-8">
-
-                    <div id="mapcanvas">
-
-                    </div>
-
-                </div>
             </div>
 
         </div>
     </div>
-
-    <script>
-        /** OpenStreetMap config */
-        var southWest = L.latLng(51.175, 3.001), northEast = L.latLng(53.549, 7.483), bounds = L.latLngBounds(southWest, northEast);
-        var map = L.map('mapcanvas').fitBounds(bounds);
-
-        coordsToLatLng = function (multiCoords) {
-            var out = [];
-            for (coords of multiCoords)
-                out.push([coords[1], coords[0]]);
-            return out;
-        };
-
-        L.tileLayer('//{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        var mapIcon = L.divIcon({className: 'fa fa-map-marker fa-4x pdx-marker blue'});
-
-        var pits = new Array();
-
-        {% if possibilities.data is defined %}
-
-            var group = new L.featureGroup();
-
-            {% for opt in possibilities.data %}
-
-                var placesLayer = L.geoJson().addTo(map);
-        /*var placesLayer = L.geoJson(
-                null, {
-                    pointToLayer: function (feature, latlng) {
-                        return L.Marker(latlng, { icon: mapIcon });
-                    }
-                }
-        ).addTo(map);*/
-                {% for src,pit in opt %}
-                    {% if pit.geometry is defined %}
-                    var geojsonFeature = {
-                        "type": "Feature",
-                        "properties": {
-                            "name": "{{ pit.name }}",
-                            "popupContent": "Hier moet de popup button in"
-                        },
-                        "geometry": {{ pit.geometry|json_encode|raw }}
-                    };
-                    var geom = placesLayer.addData(geojsonFeature);
-
-                    {% set type = pit.type|replace({'hg:': ''}) %}
-
-                    geom.bindPopup('' +
-                                    '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }}, {{ src }})</p>' +
-                                    '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ opt|json_encode }}">kies</button>'
-                            );
-                    group.addLayer(geom);
-                    {% endif %}
-                {% endfor %}
-
-            {% endfor %}
-
-            map.fitBounds(group);
-
-            jQuery(function () {
-                // reset a mapped record
-                $(document).on( "click", ".choose", function(e) {
-                    e.preventDefault();
-                    var data = $(this).attr('data-klont');
-                    var uri = $(this).attr('href');
-                    askAPI('POST', uri, data, forwardUser);
-                });
-
-                function forwardUser(json) {
-                    alertMessage('De plaats is gestandaardiseerd.');
-                    window.location.href = '{{ path('dataset-multiples', {'id': dataset.id }) }}';
-                }
-            });
-
-        {% endif %}
-    </script>
 
 {% endblock %}
