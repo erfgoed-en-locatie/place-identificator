@@ -25,7 +25,7 @@
     "autoload": {
         "psr-0": {
             "Pid": "src",
-            "Histograph": "local-src/histograph-client/src"
+            "Histograph": "local-src/histograph-api-client/src"
         }
     }
 }

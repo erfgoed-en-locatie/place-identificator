@@ -86,11 +86,11 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         try {
             /** @var DatasetService $dataService */
             $dataService = $app['dataset_service'];
+
             // todo petra implement deleteOld or different status/match types 'exact" etc
 
             $dataService->clearRecordsForDataset($id);
             $geocoder->map($csvRows, $fieldMapping, $id);
-
         } catch (\Exception $e) {
             $app['monolog']->error($e->getMessage());
             $app['session']->getFlashBag()->set('error',

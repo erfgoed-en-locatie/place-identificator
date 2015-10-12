@@ -28,7 +28,6 @@ class DataSetControllerProvider implements ControllerProviderInterface
     {
         $controllers = $app['controllers_factory'];
 
-        //$controllers->get('/active', array(new self(), 'showActive'))->bind('datasets-active');
         $controllers->get('/', array(new self(), 'showAll'))->bind('datasets-all');
 
         $controllers->get('/{id}', array(new self(), 'showDataset'))->bind('datasets-show')->value('id', null)->assert('id', '\d+');
@@ -43,7 +42,8 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $controllers->get('/{id}/download', array(new self(), 'showDownload'))->bind('dataset-downloads')->value('id', null)->assert('id', '\d+');
         
         $controllers->post('/{id}/download', array(new self(), 'doDownload'))->bind('dataset-downloadcsv')->value('id', null)->assert('id', '\d+');
-        
+        $controllers->post('/{id}/choose-pit/{recordId}',
+            array(new self(), 'choosePit'))->bind('record-choose-pit')->assert('id', '\d+');
         return $controllers;
     }
 
@@ -192,7 +192,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function showMultiples(Application $app, $id)
     {
-        
+
         $dataset = $app['dataset_service']->fetchDataset($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
@@ -216,7 +216,6 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function showMultipleRec(Application $app, $id, $recid)
     {
-        
         $dataset = $app['dataset_service']->fetchDataset($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
@@ -228,21 +227,51 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::UNMAPPABLE));
 
         $recs = $app['dataset_service']->fetchRec($recid);
-        $rec = $recs[0];
 
         $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($id);
-        $searchOn = (int) $fieldMapping['search_option'];
-        $app['geocoder_service']->setSearchOn($searchOn);
-        $possibilities = $app['geocoder_service']->mapOne($rec['original_name']);
-
-        //print_r($possibilities);
+        $possibilities = $app['geocoder_service']->fetchFeaturesForNamesWithMultipleHits($recs[0], $fieldMapping);
 
         return $app['twig']->render('datasets/multiple.twig', array(
             'dataset' => $dataset,
-            "rec" => $rec,
+            "rec" => $recs[0],
             "possibilities" => $possibilities
         ));
 
+    }
+
+    /**
+     * Normal POST for manually selecting a PIT,
+     * needed because we can not post all the geormety data through ajax (too big)
+     *
+     * @param Application $app
+     * @param Request $request
+     * @param integer $id Id of the dataset
+     * @param $recordId Id of the record to update
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function choosePit(Application $app, Request $request, $id, $recordId)
+    {
+        $jsonData = json_decode($request->request->get('data-klont'));
+        $data = [];
+        $pit = $jsonData->properties->pits[0];
+
+        //$data['hg_id'] = $pit->id
+        $data['hg_uri'] = $pit->uri;
+        $data['hg_name'] = $pit->name;
+        $data['hg_type'] = $pit->type;
+        $data['hg_dataset'] = $pit->dataset;
+        if ($pit->geometryIndex > -1) {
+            $data['hg_geometry'] = json_encode($jsonData->geometry->geometries[$pit->geometryIndex]);
+        }
+
+        if ($app['dataset_service']->storeManualMapping($data, $recordId)) {
+            $app['session']->getFlashBag()->set('alert', 'De gekozen locatie is bewaard!');
+        } else {
+            $app['session']->getFlashBag()->set('error', 'Er ging iets mis bij het opslaan. Probeer svp opnieuw!');
+        }
+
+        return $app->redirect($app['url_generator']->generate('dataset-multiples', array('id' => $id)));
     }
 
     /**

@@ -49,10 +49,12 @@
                                 <li>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <button href="/api/record/choose-pit/{{ app.request.get('recid') }}"
-                                                    class="btn btn-sm btn-primary choose"
-                                                    data-klont="{{ feature.properties|json_encode }}">kies
-                                            </button>
+                                            <form class="pull-right" action="{{ path('record-choose-pit', {'id': dataset.id, 'recordId': app.request.get('recid')}) }}" method="post">
+                                                <input type="hidden" name="data-klont" value="{{ feature|json_encode }}"/>
+                                                <input type="submit" name="kies" value="kies"
+                                                       class="btn btn-sm btn-primary" />
+
+                                            </form>
                                             {# only showing one pit #}
                                             {% set type = feature.properties.type|replace({'hg:': ''}) %}
                                             {% set pit = feature.properties.pits[0] %}
@@ -109,11 +111,12 @@
                                                 var geom{{ nr }} = placesLayer{{ nr }}.addData(geojsonFeature{{ nr }});
 
                                                 geom{{ nr }}.bindPopup('' +
-                                                        '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }})</p>' +
-                                                        '<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ feature.properties|json_encode }}">kies</button>'
+                                                        '<p class="no-pad"><strong>{{ pit.name }}</strong> ({{ type|lower }})</p>'
+                                                        //'<button href="/api/record/choose-pit/{{ app.request.get('recid') }}" class="btn btn-sm btn-primary choose" data-klont="{{ feature|json_encode }}">kies</button>'
                                                 );
                                                 group{{ nr }}.addLayer(geom{{ nr }});
                                                 map{{ nr }}.fitBounds(group{{ nr }});
+                                                map{{ nr }}.setZoom(9);
                                             </script>
                                             {% endif %}
                                         </div>
@@ -125,7 +128,7 @@
                             </li> #}
                         </ul>
                     {% else %}
-                        <p>Er zijn wel concepten gevonden.</p>
+                        <p>Er zijn geen concepten gevonden.</p>
                     {% endif %}
 
                 </div>

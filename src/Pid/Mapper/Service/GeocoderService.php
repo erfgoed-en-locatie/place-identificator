@@ -2,10 +2,9 @@
 
 namespace Pid\Mapper\Service;
 
-use Histograph\Client\GeoJsonResponse;
-use Histograph\Client\Search;
+use Histograph\Api\GeoJsonResponse;
+use Histograph\Api\Search;
 use Pid\Mapper\Model\Status;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 
 
@@ -25,7 +24,63 @@ class GeocoderService
     }
 
     /**
-     * Maps an array of rows with at least a placename against the geocoder
+     * Try to find a HG Concept for which we got multiple answers
+     *
+     * @param $row
+     * @param $fieldMapping
+     * @return bool
+     */
+    public function fetchFeaturesForNamesWithMultipleHits($row, $fieldMapping)
+    {
+        // new Histograph Search Client, should be injected some time soon!
+        /** @var Search $client */
+        $client = new Search([], $this->app['monolog']);
+
+        // client settings valid for all rows
+        $client->setGeometry(true)
+            ->setExact(true)
+            ->setQuoted(true)
+            ->setSearchType($fieldMapping['hg_type']);
+        $originalName = $client->cleanupSearchString($row['original_name']);
+        if (empty($originalName)) {
+            //print 'No name to search on ' . $row['original_name'];
+            return false;
+        }
+
+        // set bounding param if one was given
+        if (!empty($fieldMapping['liesin'])) {
+            $within = $client->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
+            if (!empty($within)) {
+                $client->setLiesIn($within);
+            }
+        }
+
+        /** @var GeoJsonResponse $histographResponse */
+        $histographResponse = $client->search($originalName);
+        // FAKE SERVER!
+        //$histographResponse = $client->callApi($originalName, 'http://pid.silex/leiden.json');
+
+        if (!$histographResponse) {
+            //print 'No response';
+            return false;
+        }
+
+        if ($histographResponse->getHits() > 0) {
+
+            $features = $histographResponse
+                // fetch only results of a certain type:
+                ->setPitSourceFilter(array($fieldMapping['hg_dataset']))
+                ->getFilteredResponse();
+
+            return $features;
+            //return $this->handleMapOneResponse($features);
+         }
+
+        return null;
+    }
+
+    /**
+     * Maps an array of rows with at least aone placename against the geocoder
      *
      * @param array $rows
      * @param array $fieldMapping
@@ -34,7 +89,6 @@ class GeocoderService
      */
     public function map($rows, $fieldMapping, $datasetId)
     {
-        // todo create batches!
         if (empty($rows)) {
             throw new RuntimeException('No rows to process.');
         }
@@ -44,11 +98,12 @@ class GeocoderService
             throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
         }
 
-        // new Histograph Search Client, should be injected maybe...
-        $client = new Search($this->app['monolog']);
+        // new Histograph Search Client, should be injected some time soon!
+        /** @var Search $client */
+        $client = new Search([], $this->app['monolog']);
 
         // client settings valid for all rows
-        $client->setGeometry($fieldMapping['geometry'])
+        $client->setGeometry($fieldMapping['geometry']) // todo if we don't store the geometry... don't fetch it
             ->setExact(true)
             ->setQuoted(true)
             ->setSearchType($fieldMapping['hg_type']);
@@ -71,6 +126,10 @@ class GeocoderService
             /** @var GeoJsonResponse $histographResponse */
             $histographResponse = $client->search($originalName);
             $data = [];
+
+            if (!$histographResponse) {
+                return false;
+            }
 
             if ($this->hits = $histographResponse->getHits() > 0) {
 
@@ -154,115 +213,6 @@ class GeocoderService
                 $row['hits'] = 1;
                 $data[] = $row;
             };
-        }
-
-        return $data;
-    }
-
-    /**
-     * Loops through the clumps and tries to find PITs
-     *
-     * @param $json
-     * @return array The array contains hits|data keys
-     */
-    private function handleResponse($json)
-    {
-        if (!property_exists($json, 'features')) {
-            return array('hits' => 0);
-        } else {
-            if (empty($json->features)) {
-                return array('hits' => 0);
-            }
-
-            $output = array();
-            if ($this->searchOn == self::SEARCH_PLACES) {
-                $hitCount = 0;
-                // look for only place types in the features
-                foreach ($json->features as $feature) {
-                    if ($feature->properties->type == self::API_PLACE_TYPE) {
-                        $hitCount++;
-                        $output['data'] = $this->getStandardizedDataForSaving($feature);
-                    }
-                }
-                $output['hits'] = $hitCount;
-            } else {
-                if ($this->searchOn == self::SEARCH_MUNICIPALITIES) {
-                    $hitCount = 0;
-                    // look for only municipalities
-                    foreach ($json->features as $feature) {
-                        if ($feature->properties->type == self::API_MUNICIPALITY_TYPE) {
-                            $hitCount++;
-                            $output['data'] = $this->getStandardizedDataForSaving($feature);
-                        }
-                    }
-                    $output['hits'] = $hitCount;
-                } else {
-                    if ($this->searchOn == self::SEARCH_PLACES_AND_MUNICIPALITIES) {
-                        $output['data'] = [];
-                        $hitCount = 0;
-                        foreach ($json->features as $feature) {
-                            // @fixme later: for now we are really only handling places or municipalities!!
-                            if ($feature->properties->type == self::API_MUNICIPALITY_TYPE || $feature->properties->type == self::API_PLACE_TYPE) {
-                                $hitCount++;
-                                $output['data'] = array_merge($output['data'],
-                                    $this->getStandardizedDataForSaving($feature));
-                            }
-                        }
-                        $output['hits'] = $hitCount;
-                    }
-                }
-            }
-
-            //var_dump($output); die;
-            return $output;
-        }
-
-    }
-
-    /**
-     * Plucks the data to show the user (so he can make a selection)
-     *
-     * @param object $feature
-     * @return array
-     */
-    private function getStandardizedDataForDisplaying($feature)
-    {
-        $data = array();
-        foreach ($feature->properties->pits as $pit) {
-            if (in_array($pit->source, $this->fieldsOfInterest)) {
-
-                $data[$pit->source]['name'] = $pit->name;
-                if (property_exists($pit, 'uri')) {
-                    $data[$pit->source]['uri'] = $pit->uri;
-                }
-                if ($pit->geometryIndex > -1) {
-                    $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
-                }
-                $data[$pit->source]['type'] = $feature->properties->type;
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * Plucks the data we want to store from the geocoder PITs
-     *
-     * @param object $feature
-     * @return array
-     */
-    private function getStandardizedDataForSaving($feature)
-    {
-        $data = array();
-        foreach ($feature->properties->pits as $pit) {
-            if (in_array($pit->source, $this->fieldsOfInterest)) {
-                $data[$pit->source]['name'] = $pit->name;
-                $data[$pit->source]['uri'] = $pit->uri;
-                if (isset($feature->geometry->geometries[$pit->geometryIndex])) {
-                    $data[$pit->source]['geometry'] = $feature->geometry->geometries[$pit->geometryIndex];
-                }
-
-            }
         }
 
         return $data;

@@ -3,6 +3,7 @@
 namespace Pid\Mapper\Command;
 
 use Knp\Command\Command;
+use Pid\Mapper\Service\DatasetService;
 use Pid\Mapper\Service\GeocoderService;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,9 +31,12 @@ class StandardizeCommand extends Command {
         $datasetId = $input->getArgument('dataset');
         $app = $this->getSilexApplication();
 
-        $app['monolog']->addInfo('CLI called');
+        $app['monolog']->addInfo('Standardize process called for dataset ' . $datasetId);
 
-        $dataset = $app['dataset_service']->fetchDataset($datasetId);
+        /** @var DatasetService $dataService */
+        $dataService = $app['dataset_service'];
+
+        $dataset = $dataService->fetchDataset($datasetId);
 
         $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
         if (!file_exists($file)) {
@@ -41,6 +45,7 @@ class StandardizeCommand extends Command {
         $csv = \League\Csv\Reader::createFromPath($file);
         // detect delimiter:
         $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+
 
         $rows =
             $csv->setOffset(0)
@@ -51,30 +56,40 @@ class StandardizeCommand extends Command {
                     }
                 })
                 ->fetchAll();
+
+        $app['monolog']->addInfo('Found ' . count($rows) . ' to process.');
         if ($dataset['skip_first_row']) {
             array_shift($rows);
         }
-        $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($datasetId);
 
-        $placeColumn = (int) $fieldMapping['placename'];
-        $idColumn = (int) $fieldMapping['identifier'];
-        $searchOn = (int) $fieldMapping['search_option'];
+        // todo; create batches!
+
+        $fieldMapping = $dataService->getFieldMappingForDataset($datasetId);
+        if (!$fieldMapping) {
+            $app['session']->getFlashBag()->set('error',
+                'Sorry maar er zijn nog geen instellingen voor dat csv-bestand.');
+
+
+            $dataService->setMappingFailed($datasetId);
+        }
 
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
-        $geocoder->setSearchOn($searchOn);
+
         try {
-            $app['dataset_service']->setMappingStarted($datasetId);
+            $dataService->setMappingStarted($datasetId);
+            $dataService->clearRecordsForDataset($datasetId);
 
-            $mappedRows = $geocoder->map($rows, $placeColumn);
-
-            $app['dataset_service']->storeMappedRecords($mappedRows, $datasetId, $placeColumn, $idColumn);
+            if (false === $geocoder->map($rows, $fieldMapping, $datasetId)) {
+                $dataService->setMappingFailed($datasetId);
+                return $app['monolog']->addError('No response could be retrieved from the Histograph API.');
+            }
 
             // get user via dataset user_id
-            $user = $app['dataset_service']->getUser($dataset['user_id']);
+            $user = $dataService->getUser($dataset['user_id']);
             $app['monolog']->addInfo('Sending an email to user, with id: ' . $dataset['user_id']);
 
-            $app['dataset_service']->setMappingFinished($datasetId);
+            $dataService->setMappingFinished($datasetId);
 
             $message = \Swift_Message::newInstance()
                 ->setSubject($app['sitename'] . ' CSV-bestand verwerkt')
@@ -91,10 +106,9 @@ http://locatienaaruri.erfgeo.nl/datasets/{$datasetId}
             $app['mailer']->send($message);
 
         } catch (\Exception $e) {
-            $app['dataset_service']->setMappingFailed($datasetId);
+            $dataService->setMappingFailed($datasetId);
             return $app['monolog']->addError('CLI error: Histograph API returned error: ' . $e->getMessage());
         }
 
-        $output->writeln('All done');
     }
 }

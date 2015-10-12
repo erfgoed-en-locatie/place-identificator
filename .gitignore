@@ -8,5 +8,6 @@
 /app/storage/uploads/*
 /vendor/
 composer.phar
+/app/views/datasets/multiple.twig
 
 tests/_output/*

@@ -95,7 +95,15 @@ class ApiControllerProvider implements ControllerProviderInterface
             !preg_match("/geonames.org/", $uri) &&
             !preg_match("/vocab.getty.edu\/tgn/", $uri)
         ) {
-            return $app->json(array('error' => 'Geen GG, TGN of GeoNames Uri. Er is niets opgeslagen.'), 400);
+            // no longer returning an error, now simply storing whatever the user fills in
+            // return $app->json(array('error' => 'Geen GG, TGN of GeoNames Uri. Er is niets opgeslagen.'), 400);
+
+            $data['hg_dataset'] = Sources::discoverSourceType($uri);
+            $data['hg_uri'] = $uri;
+
+            if ($ids = $app['dataset_service']->storeManualMapping($data, $id)) {
+                return $app->json($ids);
+            }
         }
 
         // if geonames, we do'nt want the last part they keep communicating!
@@ -108,7 +116,7 @@ class ApiControllerProvider implements ControllerProviderInterface
 
             if (false === $uriData) { // probably means uri could not be found, so we will not be storing the geometry
                 $data['hg_dataset'] = Sources::discoverSourceType($uri);
-                $data['uri'] = $uri;
+                $data['hg_uri'] = $uri;
 
                 if ($ids = $app['dataset_service']->storeManualMapping($data, $id)) {
                     return $app->json($ids);
@@ -128,6 +136,7 @@ class ApiControllerProvider implements ControllerProviderInterface
             return $app->json(array('id' => $id), 404);
         } catch (\Exception $e) {
             $app['monolog']->error($e->getMessage());
+
             return $app->json(array('id' => $id), 503);
         }
     }
@@ -167,17 +176,15 @@ class ApiControllerProvider implements ControllerProviderInterface
         $jsonData = json_decode($data = $request->getContent());
         $data = [];
 
-        if (isset($jsonData->geonames)) {
-            $data['geonames'] = json_encode($jsonData->geonames);
-        }
-        if (isset($jsonData->tgn)) {
-            $data['tgn'] = json_encode($jsonData->tgn);
-        }
-        if (isset($jsonData->bag)) {
-            $data['bag'] = json_encode($jsonData->bag);
-        }
-        if (isset($jsonData->gemeentegeschiedenis)) {
-            $data['gg'] = json_encode($jsonData->gemeentegeschiedenis);
+        $pit = $jsonData->properties->pits[0];
+
+        //$data['hg_id'] = $pit['id'];
+        $data['hg_uri'] = $pit['uri'];
+        $data['hg_name'] = $pit['name'];
+        $data['hg_type'] = $pit['type'];
+        $data['hg_dataset'] = $pit['dataset'];
+        if ($pit['geometryIndex'] > -1) {
+            $data['hg_geometry'] = $jsonData->geometry->geometries[$pit['geometryIndex']];
         }
 
         if ($app['dataset_service']->storeManualMapping($data, $id)) {
