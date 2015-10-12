@@ -103,7 +103,7 @@ class GeocoderService
         $client = new Search([], $this->app['monolog']);
 
         // client settings valid for all rows
-        $client->setGeometry($fieldMapping['geometry']) // todo if we don't store the geometry... don't fetch it
+        $client->setGeometry($fieldMapping['geometry'])
             ->setExact(true)
             ->setQuoted(true)
             ->setSearchType($fieldMapping['hg_type']);

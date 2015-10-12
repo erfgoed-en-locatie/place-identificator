@@ -113,8 +113,19 @@ class DatasetService {
         $params = array(
             'id' => (int)$recid);
         $stmt = $this->db->executeQuery($sql, $params);
-        
+
         return $stmt->fetchAll();
+    }
+
+    public function fetchRecordByName($name)
+    {
+        $sql = 'SELECT * FROM records WHERE original_name = :name';
+        $params = array(
+            'name' => $name
+        );
+        $stmt = $this->db->executeQuery($sql, $params);
+
+        return $stmt->fetch();
     }
 
     public function fetchRecs($setid)

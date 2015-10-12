@@ -62,8 +62,7 @@
                                             {% if pit.uri is defined %}
                                             {{ pit.uri }}<br/>
                                             {% endif %}
-                                            ..meer data tonen? zoals liesIn?
-                                            {#{{ dump(pit) }}#}
+                                            {# twig problem with displaying hg:liesIn #}
                                             {#{% if pit.relations.hg:liesIn is defined %}
                                             {{ dump(pit.relations.hg:liesIn) }}
                                             {% endif %}#}

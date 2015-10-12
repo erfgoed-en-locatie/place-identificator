@@ -13,7 +13,7 @@
         "symfony/config": "~2.3",
         "symfony/translation": "~2.3",
         "jasongrimes/silex-simpleuser": "~2.0",
-        "league/csv": "~6.3",
+        "league/csv": "~7.0",
         "knplabs/console-service-provider": "~1.0"
     },
 
