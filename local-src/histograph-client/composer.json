@@ -1,6 +1,6 @@
 {
-    "name": "phpetra/histograph-client",
-    "description": "HTTP Client for the histograph API.",
+    "name": "phpetra/histograph-api-client",
+    "description": "HTTP Client for the Histograph API.",
     "type": "library",
     "keywords": [
         "phpetra",
@@ -9,7 +9,7 @@
         "Erfgoed en locatie",
         "erfego.nl"
     ],
-    "homepage": "https://github.com/phpetra/histograph-client",
+    "homepage": "https://github.com/phpetra/histograph-api-client",
     "authors": [
         {
             "name": "Petra Dreiskämper",
@@ -20,9 +20,15 @@
         "monolog/monolog": "^1.15",
         "guzzlehttp/guzzle": "~5.1"
     },
+    "require-dev": {
+        "phpspec/phpspec": "~2.0"
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
     "autoload": {
-        "psr-0": {
-            "Histograph": "src/"
+        "psr-4": {
+            "Histograph\\": "src/Histograph"
         }
     }
 }

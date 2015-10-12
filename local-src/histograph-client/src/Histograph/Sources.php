@@ -2,9 +2,8 @@
 
 namespace Histograph;
 
-
 /**
- * Object that holds some of the available data set (formerly known as sources) for Histograph.
+ * Object that holds some of the available data sets (formerly known as sources) for Histograph.
  * Hardcoded, because we don not want to facilitate all obscure ones at the moment
  *
  * The list of available sources can also be fetched from the API directly
@@ -21,6 +20,26 @@ class Sources
     const TYPE_KLOEKE = 'kloeke';
     const TYPE_HG = 'hg';
 
+    private static $allSets = array(
+        self::TYPE_TGN,
+        self::TYPE_GENONAMES,
+        self::TYPE_GG,
+        self::TYPE_NWB,
+        self::TYPE_BAG,
+        self::TYPE_KLOEKE,
+
+        'bag-utr',
+        'geonames-tgn',
+        'militieregisters',
+        'pleiades',
+        'voc-opvarenden',
+        'atlasverstedelijking',
+        'verdwenen-dorpen',
+        'simon-hart',
+        'departementen1812',
+        'ilvb',
+    );
+
     private static $types = array(
         self::TYPE_TGN,
         self::TYPE_GENONAMES,
@@ -28,7 +47,14 @@ class Sources
         self::TYPE_NWB,
         self::TYPE_BAG,
         self::TYPE_KLOEKE,
+        'bag-utr'
     );
+
+    public static function getAllSets()
+    {
+        natsort(self::$allSets);
+        return array_combine(self::$allSets, self::$allSets);
+    }
 
     public static function getTypes()
     {
