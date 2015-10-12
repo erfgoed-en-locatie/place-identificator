@@ -86,15 +86,15 @@
 
             <p>
                 Als u tevreden bent met de resultaten en eventuele handmatige correcties kunt U hier
-                (opnieuw) een downloadbaar bestand genereren.
+                <strong>(opnieuw)</strong> een downloadbaar bestand genereren.
                 Afhankelijk van de grootte van uw csv kan dit enige tijd in beslag nemen.
             </p>
-            <a href="/datasets/{{ dataset.id }}/download" class="btn btn-primary">Genereer een
+            <a href="{{ path('dataset-create-download', {'id': dataset.id}) }}" class="btn btn-primary">Genereer een
                 csv-bestand</a>
             <br/>
 
             {% if downloadable is not empty %}
-                <a href="/datasets/{{ dataset.id }}/download" class="btn btn-primary downloadbutton">Download
+                <a href="{{ path('dataset-download-file', {'id': dataset.id}) }}" class="btn btn-primary downloadbutton">Download
                     csv-bestand</a>
             {% endif %}
 
