@@ -39,9 +39,10 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $controllers->get('/{id}/multiples/{recid}', array(new self(), 'showMultipleRec'))->bind('dataset-multiple-rec')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/noresults', array(new self(), 'showNoResults'))->bind('dataset-noresults')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/unmappables', array(new self(), 'showUnmappables'))->bind('dataset-unmappables')->value('id', null)->assert('id', '\d+');
-        $controllers->get('/{id}/download', array(new self(), 'doDownload'))->bind('dataset-downloads')->value('id', null)->assert('id', '\d+');
-        
-        //$controllers->post('/{id}/download', array(new self(), 'doDownload'))->bind('dataset-downloadcsv')->value('id', null)->assert('id', '\d+');
+
+        $controllers->get('/{id}/create-download', array(new self(), 'createDownload'))->bind('dataset-create-download')->value('id', null)->assert('id', '\d+');
+        $controllers->get('/{id}/download', array(new self(), 'doDownload'))->bind('dataset-download-file')->value('id', null)->assert('id', '\d+');
+
         $controllers->post('/{id}/choose-pit/{recordId}',
             array(new self(), 'choosePit'))->bind('record-choose-pit')->assert('id', '\d+');
         return $controllers;
@@ -114,7 +115,16 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::MAPPED_EXACT_NOT_FOUND));
         $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::UNMAPPABLE));
 
-        return $app['twig']->render('datasets/details.html.twig', array('dataset' => $dataset));
+        $downloadable = false;
+        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['id'];
+        if (file_exists($newfile)) {
+            $downloadable = true;
+        }
+
+        return $app['twig']->render('datasets/details.html.twig', array(
+            'dataset' => $dataset,
+            'downloadable' => $downloadable
+        ));
     }
 
 
@@ -323,110 +333,24 @@ class DataSetControllerProvider implements ControllerProviderInterface
 
 
     /**
-     * Show downloadpage for this dataset
+     * (Re-)Create a downloadable file
      *
      * @param Application $app
      * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function showDownload(Application $app, $id)
+    public function createDownload(Application $app, $id)
     {
         $dataset = $app['dataset_service']->fetchDataset($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }
 
-        $dataset['countStandardized'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::MAPPED_EXACT, Status::MAPPED_MANUALLY));
-        $dataset['countMultiples'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::MAPPED_EXACT_MULTIPLE));
-        $dataset['countNoResults'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::MAPPED_EXACT_NOT_FOUND));
-        $dataset['countUnmappables'] = $app['dataset_service']->fetchCountForDatasetWithStatus($id, array(Status::UNMAPPABLE));
+        exec('php ../bin/pid standardize ' . $id . ' --method=download > /dev/null &');
+        $app['session']->getFlashBag()->set('alert',
+            'Het maken van de download-csv is begonnen en kan enige tijd duren. Refresh deze pagina over een paar minuten.');
 
-        return $app['twig']->render('datasets/download.twig', array('dataset' => $dataset));
-    }
-
-
-    /**
-     * Show downloadpage for this dataset
-     *
-     * @param Application $app
-     * @param $id
-     * @return string
-     */
-    public function doDownloadOld(Application $app, Request $request, $id)
-    {
-        $dataset = $app['dataset_service']->fetchDatasetDetails($id);
-        if (!$dataset) {
-            $app->abort(404, "Dataset with id ($id) does not exist.");
-        }
-
-        $csv = Writer::createFromFileObject(new SplTempFileObject());
-
-        $fieldnames = array('original_name');
-        if (null !== $dataset['identifier']) {
-            $fieldnames[] = 'identifier';
-        }
-
-        $postData = $request->request->all();
-        foreach ($postData as $key => $value) {
-            $fieldnames[] = $key;
-        }
-        $csv->insertOne($fieldnames);
-
-        // get records in dataset
-        $records = $app['dataset_service']->fetchRecs($id);
-
-        for($i=0; $i < count($records); $i++) {
-
-            // split up jsonblobs for geonames, tgn and gemeentegeschiedenis
-            if($records[$i]['geonames']!=""){
-                $geonames = json_decode($records[$i]['geonames']);
-                $records[$i]['geonames-uri'] = $geonames->uri;
-                $records[$i]['geonames-label'] = $geonames->name;
-                if (property_exists($geonames, 'geometry')) {
-                    $records[$i]['geonames-geometry'] = json_encode($geonames->geometry);
-                }
-            }else{
-                $records[$i]['geonames-uri'] = "";
-                $records[$i]['geonames-label'] = "";
-                $records[$i]['geonames-geometry'] = "";
-            }
-            if($records[$i]['tgn']!=""){
-                $tgn = json_decode($records[$i]['tgn']);
-                $records[$i]['tgn-uri'] = $tgn->uri;
-                $records[$i]['tgn-label'] = $tgn->name;
-                if (property_exists($tgn, 'geometry')) {
-                    $records[$i]['tgn-geometry'] = json_encode($tgn->geometry);
-                }
-            }else{
-                $records[$i]['tgn-uri'] = "";
-                $records[$i]['tgn-label'] = "";
-                $records[$i]['tgn-geometry'] = "";
-            }
-            if($records[$i]['gg']!=""){
-                $gg = json_decode($records[$i]['gg']);
-                $records[$i]['gg-uri'] = $gg->uri;
-                $records[$i]['gg-label'] = $gg->name;
-                if (property_exists($gg, 'geometry')) {
-                    $records[$i]['gg-geometry'] = json_encode($gg->geometry);
-                }
-            }else{
-                $records[$i]['gg-uri'] = "";
-                $records[$i]['gg-label'] = "";
-                $records[$i]['gg-geometry'] = "";
-            }
-
-            $wanted = array();
-            foreach ($fieldnames as $field) {
-                $wanted[$field] = $records[$i][$field];
-            }
-
-            $csv->insertOne($wanted);
-        }
-
-        header('Content-Type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="' . $dataset['name'] . '.csv"');
-        $csv->output();
-
-        return '';
+        return $app->redirect($app['url_generator']->generate('datasets-show', ['id' => $id]));
     }
 
     /**
@@ -454,13 +378,10 @@ class DataSetControllerProvider implements ControllerProviderInterface
             print file_get_contents($newfile);
             die;
         }
-        //if not create one
+        $app['session']->getFlashBag()->set('error',
+            'Downloaden is mislukt omdat het csv-bestand niet bestaat.');
+        return $app->redirect($app['url_generator']->generate('datasets-show', ['id' => $id]));
 
-        exec('php ../bin/pid standardize ' . $id . ' --method=download > /dev/null &');
-        $app['session']->getFlashBag()->set('alert',
-            'Het maken van de download-csv is begonnen en kan enige tijd duren. Refresh deze pagina over een paar minuten.');
-
-        return $app->redirect($app['url_generator']->generate('datasets-all'));
     }
 
 }

@@ -41,7 +41,8 @@
                             <li><strong>Type</strong> {{ dataset.hg_type }}</li>
                             <li><strong>Standaardiseren naar</strong> {{ dataset.hg_dataset }}</li>
 
-                            <li><strong>Met geometrie</strong> {% if dataset.geometry == 1 %} Ja {% else %} Nee {% endif %}</li>
+                            <li><strong>Met
+                                    geometrie</strong> {% if dataset.geometry == 1 %} Ja {% else %} Nee {% endif %}</li>
                         </uL>
                     </td>
                 </tr>
@@ -50,28 +51,53 @@
                         Resultaten
                     </th>
                     <td>
-                        <a class="btn btn-default" href="/datasets/{{ dataset.id }}/standardized">bekijk gestandaardiseerde record{% if dataset.countStandardized != 1 %}s ({{ dataset.countStandardized }}){% endif %} </a>
+                        <table class="table table-striped">
+                            <tr>
+                                <td>Gestandaardiseerde records</td>
+                                <td>{{ dataset.countStandardized }}</td>
+                                <td><a class="btn btn-primary" href="/datasets/{{ dataset.id }}/standardized">bekijk</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Records met meerdere resutaten</td>
+                                <td>{{ dataset.countMultiples }}</td>
+                                <td><a class="btn btn-primary" href="/datasets/{{ dataset.id }}/multiples">bekijk</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Rrecords zonder resultaat</td>
+                                <td>{{ dataset.countNoResults }}</td>
+                                <td><a class="btn btn-primary" href="/datasets/{{ dataset.id }}/noresults">bekijk</a>
+                                </td>
+                            </tr>
+                        </table>
 
-                        <a class="btn btn-default" href="/datasets/{{ dataset.id }}/multiples">bekijk records met meerdere resultaten ({{ dataset.countMultiples }})</a><br />
-
-                        <a class="btn btn-default" href="/datasets/{{ dataset.id }}/noresults">bekijk  records zonder resultaat ({{ dataset.countNoResults }})</a>
                     </td>
                 </tr>
-                
-                <tr>
-                    <th>
-                        Download
-                    </th>
-                    <td>
-                        <a href="/datasets/{{ dataset.id }}/download">Download hier de resultaten</a>.
-                    </td>
-                </tr>
+
             </table>
         </div>
 
         <div class="col-md-6">
-            
-            <a href="{{ path('import-mapcsv', {'id': dataset.id}) }}" title="Test de huidige mapping" class="btn btn-danger">Instellingen wijzigen / opnieuw standaardiseren</a>
+            <a href="{{ path('import-mapcsv', {'id': dataset.id}) }}" title="Test de huidige mapping"
+               class="btn btn-danger">Instellingen wijzigen / opnieuw standaardiseren</a>
+
+            <h3>Download</h3>
+
+            <p>
+                Als u tevreden bent met de resultaten en eventuele handmatige correcties kunt U hier
+                (opnieuw) een downloadbaar bestand genereren.
+                Afhankelijk van de grootte van uw csv kan dit enige tijd in beslag nemen.
+            </p>
+            <a href="/datasets/{{ dataset.id }}/download" class="btn btn-primary">Genereer een
+                csv-bestand</a>
+            <br/>
+
+            {% if downloadable is not empty %}
+                <a href="/datasets/{{ dataset.id }}/download" class="btn btn-primary downloadbutton">Download
+                    csv-bestand</a>
+            {% endif %}
+
         </div>
 
     </div>

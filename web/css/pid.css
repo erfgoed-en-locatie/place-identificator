@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /* CSS Document */
 
-/*@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:300,700,400);*/
+@import url(http://fonts.googleapis.com/css?family=Roboto+Slab:300,700,400);
 
 body{
 	background-color: #eeeeee;
@@ -26,13 +26,13 @@ p{margin-top: 8px;}
 	font-size: 18px;
 	font-family: 'Roboto Slab', serif;
 	display: inline-block;
-	padding: 0 20px 5px 20px;
+	padding: 0 40px 5px 20px;
 	border-bottom: 2px solid #638197;
 	margin: 0;
 	text-decoration: none;
 	color: #bfd2dd;
 }
-#resultnav a.current{
+#resultnav a.current, #resultnav a:hover {
 	color: #638197;
 }
 .navbar-default{
@@ -84,7 +84,7 @@ p{margin-top: 8px;}
 }
 .downloadbutton{
 	margin-left: 0px;
-	margin-top: 100px;
+	margin-top: 20px;
 }
 #mapcanvas {
 	width: 100%;

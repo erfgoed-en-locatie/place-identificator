@@ -10,7 +10,6 @@
             askAPI('GET', '/api/record/map/'+recid, data, deleteRows);
         }
 
-
         function deleteRows(json) {
             var tot = json.length;
             $.each(json, function(key, item) {
@@ -59,7 +58,9 @@
                     {% for rec in unmappables %}
                         <tr id="row_{{ rec.id }}">
                             <td>{{ rec.original_name }}</td>
-                            <td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
+                            <td>
+                                <input class="form-control wide" type="text" id="uri-with-{{ rec.id }}" value="" placeholder="http://sws.geonames.org/1234"/>
+                            </td>
                             <td><button class="btn btn-primary btn-sm" onclick="setUri({{ rec.id }})">sla op</button></td>
                         </tr>
                     {% endfor %}
