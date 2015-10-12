@@ -3,18 +3,12 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 17, 2015 at 02:09 PM
+-- Generation Time: Oct 12, 2015 at 05:45 PM
 -- Server version: 5.5.44-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
 
 --
 -- Database: `pid2`
@@ -41,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `crowd_mapping` (
   `hg_dataset` varchar(255) DEFAULT NULL COMMENT 'Name according to APi source',
   PRIMARY KEY (`id`),
   KEY `record_dataset` (`dataset_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -65,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `datasets` (
   `enddate_column` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `dataset_user` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=31 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
 -- --------------------------------------------------------
 
@@ -89,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `field_mapping` (
   `status` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `record_dataset` (`dataset_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Which column in the dataset has what info' AUTO_INCREMENT=22 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Which column in the dataset has what info' AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -113,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `records` (
   `hits` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `record_dataset` (`dataset_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1699 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -136,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_email` (`email`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -172,7 +166,3 @@ ALTER TABLE `datasets`
 --
 ALTER TABLE `records`
   ADD CONSTRAINT `record_ibfk_1` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
