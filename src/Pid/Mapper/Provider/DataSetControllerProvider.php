@@ -39,9 +39,9 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $controllers->get('/{id}/multiples/{recid}', array(new self(), 'showMultipleRec'))->bind('dataset-multiple-rec')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/noresults', array(new self(), 'showNoResults'))->bind('dataset-noresults')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/unmappables', array(new self(), 'showUnmappables'))->bind('dataset-unmappables')->value('id', null)->assert('id', '\d+');
-        $controllers->get('/{id}/download', array(new self(), 'showDownload'))->bind('dataset-downloads')->value('id', null)->assert('id', '\d+');
+        $controllers->get('/{id}/download', array(new self(), 'doDownload'))->bind('dataset-downloads')->value('id', null)->assert('id', '\d+');
         
-        $controllers->post('/{id}/download', array(new self(), 'doDownload'))->bind('dataset-downloadcsv')->value('id', null)->assert('id', '\d+');
+        //$controllers->post('/{id}/download', array(new self(), 'doDownload'))->bind('dataset-downloadcsv')->value('id', null)->assert('id', '\d+');
         $controllers->post('/{id}/choose-pit/{recordId}',
             array(new self(), 'choosePit'))->bind('record-choose-pit')->assert('id', '\d+');
         return $controllers;
@@ -351,7 +351,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
      * @param $id
      * @return string
      */
-    public function doDownload(Application $app, Request $request, $id)
+    public function doDownloadOld(Application $app, Request $request, $id)
     {
         $dataset = $app['dataset_service']->fetchDatasetDetails($id);
         if (!$dataset) {
@@ -427,6 +427,40 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $csv->output();
 
         return '';
+    }
+
+    /**
+     * Run the download command or simply display the file if it exists already
+     *
+     * @param Application $app
+     * @param Request $request
+     * @param integer $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function doDownload(Application $app, Request $request,$id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
+        if (!$dataset) {
+            $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
+
+        // check if file_exists
+        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['id'];
+        if (file_exists($newfile)) {
+            header('Content-Type: text/csv; charset=UTF-8');
+            header('Content-Disposition: attachment; filename="download_' . $dataset['name'] . '.csv"');
+            print file_get_contents($newfile);
+            die;
+        }
+        //if not create one
+
+        exec('php ../bin/pid standardize ' . $id . ' --method=download > /dev/null &');
+        $app['session']->getFlashBag()->set('alert',
+            'Het maken van de download-csv is begonnen en kan enige tijd duren. Refresh deze pagina over een paar minuten.');
+
+        return $app->redirect($app['url_generator']->generate('datasets-all'));
     }
 
 }

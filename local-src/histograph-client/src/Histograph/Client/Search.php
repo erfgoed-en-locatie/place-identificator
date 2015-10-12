@@ -10,10 +10,6 @@ use Histograph\PitTypes;
  */
 class Search extends Client
 {
-
-    const API_TIMEOUT           = 5;
-    const API_CONNECT_TIMEOUT   = 5;
-
     /**
      * Whether to search for a specific hg:Type or not
      * @var string

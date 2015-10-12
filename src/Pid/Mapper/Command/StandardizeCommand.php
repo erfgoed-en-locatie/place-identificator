@@ -70,7 +70,6 @@ class StandardizeCommand extends Command
         $csv->setDelimiter(current($csv->detectDelimiterList(2)));
         $rows =
             $csv->setOffset(0)
-                ->setLimit(100)
                 // skipping empty rows
                 ->addFilter(function ($row) {
                     if (!empty($row[0])) {
@@ -107,11 +106,11 @@ class StandardizeCommand extends Command
         }
 
         // create a new file
-        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['filename'];
+        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['id'];
 
         $writer = Writer::createFromFileObject(new SplTempFileObject());
         $writer->setDelimiter(",");
-        $writer->setNewline("\r\n");
+        //$writer->setNewline("\r\n");
         $writer->setEncodingFrom("utf-8");
         if ($headerRow) {
             $writer->insertOne($headerRow);

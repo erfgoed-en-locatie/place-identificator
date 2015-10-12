@@ -11,15 +11,16 @@ use Monolog\Logger;
 class Client
 {
 
-    const API_TIMEOUT           = 5;
-    const API_CONNECT_TIMEOUT   = 5;
+    const API_TIMEOUT = 5;
+    const API_CONNECT_TIMEOUT = 5;
 
     /**
      * @var string $baseUri Uri of the service to call
      */
     protected $baseUri = 'http://api.erfgeo.nl';
+    //protected $baseUri = 'https://api.histograph.io';
 
-    /** @var array  */
+    /** @var array */
     protected $cache = null;
 
     /**
@@ -34,7 +35,22 @@ class Client
      */
     public function __construct(Logger $logger = null)
     {
-        $this->client = new \GuzzleHttp\Client();
+        // fixme bad class instantiation here
+        $this->client = new \GuzzleHttp\Client([
+                'base_url' => [
+                    $this->baseUri
+                ],
+                'defaults' => [
+                    'timeout' => self::API_TIMEOUT,
+                    'connect_timeout' => self::API_CONNECT_TIMEOUT,
+                    'allow_redirects' => false
+                ]
+            ]
+        );
+
+        // $this->setDefaultOption('headers/Accept-Charset', 'utf-8');
+        // $this->setDefaultOption('headers/Accept', 'application/json');
+        //$this->setDefaultOption('headers/Content-Type', 'application/json');
         $this->logger = $logger;
     }
 
@@ -72,7 +88,7 @@ class Client
             }
         }
 
-            return false;
+        return false;
     }
 
     /**
@@ -97,13 +113,14 @@ class Client
                 foreach ($response->json() as $source) {
                     $sources[] = $source['id'];
                 }
-                return $sources;
-                }
 
-                return $response->json();
+                return $sources;
             }
 
-            return false;
+            return $response->json();
+        }
+
+        return false;
     }
 
     /**
