@@ -50,9 +50,12 @@ p{margin-top: 8px;}
 	margin-top: 0;
 	height: 30px;
 }
-.form-control{
+.form-control {
 	padding: 3px 10px;
 	height: 30px;
+}
+.form-control.wide {
+    width: 300px;
 }
 .container .jumbotron{
 	background-image: url(/images/jumbo-bg.jpg);

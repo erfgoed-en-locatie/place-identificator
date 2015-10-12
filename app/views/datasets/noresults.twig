@@ -73,14 +73,18 @@
                     </tr>
                     </tfoot>
                     <tbody>
+
                     {% for rec in noresults %}
                         <tr id="row_{{ rec.id }}">
                             <td>{{ rec.original_name }}</td>
-                            <td><input class="form-control" type="text" id="uri-with-{{ rec.id }}" value=""/></td>
+                            <td>
+                                <input class="form-control wide" type="text" id="uri-with-{{ rec.id }}" value="" placeholder="http://sws.geonames.org/1234"/>
+                            </td>
                             <td><button type="button" class="btn btn-primary btn-sm" onclick="setUri({{ rec.id }})">sla op</button></td>
                             <td><button type="button" class="btn-danger btn btn-sm unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button></td>
                         </tr>
                     {% endfor %}
+                    </form>
                     </tbody>
                 </table>
             {% endif %}
