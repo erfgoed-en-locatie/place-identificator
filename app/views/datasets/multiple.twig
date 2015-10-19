@@ -63,9 +63,12 @@
                                             {{ pit.uri }}<br/>
                                             {% endif %}
                                             {# twig problem with displaying hg:liesIn #}
-                                            {#{% if pit.relations.hg:liesIn is defined %}
-                                            {{ dump(pit.relations.hg:liesIn) }}
-                                            {% endif %}#}
+
+                                            {#{{ dump(pit) }}#}
+
+                                            {{ dump(attribute(pit, 'relations') ) }}
+
+                                            {#{{ dump(attribute(pit.relations, 'hg:liesIn')) }}#}
                                         </div>
                                         <div class="col-md-6">
 

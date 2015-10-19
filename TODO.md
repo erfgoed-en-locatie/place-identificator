@@ -1,6 +1,7 @@
 # TODO for the rewrite
 
-
+- page multiple: meer info laten zien (bv bij Middelburg, het land!)
+    - dus twig ding uitzoeken
 - batches!
 - make csv file viewable
 - test test test!

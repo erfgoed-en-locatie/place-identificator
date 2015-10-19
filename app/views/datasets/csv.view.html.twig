@@ -1,0 +1,14 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Bestand '{{ filename }}'</h1>
+
+            {{ table|raw }}
+        </div>
+
+    </div>
+
+{% endblock %}

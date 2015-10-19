@@ -18,6 +18,7 @@ $app->mount('/datasets', new \Pid\Mapper\Provider\DataSetControllerProvider());
 $app->mount('/import', new \Pid\Mapper\Provider\ImportControllerProvider());
 $app->mount('/standardize', new \Pid\Mapper\Provider\StandardizeControllerProvider());
 $app->mount('/api', new \Pid\Mapper\Provider\ApiControllerProvider());
+$app->mount('/file', new \Pid\Mapper\Provider\FileControllerProvider());
 
 // Mount the user controller routes:
 $app->mount('/user', $simpleUserProvider);

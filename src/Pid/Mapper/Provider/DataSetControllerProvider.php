@@ -195,7 +195,6 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function showMultiples(Application $app, $id)
     {
-
         $dataset = $app['dataset_service']->fetchDataset($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");

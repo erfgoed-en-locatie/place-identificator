@@ -14,6 +14,7 @@
                     </th>
                     <td>
                         {{ dataset.filename }}
+                        <a href="{{ path('file-view-csv', {'filename': dataset.filename}) }}" class="btn btn-primary">Bekijk csv</a>
                     </td>
                 </tr>
                 <tr>
