@@ -125,8 +125,17 @@
         $(".table").on( "click", ".unmappable", function(e) {
             e.preventDefault();
             var uri = $(this).attr('data-ref');
-            askAPI('GET', uri, null, deleteUnmappedRow);
+            askAPI('GET', uri, null, deleteRows);
         });
+
+        /** deletes rows from the dataTable on ajax calls */
+        function deleteRows(json) {
+            var tot = json.length;
+            $.each(json, function(key, item) {
+                var tr = '#row_'+item.id;
+                $(tr).remove();
+            });
+        }
 
         /** DataTable **/
         if ($('#pdxtable')) {

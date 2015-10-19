@@ -8,14 +8,6 @@
             uri = jQuery('#uri-with-' + recid).val();
             data = {"uri": uri };
             askAPI('GET', '/api/record/map/'+recid, data, deleteRows);
-        }
-
-        function deleteRows(json) {
-            var tot = json.length;
-            $.each(json, function(key, item) {
-                var tr = '#row_'+item.id;
-                $(tr).remove();
-            });
 
             var one = jQuery('#nr-one').html();
             one = Number(one) + tot;
@@ -23,25 +15,24 @@
             none = Number(none) - tot;
 
             setNumbers(one,null,none,null);
-
             alertMessage('De uri is opgeslagen!');
         }
 
-        function deleteUnmappedRow(json) {
-            var tr = '#row_'+json.id;
-            $(tr).remove();
+        $(document.body).on( "click", ".unmappable", function(e) {
+            e.preventDefault();
+            var uri = $(this).attr('data-ref');
+            askAPI('GET', uri, null, deleteRows);
 
             var none = jQuery('#nr-none').html();
             none = Number(none) - 1;
             var unmappables = jQuery('#nr-unmappables').html();
             unmappables = Number(unmappables) + 1;
 
-            alertMessage('De naam is verwijderd.');
-            setNumbers(null, null,none,unmappables);
-        }
+            alertMessage('De naam is als niet achterhaalbaar gemarkeerd.');
+            setNumbers(null, null,none,unmappables)
+        });
 
     </script>
-
 
     <div class="row">
         <div class="col-md-12">
