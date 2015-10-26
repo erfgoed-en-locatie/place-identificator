@@ -154,7 +154,9 @@ class ApiControllerProvider implements ControllerProviderInterface
 
         $pit = $jsonData->properties->pits[0];
 
-        //$data['hg_id'] = $pit['id'];
+        if (property_exists($pit, 'id')) {
+            $data['hg_id'] = $pit->id;
+        }
         $data['hg_uri'] = $pit['uri'];
         $data['hg_name'] = $pit['name'];
         $data['hg_type'] = $pit['type'];

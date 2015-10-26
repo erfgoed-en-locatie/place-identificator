@@ -195,7 +195,9 @@ class GeocoderService
 
             foreach ($feature->properties->pits as $pit) {
                 $row = [];
-                $row['hg_id'] = $pit->hgid;
+                if (property_exists($pit, 'id')) {
+                    $row['hg_id'] = $pit->id;
+                }
                 $row['hg_name'] = $pit->name;
                 $row['hg_type'] = $pit->type;
                 if (property_exists($pit, 'uri')) {
