@@ -1,11 +1,4 @@
--- phpMyAdmin SQL Dump
--- version 4.0.10deb1
--- http://www.phpmyadmin.net
---
--- Host: localhost
--- Generation Time: Oct 12, 2015 at 05:45 PM
--- Server version: 5.5.44-0ubuntu0.14.04.1
--- PHP Version: 5.5.9-1ubuntu4.11
+
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -57,6 +50,9 @@ CREATE TABLE IF NOT EXISTS `datasets` (
   `liesin_column` int(11) DEFAULT NULL,
   `startdate_column` int(11) DEFAULT NULL,
   `enddate_column` int(11) DEFAULT NULL,
+  `delimiter` varchar(4) DEFAULT NULL,
+  `enclosure_character` varchar(4) DEFAULT NULL,
+  `escape_character` varchar(4) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `dataset_user` (`user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
@@ -153,16 +149,16 @@ CREATE TABLE IF NOT EXISTS `user_custom_fields` (
 -- Constraints for table `crowd_mapping`
 --
 ALTER TABLE `crowd_mapping`
-  ADD CONSTRAINT `record_ibfk_2` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
+ADD CONSTRAINT `record_ibfk_2` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `datasets`
 --
 ALTER TABLE `datasets`
-  ADD CONSTRAINT `dataset_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+ADD CONSTRAINT `dataset_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `records`
 --
 ALTER TABLE `records`
-  ADD CONSTRAINT `record_ibfk_1` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
+ADD CONSTRAINT `record_ibfk_1` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
