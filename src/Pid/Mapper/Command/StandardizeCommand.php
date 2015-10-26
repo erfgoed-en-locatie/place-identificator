@@ -72,6 +72,13 @@ class StandardizeCommand extends Command
         } else {
             $csv->setDelimiter(current($csv->detectDelimiterList(2)));
         }
+        if (0 < mb_strlen($dataset['enclosure_character'])) {
+            $csv->setEnclosure($dataset['enclosure_character']);
+        }
+        if (0 < mb_strlen($dataset['escape_character'])) {
+            $csv->setEscape($dataset['escape_character']);
+        }
+
         $rows =
             $csv->setOffset(0)
                 // skipping empty rows
@@ -154,6 +161,12 @@ class StandardizeCommand extends Command
             $csv->setDelimiter($dataset['delimiter']);
         } else {
             $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        }
+        if (0 < mb_strlen($dataset['enclosure_character'])) {
+            $csv->setEnclosure($dataset['enclosure_character']);
+        }
+        if (0 < mb_strlen($dataset['escape_character'])) {
+            $csv->setEscape($dataset['escape_character']);
         }
 
         $rows =

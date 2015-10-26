@@ -66,6 +66,12 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         } else {
             $csv->setDelimiter(current($csv->detectDelimiterList(2)));
         }
+        if (0 < mb_strlen($dataset['enclosure_character'])) {
+            $csv->setEnclosure($dataset['enclosure_character']);
+        }
+        if (0 < mb_strlen($dataset['escape_character'])) {
+            $csv->setEscape($dataset['escape_character']);
+        }
 
         $limit = self::NUMBER_TO_TEST;
         if ($dataset['skip_first_row']) {

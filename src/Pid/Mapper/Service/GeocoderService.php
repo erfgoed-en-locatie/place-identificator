@@ -93,11 +93,6 @@ class GeocoderService
             throw new RuntimeException('No rows to process.');
         }
 
-        $placeColumn = (int)$fieldMapping['placename'];
-        if (!$rows[0][$placeColumn]) {
-            throw new RuntimeException('Error calling geocoder: no placename column in the rows.');
-        }
-
         // new Histograph Search Client, should be injected some time soon!
         /** @var Search $client */
         $client = new Search([], $this->app['monolog']);
