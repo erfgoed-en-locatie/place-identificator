@@ -16,7 +16,7 @@ class FileControllerProvider implements ControllerProviderInterface
     {
         $controllers = $app['controllers_factory'];
 
-        $controllers->get('/view-csv/{filename}', array(new self(), 'viewCsv'))
+        $controllers->get('/view-csv/{filename}/{id}', array(new self(), 'viewCsv'))
             ->bind('file-view-csv')
             ;
         $controllers->get('/download-csv/{filename}', array(new self(), 'downloadCsv'))
@@ -31,14 +31,26 @@ class FileControllerProvider implements ControllerProviderInterface
      *
      * @param Application $app
      * @param $filename
+     * @param $id
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function viewCsv(Application $app, $filename)
+    public function viewCsv(Application $app, $filename, $id)
     {
+        $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
+        if (!$dataset) {
+            $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
+
         $file = $app['upload_dir'] . '/' . $filename;
 
         $csv = \League\Csv\Reader::createFromPath($file);
-        $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        if (0 < mb_strlen($dataset['delimiter'])) {
+            $csv->setDelimiter($dataset['delimiter']);
+        } else {
+            $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        }
         $rows =
             $csv->setOffset(0)
                 ->fetchAll();

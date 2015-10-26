@@ -1,16 +1,10 @@
 {% extends "layout.html.twig" %}
 
+    <h1>Configuratie voor dataset "{{ dataset.name }}"</h1>
+
 {% block content %}
     <div class="row">
         <div class="col-md-6">
-
-            <h1>Dataset Uploaden</h1>
-
-            <p>
-                Upload een csv-bestand met de te standaardiseren plaatsnamen.
-                In het csv-bestand mogen ook contextverschaffende velden opgenomen zijn - bijvoorbeeld voor provincie of land.
-                Het csv-bestand mag maximaal 40MB groot zijn.
-            </p>
 
             <p>
                 Geef s.v.p. ten minste het teken op waarmee in uw csv-bestand de kolommen van elkaar te onderscheiden zijn.<br>
@@ -22,7 +16,7 @@
             {{ form_widget(form) }}
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">bestand uploaden</button>
+                <button type="submit" class="btn btn-primary">wijzigingen opslaan</button>
             </div>
             {{ form_end(form) }}
 

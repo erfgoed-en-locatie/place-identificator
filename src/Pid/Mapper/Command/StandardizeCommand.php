@@ -67,7 +67,11 @@ class StandardizeCommand extends Command
 
         $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
         $csv = \League\Csv\Reader::createFromPath($file);
-        $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        if (0 < mb_strlen($dataset['delimiter'])) {
+            $csv->setDelimiter($dataset['delimiter']);
+        } else {
+            $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        }
         $rows =
             $csv->setOffset(0)
                 // skipping empty rows
@@ -146,7 +150,11 @@ class StandardizeCommand extends Command
             return $app['monolog']->addError('CLI error: het csv-bestand (' . $dataset['filename'] . ') kon niet gelezen worden.');
         }
         $csv = \League\Csv\Reader::createFromPath($file);
-        $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        if (0 < mb_strlen($dataset['delimiter'])) {
+            $csv->setDelimiter($dataset['delimiter']);
+        } else {
+            $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        }
 
         $rows =
             $csv->setOffset(0)

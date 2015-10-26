@@ -32,6 +32,10 @@ class ImportControllerProvider implements ControllerProviderInterface
         $controllers->get('/upload', array(new self(), 'uploadForm'))->bind('dataset-upload-form');
         $controllers->post('/upload', array(new self(), 'handleUpload'))->bind('dataset-upload');
 
+        $controllers->match('/config/{id}', array(new self(), 'editCsvConfig'))
+            ->bind('import-editcsv')->assert('id', '\d+')->method('GET|POST');
+
+
         $controllers->match('/mapcsv/{id}', array(new self(), 'mapCsv'))
             ->bind('import-mapcsv')->assert('id', '\d+')->method('GET|POST');
 
@@ -42,12 +46,13 @@ class ImportControllerProvider implements ControllerProviderInterface
      * Form for csv file uploads
      *
      * @param Application $app
+     * @param null $data
      * @return mixed
      */
-    private function getUploadForm(Application $app)
+    private function getUploadForm(Application $app, $data = null)
     {
         $form = $app['form.factory']
-            ->createBuilder('form')
+            ->createBuilder('form', $data)
             ->add('name', 'text', array(
                 'label' => 'Geef uw dataset een herkenbare naam',
                 'required' => true,
@@ -60,6 +65,37 @@ class ImportControllerProvider implements ControllerProviderInterface
                         'message' => 'Voer alleen letters of cijfers in',
                     )),
                     new Assert\Length(array('min' => 1, 'max' => 123))
+                )
+            ))
+            ->add('delimiter', 'text', array(
+                'label' => 'Wat is het scheidingsteken van de kolommen in uw dataset?',
+                'required' => false,
+                'constraints' => array(
+                    new Assert\Length(array('min' => 1, 'max' => 2))
+                ),
+                'attr' => array(
+                    'placeholder' => 'bv , of ; ',
+                    'class'     => 'narrow'
+                )
+            ))
+            ->add('enclosure_character', 'text', array(
+                'label' => 'Worden de velden "enclosed" door een bepaald teken?',
+                'required' => false,
+                'constraints' => array(
+                    new Assert\Length(array('min' => 1, 'max' => 1))
+                ),
+                'attr' => array(
+                    'class'     => 'narrow'
+                )
+            ))
+            ->add('escape_character', 'text', array(
+                'label' => 'Is er een bepaald karakter dat "escaped" moet worden?',
+                'required' => false,
+                'constraints' => array(
+                    new Assert\Length(array('min' => 1, 'max' => 1))
+                ),
+                'attr' => array(
+                    'class'     => 'narrow'
                 )
             ))
             ->add('skip_first_row', 'choice', array(
@@ -168,7 +204,7 @@ class ImportControllerProvider implements ControllerProviderInterface
         $form = $app['form.factory']
             ->createBuilder('form', $mapping)
             ->add('placename', 'choice', array(
-                'label' => 'Toponiem in veld (verplicht)',
+                'label' => 'Toponiem in veld ',
                 'choices' => $fieldChoices,
                 'empty_value' => 'selecteer een veld',
                 'required' => true,
@@ -187,8 +223,8 @@ class ImportControllerProvider implements ControllerProviderInterface
                 )
             ))
             ->add('hg_type', 'choice', array(
-                'label' => 'Dit toponiem is van het type (verplicht)',
-                'required' => false,
+                'label' => 'Dit toponiem is van het type ',
+                'required' => true,
                 'choices' => PitTypes::getTypes(),
                 'empty_value' => 'selecteer een veld',
                 'constraints' => array(
@@ -196,8 +232,8 @@ class ImportControllerProvider implements ControllerProviderInterface
                 )
             ))
             ->add('hg_dataset', 'choice', array(
-                'label' => 'Standaardiseer naar (verplicht)',
-                'required' => false,
+                'label' => 'Standaardiseer naar ',
+                'required' => true,
                 'choices' => Sources::getTypes(),
                 'empty_value' => 'kies standaard',
                 'constraints' => array(
@@ -213,16 +249,6 @@ class ImportControllerProvider implements ControllerProviderInterface
                     new Assert\Type('integer')
                 )
             ))
-            /*   ->add('search_option', 'choice', array(
-                'label' => 'Zoeken naar',
-                'required' => true,
-                'choices' => GeocoderService::$searchOptions,
-                //'empty_value' => 'selecteer een veld',
-                'constraints' => array(
-                    new Assert\Length(array('min' => 1, 'max' => 123))
-                )
-            ))*/
-
             ->add('save', 'submit', array(
                 'label' => 'bewaar deze instellingen',
                 'attr' => array('class' => 'btn btn-success'),
@@ -265,8 +291,11 @@ class ImportControllerProvider implements ControllerProviderInterface
         $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
 
         $csv = \League\Csv\Reader::createFromPath($file);
-        // detect delimiter:
-        $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        if (0 < mb_strlen($dataset['delimiter'])) {
+            $csv->setDelimiter($dataset['delimiter']);
+        } else {
+            $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        }
         $columnNames = $csv->fetchOne();
 
         // see if we already have a mapping..
@@ -303,6 +332,51 @@ class ImportControllerProvider implements ControllerProviderInterface
         // form or form errors
         return $app['twig']->render('import/field-mapper.twig', array(
             'columnNames' => $columnNames,
+            'form' => $form->createView(),
+            'dataset' => $dataset
+        ));
+    }
+
+    /**
+     * Edit the config for the csv the name annd the delimiters
+     *
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function editCsvConfig(Application $app, Request $request, $id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
+        if (!$dataset) {
+            $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
+
+        $form = $this->getUploadForm($app, $dataset);
+        $form->remove('csvFile');
+
+        // if the form was posted
+        if ($request->getMethod() == 'POST') {
+            $form->bind($request);
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                // save the mapping
+                if ($app['dataset_service']->storeCSVConfig($data)) { // ok
+                    $app['session']->getFlashBag()->set('alert', 'De instellingen zijn aangepast en opgeslagen.');
+                    return $app->redirect($app['url_generator']->generate('datasets-all'));
+
+                } else {
+                    $app['session']->getFlashBag()->set('error', 'Sorry maar de instellingen konden niet opgeslagen worden.');
+
+                    return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
+                }
+            }
+        }
+
+        // form or form errors
+        return $app['twig']->render('import/editform.html.twig', array(
             'form' => $form->createView(),
             'dataset' => $dataset
         ));

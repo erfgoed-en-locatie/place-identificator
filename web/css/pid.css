@@ -57,6 +57,13 @@ p{margin-top: 8px;}
 .form-control.wide {
     width: 300px;
 }
+.form-control.narrow {
+	width: 100px;
+}
+.control-label.required:after {
+    content:" *";
+    color:red;
+}
 .container .jumbotron{
 	background-image: url(/images/jumbo-bg.jpg);
 	background-position: -12px -20px;
@@ -102,8 +109,6 @@ p{margin-top: 8px;}
 .possibilities{
 	padding-left: 0;
 	list-style-type: none;
-
-
 }
 .possibilities li{
 	background-color: #fff;
@@ -125,4 +130,12 @@ p{margin-top: 8px;}
 }
 .no-pad {
     margin: 0; padding: 0;
+}
+.pad {
+    padding: 10px;
+}
+.mappingfield {
+    margin-bottom: 20px;
+    #color: #638197;
+    color: #3276b1;
 }

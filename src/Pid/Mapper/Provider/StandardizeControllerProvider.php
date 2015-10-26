@@ -61,7 +61,11 @@ class StandardizeControllerProvider implements ControllerProviderInterface
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
         $csv = \League\Csv\Reader::createFromPath($file);
-        $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        if (0 < mb_strlen($dataset['delimiter'])) {
+            $csv->setDelimiter($dataset['delimiter']);
+        } else {
+            $csv->setDelimiter(current($csv->detectDelimiterList(2)));
+        }
 
         $limit = self::NUMBER_TO_TEST;
         if ($dataset['skip_first_row']) {

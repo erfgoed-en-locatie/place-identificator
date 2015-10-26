@@ -58,7 +58,7 @@ class DatasetService {
         $stmt = $this->db->executeQuery('
           SELECT d.*, f.hg_type, f.hg_dataset, f.geometry
           FROM datasets d
-          INNER JOIN field_mapping f ON f.dataset_id = d.id
+          LEFT JOIN field_mapping f ON f.dataset_id = d.id
           WHERE d.id = :id', array(
             'id' => (int)$id
         ));
@@ -208,6 +208,21 @@ class DatasetService {
 
         $data['created_on'] = $date->format('Y-m-d H:i:s');
         return $this->db->insert('field_mapping', $data);
+    }
+
+    /**
+     * Store the csv properties for which reading the csv is not necessary
+     *
+     * @param $data
+     * @return int
+     */
+    public function storeCSVConfig($data)
+    {
+        $date = new \DateTime('now');
+        $data['updated_on'] = $date->format('Y-m-d H:i:s');
+        return $this->db->update('datasets', $data, array(
+            'id' => $data['id']
+        ));
     }
 
     public function setMappingStarted($datasetId)
