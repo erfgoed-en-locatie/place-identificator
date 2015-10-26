@@ -40,10 +40,14 @@
                             <td>{{ rec.original_name }}</td>
                             <td>{% if rec.hg_name is not empty %} {{ rec.hg_name }} {% endif %}</td>
                             <td>{% if rec.hg_type is not empty %} {{ rec.hg_type }} {% endif %}</td>
-                            {#{{  todo: petra linkje maken naar hg-concept via thesuarus, bij voorkeur via hgid, maar als dat er niet is, via de uri }}#}
                             <td>
-                                {% if rec.hg_id is not empty %}<a href="" target="_blank">{{ rec.hg_id }}</a>{% endif %}
-                                {% if rec.hg_uri is not empty %}<a href="#" target="_blank">{{ rec.hg_uri }}</a>{% endif %}
+                                {% if rec.hg_id is not empty %}<a title="Bekijk locatie in thesaurus" href="{{ app.thesaurus_uri }}/pit/?id={{ rec.hg_id }}" target="_blank">{{ rec.hg_id }}</a>
+                                    --
+                                 <a title="Bekijk json data in de API" href="{{ app.histograph_api }}/search?id={{ rec.hg_id }}" target="_blank">(data)</a>
+                                {% endif %}
+                                {% if rec.hg_uri is not empty %}
+                                    <a title="Bekijk locatie in thesaurus" href="{{ app.thesaurus_uri }}/pit/?id={{ rec.hg_uri }}" target="_blank">{{ rec.hg_uri }}</a>
+                                {% endif %}
                             </td>
                             <td><a class="btn btn-danger btn-sm clear-mapping" data-id="{{ rec.id }}" data-ref="{{ path('api-clear-mapping', {'id': rec.id }) }}">niet juist</a></td>
                         </tr>
