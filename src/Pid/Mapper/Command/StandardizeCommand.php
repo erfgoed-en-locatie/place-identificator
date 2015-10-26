@@ -81,8 +81,9 @@ class StandardizeCommand extends Command
             $headerRow = $rows[0];
             array_shift($rows);
         }
+
         if ($headerRow) {
-            $data = array('hg_uri', 'hg_name', 'hg_geometry', 'hg_type', 'hg_dataset');
+            $data = array('hg_id','hg_uri', 'hg_name', 'hg_geometry', 'hg_type', 'hg_dataset');
             foreach ($data as $ding) {
                 array_push($headerRow, $ding);
             }
@@ -98,6 +99,7 @@ class StandardizeCommand extends Command
             $record = $dataService->fetchRecordByName($originalName);
 
             // add db data to th csv file to Write
+            array_push($row, $record['hg_id']);
             array_push($row, $record['hg_uri']);
             array_push($row, $record['hg_name']);
             array_push($row, $record['hg_geometry']);
