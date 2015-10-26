@@ -16,11 +16,16 @@ use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 class GeocoderService
 {
 
-    protected $app;
+    /** @var DatasetService */
+    protected $datasetService;
 
-    public function __construct($app)
+    /** @var Search */
+    protected $searchClient;
+
+    public function __construct(DatasetService $datasetService, Search $searchClient)
     {
-        $this->app = $app;
+        $this->datasetService = $datasetService;
+        $this->searchClient = $searchClient;
     }
 
     /**
@@ -32,16 +37,12 @@ class GeocoderService
      */
     public function fetchFeaturesForNamesWithMultipleHits($row, $fieldMapping)
     {
-        // new Histograph Search Client, should be injected some time soon!
-        /** @var Search $client */
-        $client = new Search([], $this->app['monolog']);
-
         // client settings valid for all rows
-        $client->setGeometry(true)
+        $this->searchClient->setGeometry(true)
             ->setExact(true)
             ->setQuoted(true)
             ->setSearchType($fieldMapping['hg_type']);
-        $originalName = $client->cleanupSearchString($row['original_name']);
+        $originalName = $this->searchClient->cleanupSearchString($row['original_name']);
         if (empty($originalName)) {
             //print 'No name to search on ' . $row['original_name'];
             return false;
@@ -49,19 +50,18 @@ class GeocoderService
 
         // set bounding param if one was given
         if (!empty($fieldMapping['liesin'])) {
-            $within = $client->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
+            $within = $this->searchClient->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
             if (!empty($within)) {
-                $client->setLiesIn($within);
+                $this->searchClient->setLiesIn($within);
             }
         }
 
         /** @var GeoJsonResponse $histographResponse */
-        $histographResponse = $client->search($originalName);
+        $histographResponse = $this->searchClient->search($originalName);
         // FAKE SERVER!
-        //$histographResponse = $client->callApi($originalName, 'http://pid.silex/leiden.json');
+        //$histographResponse = $this->searchClient->callApi($originalName, 'http://pid.silex/leiden.json');
 
         if (!$histographResponse) {
-            //print 'No response';
             return false;
         }
 
@@ -73,7 +73,6 @@ class GeocoderService
                 ->getFilteredResponse();
 
             return $features;
-            //return $this->handleMapOneResponse($features);
          }
 
         return null;
@@ -93,33 +92,29 @@ class GeocoderService
             throw new RuntimeException('No rows to process.');
         }
 
-        // new Histograph Search Client, should be injected some time soon!
-        /** @var Search $client */
-        $client = new Search([], $this->app['monolog']);
-
         // client settings valid for all rows
-        $client->setGeometry($fieldMapping['geometry'])
+        $this->searchClient->setGeometry($fieldMapping['geometry'])
             ->setExact(true)
             ->setQuoted(true)
             ->setSearchType($fieldMapping['hg_type']);
 
         // settings for each row
         foreach ($rows as $row) {
-            $originalName = $client->cleanupSearchString($row[(int)($fieldMapping['placename'])]);
+            $originalName = $this->searchClient->cleanupSearchString($row[(int)($fieldMapping['placename'])]);
             if (empty($originalName)) {
                 continue;
             }
 
             // set bounding param if one was given
             if (!empty($fieldMapping['liesin'])) {
-                $within = $client->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
+                $within = $this->searchClient->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
                 if (!empty($within)) {
-                    $client->setLiesIn($within);
+                    $this->searchClient->setLiesIn($within);
                 }
             }
 
             /** @var GeoJsonResponse $histographResponse */
-            $histographResponse = $client->search($originalName);
+            $histographResponse = $this->searchClient->search($originalName);
             $data = [];
 
             if (!$histographResponse) {
@@ -136,24 +131,22 @@ class GeocoderService
                 $hits = count($features);
 
                 if ($hits == 1) {
-                    /** @var DatasetService $dataService */
-                    $dataService = $this->app['dataset_service'];
                     $data = $this->transformPiTs2Rows($originalName, $datasetId, $features, $fieldMapping['hg_dataset']);
-                    $dataService->storeGeocodedRecords($data);
+                    $this->datasetService->storeGeocodedRecords($data);
                 } elseif ($hits > 1) {
                     $data['hits'] =  $hits;
                     $data['status'] = Status::MAPPED_EXACT_MULTIPLE;
                     $data['original_name'] = $originalName;
                     $data['dataset_id'] = $datasetId;
                     $data['hg_dataset'] = $fieldMapping['hg_dataset'];
-                    $this->app['dataset_service']->storeMappedRecord($data);
+                    $this->datasetService->storeMappedRecord($data);
                 } else {
                     $data['original_name'] = $originalName;
                     $data['dataset_id'] = $datasetId;
                     $data['hg_dataset'] = $fieldMapping['hg_dataset'];
                     $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
                     $data['hits'] = 0;
-                    $this->app['dataset_service']->storeMappedRecord($data);
+                    $this->datasetService->storeMappedRecord($data);
                 }
             } else {
                 $data['original_name'] = $originalName;
@@ -161,7 +154,7 @@ class GeocoderService
                 $data['hg_dataset'] = $fieldMapping['hg_dataset'];
                 $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
                 $data['hits'] = 0;
-                $this->app['dataset_service']->storeMappedRecord($data);
+                $this->datasetService->storeMappedRecord($data);
             }
         }
 

@@ -11,8 +11,11 @@ use Symfony\Component\HttpFoundation\Request;
 $app['dataset_service'] = $app->share(function ($app) {
     return new \Pid\Mapper\Service\DatasetService($app['db']);
 });
+$app['histograph_search_client'] = $app->share(function ($app) {
+    return new \Histograph\Api\Search([], $app['monolog']);
+});
 $app['geocoder_service'] = $app->share(function ($app) {
-    return new \Pid\Mapper\Service\GeocoderService($app);
+    return new \Pid\Mapper\Service\GeocoderService($app['dataset_service'], $app['histograph_search_client']);
 });
 $app['uri_resolver_service'] = $app->share(function ($app) {
     return new \Pid\Mapper\Service\UriResolverService();

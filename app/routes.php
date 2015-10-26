@@ -13,6 +13,8 @@ $app->get('/colofon', function () use ($app) {
     return $app['twig']->render('colofon.html.twig');
 });
 
+$app['histograph_api'] = $app['histograph_search_client']->getBaseUri();
+
 // a complete set of routes
 $app->mount('/datasets', new \Pid\Mapper\Provider\DataSetControllerProvider());
 $app->mount('/import', new \Pid\Mapper\Provider\ImportControllerProvider());

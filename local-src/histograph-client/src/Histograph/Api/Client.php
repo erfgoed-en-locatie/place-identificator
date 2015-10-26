@@ -14,7 +14,6 @@ class Client extends GuzzleClient
     const API_TIMEOUT = 10;
     const API_CONNECT_TIMEOUT = 10;
 
-    //const DEFAULT_BASE_URL = 'https://api.histograph.io';
     protected $baseUri = 'https://api.histograph.io';
 
     /** @var array */
@@ -37,7 +36,6 @@ class Client extends GuzzleClient
     public function __construct($config = array(), Logger $logger = null)
     {
         $settings =[
-            //'base_url' => self::DEFAULT_BASE_URL,
             'defaults' => [
                 'timeout' => self::API_TIMEOUT,
                 'connect_timeout' => self::API_CONNECT_TIMEOUT,
