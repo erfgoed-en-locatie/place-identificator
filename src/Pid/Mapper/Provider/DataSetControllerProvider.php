@@ -32,7 +32,6 @@ class DataSetControllerProvider implements ControllerProviderInterface
 
         $controllers->get('/{id}', array(new self(), 'showDataset'))->bind('datasets-show')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/delete', array(new self(), 'deleteSet'))->bind('dataset-delete')->value('id', null)->assert('id', '\d+');
-        $controllers->get('/fieldmap/{id}', array(new self(), 'showMapping'))->bind('dataset-showmapping')->assert('id', '\d+');
 
         $controllers->get('/{id}/standardized', array(new self(), 'showStandardized'))->bind('dataset-standardized')->value('id', null)->assert('id', '\d+');
         $controllers->get('/{id}/multiples', array(new self(), 'showMultiples'))->bind('dataset-multiples')->value('id', null)->assert('id', '\d+');
@@ -151,17 +150,6 @@ class DataSetControllerProvider implements ControllerProviderInterface
         $app['session']->getFlashBag()->set('alert', 'De dataset is verwijderd!');
 
         return $app->redirect($app['url_generator']->generate('datasets-all'));
-    }
-
-    /**
-     * Shows an example of the way the fields are mapped for the first x records of the csv file
-     *
-     * @param Application $app
-     * @param $id
-     */
-    public function showMapping(Application $app, $id)
-    {
-        // todo show how the fields were mapped
     }
 
     /**

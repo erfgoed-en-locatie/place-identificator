@@ -161,8 +161,6 @@ class StandardizeCommand extends Command
             array_shift($rows);
         }
 
-        // todo; create batches!
-
         $fieldMapping = $dataService->getFieldMappingForDataset($datasetId);
         if (!$fieldMapping) {
             $app['session']->getFlashBag()->set('error',
