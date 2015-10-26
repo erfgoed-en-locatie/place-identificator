@@ -54,10 +54,10 @@
                     <div class="pull-right">
                         <button type="button" class="btn-danger btn btn-sm unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button>
                     </div>
-                    <p>Kies het juiste resultaat uit een van de opties hieronder.
+                    <p>
+                        Kies het juiste resultaat uit een van de opties hieronder.
                         Als de juiste optie ontbreekt markeer de term dan als niet achterhaalbaar.
                     </p>
-
 
                     {% if possibilities|length > 0 %}
                         <ul class="possibilities">
@@ -130,7 +130,6 @@
                                                             return L.circleMarker(latlng, geojsonMarkerOptions{{ nr }});
                                                         }
                                                     }).addTo(map{{ nr }});
-                                                    //var placesLayer{{ nr }} = L.geoJson().addTo(map{{ nr }});
 
                                                     var geojsonFeature{{ nr }} = {
                                                         "type": "Feature",
@@ -148,7 +147,11 @@
                                                     );
                                                     group{{ nr }}.addLayer(geom{{ nr }});
                                                     map{{ nr }}.fitBounds(group{{ nr }});
+                                                    {% if type == 'Street' or type == 'Address' or type == 'Building' %}
+                                                    map{{ nr }}.setZoom(15);
+                                                    {% else %}
                                                     map{{ nr }}.setZoom(9);
+                                                    {% endif %}
                                                 </script>
                                             {% endif %}
                                         </div>
