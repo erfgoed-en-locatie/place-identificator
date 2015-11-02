@@ -109,8 +109,7 @@ class Search extends Client
      */
     public function composeSearchUri($name)
     {
-        $searchUri = $this->baseUri . self::ENDPOINT . '?name=';
-        // fixme make serach parameter settable!
+        $searchUri = $this->baseUri . self::ENDPOINT . '?q=';
 
         // name first
         if (true === $this->isQuoted()) {
