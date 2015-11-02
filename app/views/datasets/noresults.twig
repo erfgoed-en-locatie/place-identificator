@@ -7,7 +7,15 @@
         function setUri(recid){
             uri = jQuery('#uri-with-' + recid).val();
             data = {"uri": uri };
-            askAPI('GET', '/api/record/map/'+recid, data, deleteRows);
+            askAPI('GET', '/api/record/map/'+recid, data, deleteSetRows);
+        }
+
+        function deleteSetRows(json) {
+            var tot = json.length;
+            $.each(json, function(key, item) {
+                var tr = '#row_'+item.id;
+                $(tr).remove();
+            });
 
             var one = jQuery('#nr-one').html();
             one = Number(one) + tot;
@@ -23,15 +31,23 @@
             var uri = $(this).attr('data-ref');
             askAPI('GET', uri, null, deleteRows);
 
+        });
+
+        function deleteRows(json) {
+            var tot = json.length;
+            $.each(json, function(key, item) {
+                var tr = '#row_'+item.id;
+                $(tr).remove();
+            });
+
             var none = jQuery('#nr-none').html();
             none = Number(none) - 1;
             var unmappables = jQuery('#nr-unmappables').html();
             unmappables = Number(unmappables) + 1;
 
             alertMessage('De naam is als niet achterhaalbaar gemarkeerd.');
-            setNumbers(null, null,none,unmappables)
-        });
-
+            setNumbers(null, null,none, unmappables)
+        }
     </script>
 
     <div class="row">

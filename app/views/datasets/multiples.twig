@@ -2,16 +2,27 @@
 
 {% block content %}
     <script type="text/javascript">
-        function deleteUnmappedRow(json) {
-            var tr = '#row_'+json.id;
-            $(tr).remove();
 
-            var min = Number(jQuery('#nr-more').html() -1);
+        // mark an item as unmappable
+        $(document.body).on( "click", "button.unmappable", function(e) {
+            e.preventDefault();
+            var uri = $(this).attr('data-ref');
+            askAPI('GET', uri, null, deleteRows);
+        });
 
+        function deleteRows(json) {
+            var tot = json.length;
+            $.each(json, function(key, item) {
+                var tr = '#row_'+item.id;
+                $(tr).remove();
+            });
+
+            var more = jQuery('#nr-more').html();
+            more = Number(more) - tot;
             var unmappables = jQuery('#nr-unmappables').html();
-            unmappables = Number(unmappables) + 1;
-
-            setNumbers(null, min, null, unmappables);
+            unmappables = Number(unmappables) + tot;
+            setNumbers(null,more, null,unmappables);
+            alertMessage('De naam is als niet achterhaalbaar gemarkeerd.');
         }
 
     </script>
