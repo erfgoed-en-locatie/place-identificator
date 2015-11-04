@@ -48,13 +48,14 @@ class GeocoderService
             return false;
         }
 
-        // set bounding param if one was given
-        if (!empty($fieldMapping['liesin'])) {
+        // todo set bounding param if one was given
+        // can't do this now since we don not have teh liesIn field copied in here .. will be possible once I fix all of that
+        /*if (!empty($fieldMapping['liesin'])) {
             $within = $this->searchClient->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
             if (!empty($within)) {
                 $this->searchClient->setLiesIn($within);
             }
-        }
+        }*/
 
         /** @var GeoJsonResponse $histographResponse */
         $histographResponse = $this->searchClient->search($originalName);
