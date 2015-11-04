@@ -218,7 +218,7 @@ class StandardizeCommand extends Command
 
 Uw plaatsnamenbestand '{$dataset['name']}' is verwerkt. Kijk op onderstaande link om de resultaten in te zien of te downloaden.
 
-http://locatienaaruri.erfgeo.nl/datasets/{$datasetId}
+http://standaardiseren.erfgeo.nl/datasets/{$datasetId}
 
                 ");
 
