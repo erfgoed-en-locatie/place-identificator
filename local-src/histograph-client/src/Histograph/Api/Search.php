@@ -117,8 +117,9 @@ class Search extends Client
         }
         $searchUri .= $name;
 
-        if ($this->liesIn) {
+        if ($this->liesIn && !empty($this->filterBadCharacters($this->liesIn))) {
             $searchUri .= ', ' . $this->filterBadCharacters($this->liesIn);
+            //$searchUri .= '&related=hg:liesIn&related.q=' . $this->filterBadCharacters($this->liesIn);
         }
 
         // specific type

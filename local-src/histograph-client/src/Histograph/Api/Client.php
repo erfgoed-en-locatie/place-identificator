@@ -57,7 +57,6 @@ class Client extends GuzzleClient
 
     }
 
-
     /**
      * @return string
      */
