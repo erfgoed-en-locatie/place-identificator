@@ -93,16 +93,26 @@
                                                 <strong>Dataset id:</strong> {{ pit.id }}<br/>
                                             {% endif %}
 
-                                                {#{{ dump(pit) }}#}
                                                 {% if(attribute(pit, 'relations') is defined) %}
+                                                    {% set relations = pit.relations %}
+                                                    {% if(attribute(relations, 'hg:liesIn') is defined) %}
+                                                        {% set liesIns = attribute(pit.relations, 'hg:liesIn') %}
+                                                        {% for liesIn in liesIns %}
+                                                            {% set containerId = attribute(liesIn, '@id') %}
+                                                            {% for hair in pit.hairs %}
+                                                                {% if attribute(hair, '@id') == containerId %}
+                                                                    ligt in: {{ hair.name }}&nbsp; 
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    {% endif %}   
                                                     {#{{ dump(attribute(pit, 'relations') ) }}#}
                                                     {#{{ dump(attribute(pit.relations, 'hg:liesIn')) }}#}
                                                 {% endif %}
 
                                         </div>
                                         <div class="col-md-6">
-
-                                            {% if feature.geometry is not empty %}
+                                            {% if feature.geometry is not empty and pit.geometryIndex >= 0 %}
                                                 <div id="map{{ nr }}" class="mapcanvas"></div>
                                                 <script>
                                                     var map{{ nr }} = L.map('map{{ nr }}', {
