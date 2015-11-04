@@ -100,7 +100,7 @@
                                                         {% for liesIn in liesIns %}
                                                             {% set containerId = attribute(liesIn, '@id') %}
                                                             {% for hair in pit.hairs %}
-                                                                {% if attribute(hair, '@id') == containerId %}
+                                                                {% if attribute(hair, '@id') == containerId and hair.name is defined %}
                                                                     ligt in: {{ hair.name }}&nbsp; 
                                                                 {% endif %}
                                                             {% endfor %}
