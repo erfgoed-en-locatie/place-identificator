@@ -78,7 +78,7 @@ class ImportControllerProvider implements ControllerProviderInterface
                     'class'     => 'narrow'
                 )
             ))
-            ->add('enclosure_character', 'text', array(
+            /*->add('enclosure_character', 'text', array(
                 'label' => 'Worden de velden "enclosed" door een bepaald teken?',
                 'required' => false,
                 'constraints' => array(
@@ -87,8 +87,8 @@ class ImportControllerProvider implements ControllerProviderInterface
                 'attr' => array(
                     'class'     => 'narrow'
                 )
-            ))
-            ->add('escape_character', 'text', array(
+            ))*/
+            /*->add('escape_character', 'text', array(
                 'label' => 'Is er een bepaald karakter dat "escaped" moet worden?',
                 'required' => false,
                 'constraints' => array(
@@ -97,7 +97,7 @@ class ImportControllerProvider implements ControllerProviderInterface
                 'attr' => array(
                     'class'     => 'narrow'
                 )
-            ))
+            ))*/
             ->add('skip_first_row', 'choice', array(
                 'label' => 'Bevat de eerste rij de kolomnamen?',
                 'required' => true,
