@@ -43,6 +43,9 @@ class Search extends Client
     /** @var bool Whether to fetch the result with or without geometries */
     protected $geometry = true;
 
+    /** @var array Temporary cache to store the results in */
+    protected $cache = null;
+
     /**
      * Escape characters before they're send to the API
      * @param $name
@@ -50,7 +53,7 @@ class Search extends Client
      */
     protected function filterBadCharacters($name)
     {
-        $bad = ':/?#[]@!$&()*+;='; // @fixme escape some
+        $bad = ':/?#[]@!$&()*+;=';
         return preg_replace('!\s+!', ' ', str_ireplace(str_split($bad), '', $name));
     }
 
@@ -88,11 +91,12 @@ class Search extends Client
      */
     public function search($name)
     {
-        if (isset($this->cache[$name])) {
+        $this->currentCacheId  = $name . $this->getLiesIn();
+        if (isset($this->cache[$this->currentCacheId])) {
             if ($this->logger) {
                 $this->logger->addDebug('Fetched from cache: "' . $name . '"');
             }
-            return new GeoJsonResponse($this->cache[$name]);
+            return new GeoJsonResponse($this->cache[$this->currentCacheId]);
         }
 
         $name = $this->filterBadCharacters($name);
@@ -290,7 +294,7 @@ class Search extends Client
             $response = $this->get($uri);
             if ($response->getStatusCode() === 200) {
                 $geoJson = $response->json(array('object' => true));
-                $this->cache[$name] = $geoJson;
+                $this->cache[$this->currentCacheId] = $geoJson;
 
                 return new GeoJsonResponse($geoJson);
             } else {

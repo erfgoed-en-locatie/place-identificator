@@ -1,10 +1,7 @@
 # TODO for the rewrite
 
-- page multiple: meer info laten zien (bv bij Middelburg, het land!)
 
-- do the liesIn relation properly! in stead of with comma...
-
-- aaargh... cache also with liesIn!!! and with liesIn... when running in bulk, do not use
+- why are all the values stored again and again...?
 
 - final rewrite:
     - on loading the dataset, see if it is a valid one

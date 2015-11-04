@@ -126,7 +126,6 @@ class GeoJsonResponse
                 $filteredPits = [];
                 if (property_exists($feature->properties, 'pits')) {
                     foreach ($feature->properties->pits as $pit) {
-
                         // filter on both conditions
                         if ($this->filters['source'] && $this->filters['type']) {
                             if (in_array($pit->dataset, $this->filters['source']) &&
