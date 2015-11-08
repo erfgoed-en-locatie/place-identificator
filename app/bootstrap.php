@@ -8,8 +8,11 @@
 use Knp\Provider\ConsoleServiceProvider;
 use Symfony\Component\HttpFoundation\Request;
 
+$app['csv_service'] = $app->share(function ($app) {
+    return new \Pid\Mapper\Service\CsvService($app['upload_dir']);
+});
 $app['dataset_service'] = $app->share(function ($app) {
-    return new \Pid\Mapper\Service\DatasetService($app['db']);
+    return new \Pid\Mapper\Service\DatasetService($app['db'], $app['csv_service']);
 });
 $app['histograph_search_client'] = $app->share(function ($app) {
     return new \Histograph\Api\Search([], $app['monolog']);

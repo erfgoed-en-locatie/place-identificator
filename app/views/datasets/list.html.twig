@@ -14,7 +14,7 @@
                     <tr>
                         <th>#</th>
                         <th>Naam</th>
-                        <th>Bestandsnaam</th>
+                        <th>Dataset</th>
                         <th>Gebruiker</th>
                         <th>Aangemaakt</th>
                         <th>Status</th>
@@ -26,7 +26,7 @@
                         <tr>
                             <td>{{ set.id }}</td>
                             <td>{{ set.name }}</td>
-                            <td>{{ set.original_name }}</td>
+                            <td><a title="Bekijk het csv-bestand" href="{{ path('file-view-csv', {'filename': set.filename, 'id': set.id}) }}">{{ set.original_name }}</a></td>
                             <td>{{ set.email }}</td>
                             <td>{{ set.created_on|date('d-m-Y') }}</td>
                             <td>
@@ -38,9 +38,9 @@
                                 <span class="label {{ statClass }}">{{ set.status|formatDatasetStatus }}</span>
                             </td>
                             <td>
-                                <a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="Details van deze set"><i class="fa fa-search-plus"></i> </a>
-                                <a href="{{ path('import-editcsv', {'id': set.id }) }}" title="Wijzig de csv configuratie" class="btn btn-xs btn-primary"><i class="fa fa-pencil-square-o"></i> </a>
-                                <a href="{{ path('import-mapcsv', {'id': set.id }) }}" title="Wijzig de instellingen" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i> </a>
+                                {#<a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="Details van deze set"><i class="fa fa-search-plus"></i> </a>#}
+                                <a href="{{ path('import-editcsv', {'id': set.id }) }}" title="Wijzig de csv configuratie" class="btn btn-xs btn-success"><i class="fa fa-pencil-square-o"></i> </a>
+                                <a href="{{ path('import-mapcsv', {'id': set.id }) }}" title="Wijzig de standaardisatie opties" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i> </a>
                                 <a href="{{ path('standardize-test', {'id': set.id }) }}" title="Test de instellingen met 20 records" class="btn btn-xs btn-primary"> test </a>
                                 <a href="{{ path('dataset-standardized', {'id': set.id }) }}" class="btn btn-xs btn-info" title="Bekijk de resultaten van de standaardisatie (test)">resultaten! </a>
                                 <a href="{{ path('dataset-delete', {'id': set.id }) }}" title="Verwijder de gehele dataset" class="btn btn-xs btn-danger delete"><i class="fa fa-trash"></i> </a>

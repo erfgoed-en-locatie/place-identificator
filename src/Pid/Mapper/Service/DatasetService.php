@@ -17,9 +17,15 @@ class DatasetService {
      */
     protected $db;
 
-    public function __construct($db)
+    /**
+     * @var CsvService
+     */
+    private $csvService;
+
+    public function __construct($db, $csvService)
     {
         $this->db = $db;
+        $this->csvService = $csvService;
     }
 
     /**
@@ -56,9 +62,8 @@ class DatasetService {
     public function fetchDatasetDetails($id)
     {
         $stmt = $this->db->executeQuery('
-          SELECT d.*, f.hg_type, f.hg_dataset, f.geometry
+          SELECT *
           FROM datasets d
-          LEFT JOIN field_mapping f ON f.dataset_id = d.id
           WHERE d.id = :id', array(
             'id' => (int)$id
         ));
@@ -187,8 +192,7 @@ class DatasetService {
     }
 
     /**
-     * Save the provided mapping or update if it already exists
-     * Also update the status of the dataset to mapped
+     * Store the provided mapping for the csv
      *
      * @param array $data
      * @return int
@@ -196,18 +200,41 @@ class DatasetService {
     public function storeFieldMapping($data)
     {
         $date = new \DateTime('now');
-        $this->db->update('datasets', array('status' => DatasetStatus::STATUS_FIELDS_MAPPED), array(
-            'id' => $data['dataset_id'],
-            'status' => DatasetStatus::STATUS_NEW
-        ));
+        $data['updated_on'] = $date->format('Y-m-d H:i:s');
+        $data['status'] = DatasetStatus::STATUS_FIELDS_MAPPED;
 
-        if ($this->fetchFieldmappingForDataset($data['dataset_id'])) {
-            $data['updated_on'] = $date->format('Y-m-d H:i:s');
-            return $this->db->update('field_mapping', $data, array('dataset_id' => $data['dataset_id']));
+        return $this->db->update('datasets', $data, array(
+            'id' => $data['id']
+        ));
+    }
+
+    /**
+     * Copies all the records from teh csv to the db, if that was not done already
+     *
+     * @param $dataset
+     * @return bool
+     */
+    public function copyRecordsFromCsv($dataset)
+    {
+        $stm = $this->db->query("SELECT * FROM records WHERE id = {$dataset['id']} LIMIT 1");
+        if ($stm->fetch()) {
+            return true;
         }
 
-        $data['created_on'] = $date->format('Y-m-d H:i:s');
-        return $this->db->insert('field_mapping', $data);
+        $rows = $this->csvService->getAllRows($dataset);
+        foreach ($rows as $row) {
+            $data['dataset_id'] = $dataset['id'];
+
+            $data['original_name'] = $row[$dataset['placename_column']];
+            if (isset($dataset['liesin_column'])) {
+                $data['liesin_name'] = $row[$dataset['liesin_column']];
+            }
+            $data['status'] = Status::UNMAPPED;
+
+            $this->storeRecord($data);
+        }
+
+        return true;
     }
 
     /**
@@ -246,20 +273,6 @@ class DatasetService {
         ));
     }
 
-    /**
-     * Fetch the user supplied configs for this dataset
-     *
-     * @param $id
-     * @return mixed
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public function getFieldMappingForDataset($id)
-    {
-        $stmt = $this->db->executeQuery('SELECT * FROM field_mapping WHERE dataset_id = :id', array(
-            'id' => (int)$id
-        ));
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
-    }
 
     public function getUser($id)
     {
@@ -270,12 +283,12 @@ class DatasetService {
     }
 
     /**
-     * Save the provided mapping
+     * Store a standardized record
      *
      * @param array $data
      * @return int
      */
-    public function storeMappedRecord($data)
+    public function storeRecord($data)
     {
         $date = new \DateTime('now');
         $data['created_on'] = $date->format('Y-m-d H:i:s');

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    <h1>Instellingen voor dataset "{{ dataset.name }}"</h1>
+    <h1>Stap 2. Standaardiseeropties voor dataset "{{ dataset.name }}"</h1>
 
     {{ form_start(form) }}
 
@@ -10,22 +10,22 @@
         <div class="col-md-6">
             <h2>Van...</h2>
 
-            <p>Geef hieronder aan welke kolommen van het csv-bestand gebruikt moeten worden voor de het
+            <p>Geef hieronder aan welke kolommen van het csv-bestand gebruikt moeten worden voor het
                 standaardiseren.</p>
 
             {% form_theme form 'bootstrap_3_layout.html.twig' %}
 
-            {{ form_row(form.placename) }}
-            <p class="mappingfield">Kies hier het veld dat de naam bevat die je wilt standaardiseren</p>
+            {{ form_row(form.placename_column) }}
+            <p class="mappingfield">Kies het veld dat de naam bevat die je wilt standaardiseren</p>
 
-            {{ form_row(form.liesin) }}
-            <p class="mappingfield">Gebruik deze optie alleen als je een veld in je csv hebt waar de 'bredere term' in zit. Bijvoorbeeld de provincie waar de plaatsen uit het vorige veld in liggen</p>
+            {{ form_row(form.liesin_column) }}
+            <p class="mappingfield">Gebruik deze optie alleen als je een veld in je csv hebt waar een 'bredere term' in zit. Bijvoorbeeld de provincie waar de plaatsen uit het vorige veld in liggen</p>
 
 
             {{ form_row(form.hg_type) }}
             <p class="mappingfield">
-                Kies hier het type waar de toponiemen op slaan (kies hg:Place voor plaatsen, hg:Municipalities voor gemeentes, hg:Streets voor straten, etc.). <br />
-                Mocht de dataset meerdere typen bevatten, dan dient die voor elk type apart door de standaardiseertool gehaald te worden.
+                Kies hier het type waar de toponiemen op slaan (kies hg:Place voor plaatsen, hg:Municipality voor gemeentes, hg:Street voor straten, etc.). <br />
+                Mocht de dataset meerdere typen bevatten, dan moet het standaardiseren in verschillende stappen (elk type apart) gedaan worden.
             </p>
 
         </div>
@@ -37,13 +37,11 @@
             <p>Geef hieronder aan naar welke dataset je wilt standaardiseren en of je behalve gestandaardiseerde naam, hgid en - indien aanwezig - uri ook de geometrieën terug wilt hebben.</p>
 
             {{ form_row(form.hg_dataset) }}
-            <p class="mappingfield">Naar welke dataset wil je standaardiseren? Kies GeoNames of TGN voor plaatsen, GeoNames voor huidige- en Gemeentegeschiedenis ook voor historische gemeentes, BAG voor adressen of gebouwen en het Nationaal Wegen Bestand voor straten.</p>
+            <p class="mappingfield">Kies Geonames of TGN voor plaatsen, Geonames voor huidige- en Gemeentegeschiedenis ook voor historische gemeentes, BAG voor adressen of gebouwen en het Nationaal Wegen Bestand (NWB) voor straten.</p>
 
             {{ form_row(form.geometry) }}
-            <p class="mappingfield">Wil je een geometrie? Het zoeken gaat een stuk sneller zonder.</p>
 
         </div>
-        
 
     </div>
 

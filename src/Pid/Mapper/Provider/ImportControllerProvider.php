@@ -203,7 +203,7 @@ class ImportControllerProvider implements ControllerProviderInterface
         /** @var FormFactory $form */
         $form = $app['form.factory']
             ->createBuilder('form', $mapping)
-            ->add('placename', 'choice', array(
+            ->add('placename_column', 'choice', array(
                 'label' => 'Toponiem in veld ',
                 'choices' => $fieldChoices,
                 'empty_value' => 'selecteer een veld',
@@ -213,7 +213,7 @@ class ImportControllerProvider implements ControllerProviderInterface
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
-            ->add('liesin', 'choice', array(
+            ->add('liesin_column', 'choice', array(
                 'label' => 'Dit toponiem ligt in ...(provincie, plaats, etc.)',
                 'required' => false,
                 'choices' => $fieldChoices,
@@ -288,26 +288,10 @@ class ImportControllerProvider implements ControllerProviderInterface
         }
 
         // attempt to make sense of the csv file
-        $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
-
-        $csv = \League\Csv\Reader::createFromPath($file);
-        if (0 < mb_strlen($dataset['delimiter'])) {
-            $csv->setDelimiter($dataset['delimiter']);
-        } else {
-            $csv->setDelimiter(current($csv->detectDelimiterList(2)));
-        }
-        if (0 < mb_strlen($dataset['enclosure_character'])) {
-            $csv->setEnclosure($dataset['enclosure_character']);
-        }
-        if (0 < mb_strlen($dataset['escape_character'])) {
-            $csv->setEscape($dataset['escape_character']);
-        }
-
-        $columnNames = $csv->fetchOne();
+        $columnNames = $app['csv_service']->getColumns($dataset);
 
         // see if we already have a mapping..
-        $mapping = $app['dataset_service']->fetchFieldmappingForDataset($id);
-        $form = $this->getFieldMapForm($app, $columnNames, $mapping);
+        $form = $this->getFieldMapForm($app, $columnNames, $dataset);
 
         // if the form was posted
         if ($request->getMethod() == 'POST') {
@@ -316,8 +300,10 @@ class ImportControllerProvider implements ControllerProviderInterface
                 $data = $form->getData();
 
                 // save the mapping
-                $data['dataset_id'] = $id;
                 if ($app['dataset_service']->storeFieldMapping($data)) { // ok
+
+                    // also copy the records to db
+                    $app['dataset_service']->copyRecordsFromCsv($dataset);
                     $app['session']->getFlashBag()->set('alert', 'De instellingen zijn aangepast en opgeslagen.');
 
                     // and go straight to mapping all, if clicked

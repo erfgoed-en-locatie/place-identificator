@@ -135,7 +135,8 @@ p{margin-top: 8px;}
     padding: 10px;
 }
 .mappingfield {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     #color: #638197;
+	font-size: .9em;
     color: #3276b1;
 }
