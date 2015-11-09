@@ -1,17 +1,10 @@
--- phpMyAdmin SQL Dump
--- version 4.0.10deb1
--- http://www.phpmyadmin.net
---
--- Host: localhost
--- Generation Time: Nov 07, 2015 at 04:36 PM
--- Server version: 5.5.44-0ubuntu0.14.04.1
--- PHP Version: 5.5.9-1ubuntu4.13
+
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
--- Database: `pid2`
+-- Database: `pid3`
 --
 
 -- --------------------------------------------------------
@@ -35,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `crowd_mapping` (
   `hg_dataset` varchar(255) DEFAULT NULL COMMENT 'Name according to APi source',
   PRIMARY KEY (`id`),
   KEY `record_dataset` (`dataset_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=47 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -65,9 +58,9 @@ CREATE TABLE IF NOT EXISTS `datasets` (
   `updated_on` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `dataset_user` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=36 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
--- ---------------------------------------------------------------
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `records`
@@ -76,14 +69,15 @@ CREATE TABLE IF NOT EXISTS `datasets` (
 CREATE TABLE IF NOT EXISTS `records` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dataset_id` int(11) DEFAULT NULL,
+  `row_id` int(11) DEFAULT NULL,
   `original_name` varchar(255) NOT NULL DEFAULT '' COMMENT 'Location name to search on',
+  `liesin_name` varchar(255) NOT NULL COMMENT 'Location name to use as liesIn',
   `hg_id` varchar(255) DEFAULT NULL,
   `hg_uri` varchar(255) DEFAULT NULL,
   `hg_name` varchar(255) DEFAULT NULL COMMENT 'Name according to APi source',
   `hg_geometry` text,
   `hg_type` varchar(255) DEFAULT NULL COMMENT 'Name according to APi source',
   `hg_dataset` varchar(255) DEFAULT NULL COMMENT 'Name according to APi source',
-  `liesin_name` varchar(255) NOT NULL DEFAULT '' COMMENT 'Location name to use as liesIn',
   `query` varchar(255) NOT NULL DEFAULT '' COMMENT 'Query to the API with which the location was found',
   `created_on` datetime NOT NULL,
   `updated_on` datetime DEFAULT NULL,
@@ -91,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `records` (
   `hits` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `record_dataset` (`dataset_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=43375 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -114,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_email` (`email`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -137,16 +131,16 @@ CREATE TABLE IF NOT EXISTS `user_custom_fields` (
 -- Constraints for table `crowd_mapping`
 --
 ALTER TABLE `crowd_mapping`
-  ADD CONSTRAINT `record_ibfk_2` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
+ADD CONSTRAINT `record_ibfk_2` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `datasets`
 --
 ALTER TABLE `datasets`
-  ADD CONSTRAINT `dataset_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+ADD CONSTRAINT `dataset_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `records`
 --
 ALTER TABLE `records`
-  ADD CONSTRAINT `record_ibfk_1` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
+ADD CONSTRAINT `record_ibfk_1` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`) ON DELETE CASCADE;
