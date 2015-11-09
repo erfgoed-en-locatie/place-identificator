@@ -98,9 +98,14 @@ class CsvService
     public function writeTestFile($dataset, $rows)
     {
         $testFile = $this->uploadDir . DIRECTORY_SEPARATOR . $this->testPrefix . $dataset['filename'];
-
         $writer = Writer::createFromFileObject(new SplTempFileObject());
-        $writer->setDelimiter($dataset['delimiter']);
+
+        if (0 < mb_strlen($dataset['delimiter'])) {
+            $writer->setDelimiter($dataset['delimiter']);
+        } else {
+            $writer->setDelimiter(",");
+        }
+
         $headerRow = array(
             'naam',
             'ligt in',
@@ -118,6 +123,7 @@ class CsvService
         if ($headerRow) {
             $writer->insertOne($headerRow);
         }
+
         $writer->insertAll($rows);
 
         file_put_contents($testFile, $writer);

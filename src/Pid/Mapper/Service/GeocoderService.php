@@ -124,7 +124,7 @@ class GeocoderService
                 $hits = count($features);
 
                 if ($hits == 1) {
-                    $data = $this->transformPiTs2Rows($originalName, $dataset, $features, $within);
+                    $data = $this->transformPiTs2Rows($originalName, $dataset, $features, $within, Status::getFormattedOption(Status::MAPPED_EXACT));
                     $output[] = $data[0];
                 } elseif ($hits > 1) {
                     // eigenlijk meerdere records opslaan?

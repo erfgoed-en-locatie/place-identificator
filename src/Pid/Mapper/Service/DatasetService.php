@@ -219,6 +219,7 @@ class DatasetService
         }
 
         $rows = $this->csvService->getRows($dataset);
+
         foreach ($rows as $rowId => $row) {
             $data['dataset_id'] = $dataset['id'];
             $data['row_id'] = $rowId;
@@ -229,7 +230,9 @@ class DatasetService
             }
             $data['status'] = Status::UNMAPPED;
 
-            $this->storeRecord($data);
+            if (!empty($data['original_name'])) {
+                $this->storeRecord($data);
+            }
         }
 
         return true;

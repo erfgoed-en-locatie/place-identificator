@@ -96,7 +96,11 @@ class StandardizeCommand extends Command
         $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['filename'];
 
         $writer = Writer::createFromFileObject(new SplTempFileObject());
-        $writer->setDelimiter($dataset['delimiter']);
+        if (0 < mb_strlen($dataset['delimiter'])) {
+            $writer->setDelimiter($dataset['delimiter']);
+        } else {
+            $writer->setDelimiter(",");
+        }
         //$writer->setNewline("\r\n");
         $writer->setEncodingFrom("utf-8");
         if ($headerRow) {
