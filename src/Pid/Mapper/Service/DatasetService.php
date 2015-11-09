@@ -170,8 +170,11 @@ class DatasetService
         $data['hg_geometry'] = null;
         $data['hits'] = 0;
 
+        // todo pdr ALSO WITH liesIN
         // fetch original name, so we can update all records with the same name
-        $stmt = $this->db->executeQuery('SELECT original_name as name, dataset_id FROM records WHERE id = :id', array(
+        $stmt = $this->db->executeQuery(
+            'SELECT original_name as name, dataset_id FROM records WHERE id = :id'
+            , array(
             'id' => (int)$id
         ));
         $stored = $stmt->fetch();
@@ -241,18 +244,18 @@ class DatasetService
      */
     public function fetchRecordsToStandardize($datasetId)
     {
-        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status NOT IN (:status)';
+        $sql = 'SELECT * FROM records
+          WHERE dataset_id = :id AND (status != :status1 AND status != :status2 AND status != :status3)
+          ';
         $params = array(
-            'id'     => (int) $datasetId,
-            'status' => implode(',', [
-                    Status::MAPPED_EXACT,
-                    Status::MAPPED_MANUALLY,
-                    Status::UNMAPPABLE
-                ]
-            )
+            ':id'     => (int) $datasetId,
+            ':status1' => Status::MAPPED_EXACT,
+            ':status2' => Status::MAPPED_MANUALLY,
+            ':status3' => Status::UNMAPPABLE,
         );
-        $stmt = $this->db->executeQuery($sql, $params);
 
+        //print str_replace(array_keys($params), array_values($params), $sql);
+        $stmt = $this->db->executeQuery($sql, $params);
         return $stmt->fetchAll();
     }
 

@@ -127,13 +127,13 @@ class StandardizeCommand extends Command
         $dataset = $dataService->fetchDataset($datasetId);
         $rows = $dataService->fetchRecordsToStandardize($datasetId);
 
-        $app['monolog']->addInfo('Found ' . count($rows) . ' to process.');
+        $app['monolog']->addInfo('Found ' . count($rows) . ' locations to process.');
 
         if (strlen($dataset['placename_column']) < 1) {
             $dataService->setMappingFailed($datasetId);
             return $app['monolog']->addError('No field mapping was provided, so could not standardize.');
         }
-//var_dump($rows); die;
+
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
 

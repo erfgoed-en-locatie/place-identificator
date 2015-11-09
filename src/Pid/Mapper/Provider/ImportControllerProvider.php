@@ -194,11 +194,11 @@ class ImportControllerProvider implements ControllerProviderInterface
      */
     private function getFieldMapForm(Application $app, $fieldChoices, $mapping = false)
     {
-        if (!$mapping) {
+       /* if (!$mapping) {
             $mapping = array(
                 'geometry' => false,
             );
-        }
+        }*/
 
         /** @var FormFactory $form */
         $form = $app['form.factory']
@@ -244,7 +244,6 @@ class ImportControllerProvider implements ControllerProviderInterface
                 'label' => 'Geïnteresseerd in de geometrie?',
                 'required' => true,
                 'choices' => array(1 => 'Ja', 0 => 'Nee'),
-                'data' => 0,
                 'constraints' => array(
                     new Assert\Type('integer')
                 )
@@ -289,8 +288,6 @@ class ImportControllerProvider implements ControllerProviderInterface
 
         // attempt to make sense of the csv file
         $columnNames = $app['csv_service']->getColumns($dataset);
-
-        // see if we already have a mapping..
         $form = $this->getFieldMapForm($app, $columnNames, $dataset);
 
         // if the form was posted
