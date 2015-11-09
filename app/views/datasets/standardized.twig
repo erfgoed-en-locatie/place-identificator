@@ -17,21 +17,27 @@
                 <table class="table table-condensed actions" id="pdxtable">
                     <thead>
                         <tr>
-                            <th>Oorspronkelijke naam</th>
-                            <th>Gestandaardiseerde naam</th>
-                            <th>Type </th>
-                            <th>Gevonden id / uri</th>
-                            <th>Koppeling juist?</th>
+                            <th>plaatsnaam</th>
+                            {% if dataset.liesin_column is not empty %}
+                            <th>ligt in</th>
+                            {% endif %}
+                            <th>gestandaardiseerde naam</th>
+                            <th>type </th>
+                            <th>gevonden id / uri</th>
+                            <th>koppeling juist?</th>
                         </tr>
                     </thead>
 
                     <tfoot>
                         <tr>
-                            <th>Oorspronkelijke naam</th>
-                            <th>Gestandaardiseerde naam</th>
-                            <th>Type </th>
-                            <th>Gevonden id / uri</th>
-                            <th>Koppeling juist?</th>
+                            <th>plaatsnaam</th>
+                            {% if dataset.liesin_column is not empty %}
+                                <th>ligt in</th>
+                            {% endif %}
+                            <th>gestandaardiseerde naam</th>
+                            <th>type </th>
+                            <th>gevonden id / uri</th>
+                            <th>koppeling juist?</th>
                         </tr>
                     </tfoot>
 
@@ -39,6 +45,9 @@
                     {% for rec in standardized %}
                         <tr id="row_{{ rec.id }}">
                             <td>{{ rec.original_name }}</td>
+                            {% if dataset.liesin_column is not empty %}
+                                <td>{{ rec.liesin_name }}</td>
+                            {% endif %}
                             <td>{% if rec.hg_name is not empty %} {{ rec.hg_name }} {% endif %}</td>
                             <td>{% if rec.hg_type is not empty %} {{ rec.hg_type }} {% endif %}</td>
                             <td>

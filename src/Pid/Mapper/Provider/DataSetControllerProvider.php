@@ -56,6 +56,10 @@ class DataSetControllerProvider implements ControllerProviderInterface
 
         $controllers->get('/{id}/test-result',
             array(new self(), 'showTestResult'))->bind('dataset-test-result')->value('id', null)->assert('id', '\d+');
+        $controllers->get('/{id}/clear', array(new self(), 'clearDataset'))->bind('dataset-clear')->value('id',
+            null)->assert('id', '\d+');
+
+
         $controllers->post('/{id}/choose-pit/{recordId}',
             array(new self(), 'choosePit'))->bind('record-choose-pit')->assert('id', '\d+');
 
@@ -118,7 +122,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function showTestResult(Application $app, $id)
     {
-        $dataset = $app['dataset_service']->fetchDatasetDetails($id);
+        $dataset = $app['dataset_service']->fetchDataset($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }
@@ -139,7 +143,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
      */
     public function showDataset(Application $app, $id)
     {
-        $dataset = $app['dataset_service']->fetchDatasetDetails($id);
+        $dataset = $app['dataset_service']->fetchDataset($id);
         if (!$dataset) {
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }
@@ -164,6 +168,30 @@ class DataSetControllerProvider implements ControllerProviderInterface
         ));
     }
 
+
+    /**
+     * Clear all standardized records and start fresh
+     *
+     * @param Application $app
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function clearDataset(Application $app, $id)
+    {
+        $dataset = $app['dataset_service']->fetchDataset($id);
+        if (!$dataset) {
+            $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+
+            return $app->redirect($app['url_generator']->generate('datasets-all'));
+        }
+
+        $app['dataset_service']->clearRecordsForDataset($id);
+        $app['dataset_service']->copyRecordsFromCsv($dataset);
+
+        $app['session']->getFlashBag()->set('alert', 'Data van eerdere standaardisaties is verwijderd');
+
+        return $app->redirect($app['url_generator']->generate('datasets-all'));
+    }
 
     /**
      * Delete a dataset and all it's data

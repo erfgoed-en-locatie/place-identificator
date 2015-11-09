@@ -12,7 +12,7 @@ namespace Pid\Mapper\Model;
 class Status
 {
 
-    const UNMAPPED = null;
+    const UNMAPPED = 0;
     const MAPPED_EXACT = 1;
     const MAPPED_EXACT_MULTIPLE = 2;
     const MAPPED_EXACT_NOT_FOUND = 3;

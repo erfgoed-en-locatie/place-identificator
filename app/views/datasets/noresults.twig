@@ -67,6 +67,9 @@
                     <thead>
                     <tr>
                         <th>plaatsnaam</th>
+                        {% if dataset.liesin_column is not empty %}
+                            <th>ligt in</th>
+                        {% endif %}
                         <th>en de juiste uri is...</th>
                         <th></th>
                         <th>...niet te achterhalen?</th>
@@ -75,6 +78,9 @@
                     <tfoot>
                     <tr>
                         <th>plaatsnaam</th>
+                        {% if dataset.liesin_column is not empty %}
+                            <th>ligt in</th>
+                        {% endif %}
                         <th>en de juiste uri is...</th>
                         <th></th>
                         <th>...niet te achterhalen?</th>
@@ -85,6 +91,9 @@
                     {% for rec in noresults %}
                         <tr id="row_{{ rec.id }}">
                             <td>{{ rec.original_name }}</td>
+                            {% if dataset.liesin_column is not empty %}
+                                <td>{{ rec.liesin_name }}</td>
+                            {% endif %}
                             <td>
                                 <input class="form-control wide" type="text" id="uri-with-{{ rec.id }}" value="" placeholder="http://sws.geonames.org/1234"/>
                             </td>

@@ -14,10 +14,6 @@
 
 - this also makes it possible to do less precise searches ....
 
-- set mappings and dataset details in one table, maybe, to simplify
-
-- should be able to keep earlier (matched/unmatched records
-    (dataset_Service clearRecordsForDataset should work with status)
 
 
 - should do better modelling:

@@ -43,6 +43,9 @@
                     <thead>
                     <tr>
                         <th>plaatsnaam</th>
+                        {% if dataset.liesin_column is not empty %}
+                            <th>ligt in</th>
+                        {% endif %}
                         <th>toch nog de juiste URI gevonden?</th>
                         <th></th>
                     </tr>
@@ -50,6 +53,9 @@
                     <tfoot>
                     <tr>
                         <th>plaatsnaam</th>
+                        {% if dataset.liesin_column is not empty %}
+                            <th>ligt in</th>
+                        {% endif %}
                         <th>toch nog de juiste URI gevonden?</th>
                         <th></th>
                     </tr>
@@ -59,6 +65,9 @@
                     {% for rec in unmappables %}
                         <tr id="row_{{ rec.id }}">
                             <td>{{ rec.original_name }}</td>
+                            {% if dataset.liesin_column is not empty %}
+                                <td>{{ rec.liesin_name }}</td>
+                            {% endif %}
                             <td>
                                 <input class="form-control wide" type="text" id="uri-with-{{ rec.id }}" value="" placeholder="http://sws.geonames.org/1234"/>
                             </td>

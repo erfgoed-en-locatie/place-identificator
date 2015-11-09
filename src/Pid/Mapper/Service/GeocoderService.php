@@ -171,15 +171,15 @@ class GeocoderService
 
         // settings for each row
         foreach ($rows as $row) {
-            $originalName = $this->searchClient->cleanupSearchString($row[(int)($dataset['placename_column'])]);
+            $originalName = $this->searchClient->cleanupSearchString($row['original_name']);
             if (empty($originalName)) {
                 continue;
             }
 
             // set bounding param if one was given
             $within = null;
-            if (!empty($dataset['liesin_column'])) {
-                $within = $this->searchClient->cleanupSearchString($row[(int)($dataset['liesin_column'])]);
+            if (strlen($dataset['liesin_column']) > 0) {
+                $within = $this->searchClient->cleanupSearchString($row['liesin_name']);
                 $this->searchClient->setLiesIn($within);
             }
 
@@ -202,6 +202,7 @@ class GeocoderService
 
                 if ($hits == 1) {
                     $data = $this->transformPiTs2Rows($originalName, $dataset, $features, $within);
+
                     $this->datasetService->storeGeocodedRecords($data);
                 } elseif ($hits > 1) {
                     $data['hits'] =  $hits;

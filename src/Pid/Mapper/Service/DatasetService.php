@@ -2,6 +2,7 @@
 
 namespace Pid\Mapper\Service;
 
+
 use Pid\Mapper\Model\DatasetStatus;
 use Pid\Mapper\Model\Status;
 
@@ -47,30 +48,11 @@ class DatasetService
         } else {
             $sql = 'SELECT * FROM datasets WHERE id = :id AND user_id = :userId';
             $params = array(
-                'id' => (int)$id,
+                'id'     => (int)$id,
                 'userId' => (int)$userId
             );
             $stmt = $this->db->executeQuery($sql, $params);
         }
-
-        return $stmt->fetch();
-    }
-
-    /**
-     * Fetch dataset details with Fieldmappings
-     *
-     * @param $id
-     * @return mixed
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public function fetchDatasetDetails($id)
-    {
-        $stmt = $this->db->executeQuery('
-          SELECT *
-          FROM datasets d
-          WHERE d.id = :id', array(
-            'id' => (int)$id
-        ));
 
         return $stmt->fetch();
     }
@@ -97,15 +79,6 @@ class DatasetService
         $stmt = $this->db->executeQuery($sql, $params);
 
         return $stmt->fetchColumn(0);
-    }
-
-    public function fetchFieldmappingForDataset($id)
-    {
-        $stmt = $this->db->executeQuery('SELECT * FROM field_mapping WHERE dataset_id = :id', array(
-            'id' => (int)$id
-        ));
-
-        return $stmt->fetch();
     }
 
     public function fetchRecsWithStatus($id, $status)
@@ -226,7 +199,7 @@ class DatasetService
      */
     public function copyRecordsFromCsv($dataset)
     {
-        $stm = $this->db->query("SELECT * FROM records WHERE id = {$dataset['id']} LIMIT 1");
+        $stm = $this->db->query("SELECT * FROM records WHERE dataset_id = {$dataset['id']} LIMIT 1");
         if ($stm->fetch()) {
             return true;
         }
@@ -253,14 +226,18 @@ class DatasetService
      * @param $datasetId
      * @return array
      * @throws \Doctrine\DBAL\DBALException
-     * @internal param $setid
      */
     public function fetchRecordsToStandardize($datasetId)
     {
-        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status = :status';
+        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status NOT IN (:status)';
         $params = array(
-            'id'        => (int) $datasetId,
-            'status'    => Status::UNMAPPED
+            'id'     => (int) $datasetId,
+            'status' => implode(',', [
+                    Status::MAPPED_EXACT,
+                    Status::MAPPED_MANUALLY,
+                    Status::UNMAPPABLE
+                ]
+            )
         );
         $stmt = $this->db->executeQuery($sql, $params);
 
@@ -371,10 +348,9 @@ class DatasetService
      * Clear records for a dataset, AND wit ha specific status if provided
      *
      * @param $datasetId
-     * @param null $status
      * @return int
      */
-    public function clearRecordsForDataset($datasetId, $status = null)
+    public function clearRecordsForDataset($datasetId)
     {
         return $this->db->delete('records', array('dataset_id' => $datasetId));
     }
@@ -398,8 +374,18 @@ class DatasetService
     {
         $date = new \DateTime('now');
         $data['updated_on'] = $date->format('Y-m-d H:i:s');
-        // todo enhance record update with where liesIn, if applicable
-        $this->db->update('records', $data, array('original_name' => $data['name']));
+
+        // if search was with liesIn, the update should be more specific
+        if (strlen($data['liesin_name']) > 0) {
+            $this->db->update('records', $data, array(
+                'original_name' => $data['original_name'],
+                'liesin_name' => $data['liesin_name']
+            ));
+        } else {
+            $this->db->update('records', $data, array(
+                'original_name' => $data['original_name']
+            ));
+        }
     }
 
 

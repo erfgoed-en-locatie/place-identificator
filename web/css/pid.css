@@ -140,3 +140,6 @@ p{margin-top: 8px;}
 	font-size: .9em;
     color: #3276b1;
 }
+.btn-group.action > a {
+    padding: 0 10px;
+}

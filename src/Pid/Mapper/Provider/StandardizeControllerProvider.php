@@ -62,7 +62,7 @@ class StandardizeControllerProvider implements ControllerProviderInterface
         $csvService = $app['csv_service'];
         $csvRows = $csvService->getRows($dataset, self::NUMBER_TO_TEST);
 
-        if (empty($dataset['placename_column'])) {
+        if (strlen($dataset['placename_column']) < 1) {
             $app['session']->getFlashBag()->set('error',
                 'Sorry maar voor de dataset zijn de standaardisatie opties nog niet ingevuld. Dat moet eerst gedaan worden.');
 
@@ -74,7 +74,6 @@ class StandardizeControllerProvider implements ControllerProviderInterface
 
         try {
             $output = $geocoder->mapTest($csvRows, $dataset);
-            //var_dump($output); die;
             $csvService->writeTestFile($dataset, $output);
         } catch (\Exception $e) {
             $app['monolog']->error($e->getMessage());

@@ -44,6 +44,9 @@
                     <thead>
                     <tr>
                         <th>plaatsnaam</th>
+                        {% if dataset.liesin_column is not empty %}
+                            <th>ligt in</th>
+                        {% endif %}
                         <th>aantal hits</th>
                         <th>bewerk</th>
                         <th>...niet te achterhalen?</th>
@@ -52,6 +55,9 @@
                     <tfoot>
                     <tr>
                         <th>plaatsnaam</th>
+                        {% if dataset.liesin_column is not empty %}
+                            <th>ligt in</th>
+                        {% endif %}
                         <th>aantal hits</th>
                         <th>bewerk</th>
                         <th>...niet te achterhalen?</th>
@@ -61,6 +67,9 @@
                     {% for rec in multiples %}
                         <tr id="row_{{ rec.id }}">
                             <td>{{ rec.original_name }}</td>
+                            {% if dataset.liesin_column is not empty %}
+                                <td>{{ rec.liesin_name }}</td>
+                            {% endif %}
                             <td>{{ rec.hits }}</td>
                             <td><a class="btn btn-primary btn-sm" href="/datasets/{{ dataset.id }}/multiples/{{ rec.id }}">bewerk</a></td>
                             <td><button type="button" class="btn-danger btn btn-sm unmappable" data-id="{{ rec.id }}" data-ref="{{ path('api-unmappable', {'id': rec.id }) }}">niet te achterhalen</button></td>
