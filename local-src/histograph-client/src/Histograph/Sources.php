@@ -28,7 +28,6 @@ class Sources
         self::TYPE_BAG,
         self::TYPE_KLOEKE,
 
-        'bag-utr',
         'geonames-tgn',
         'militieregisters',
         'pleiades',
@@ -46,8 +45,7 @@ class Sources
         self::TYPE_GG,
         self::TYPE_NWB,
         self::TYPE_BAG,
-        self::TYPE_KLOEKE,
-        'bag-utr'
+        self::TYPE_KLOEKE
     );
 
     public static function getAllSets()

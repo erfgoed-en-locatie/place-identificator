@@ -127,7 +127,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
             $app->abort(404, "Dataset with id ($id) does not exist.");
         }
 
-        $html = $app['csv_service']->readTestFile($dataset);
+        $html = $app['csv_service']->convertCsv2Html($dataset, 'test');
 
         return $app['twig']->render('datasets/test.result.html.twig', array(
             'dataset' => $dataset,
@@ -157,7 +157,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
             array(Status::UNMAPPABLE));
 
         $downloadable = false;
-        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['id'];
+        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['filename'];
         if (file_exists($newfile)) {
             $downloadable = true;
         }
@@ -443,7 +443,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
         }
 
         // check if file_exists
-        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['id'];
+        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['filename'];
         if (file_exists($newfile)) {
             header('Content-Type: text/csv; charset=UTF-8');
             header('Content-Disposition: attachment; filename="download_' . $dataset['name'] . '.csv"');
@@ -451,7 +451,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
             die;
         }
         $app['session']->getFlashBag()->set('error',
-            'Downloaden is mislukt omdat het csv-bestand niet bestaat.');
+            'Downloaden is mislukt omdat het download-bestand niet bestaat.');
 
         return $app->redirect($app['url_generator']->generate('datasets-show', ['id' => $id]));
 

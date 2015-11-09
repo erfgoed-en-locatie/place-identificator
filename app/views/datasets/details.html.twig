@@ -90,8 +90,7 @@
                 <strong>(opnieuw)</strong> een downloadbaar bestand genereren.
                 Afhankelijk van de grootte van uw csv kan dit enige tijd in beslag nemen.
             </p>
-            <a href="{{ path('dataset-create-download', {'id': dataset.id}) }}" class="btn btn-primary">Genereer een
-                csv-bestand</a>
+            <a href="{{ path('dataset-create-download', {'id': dataset.id}) }}" class="btn btn-primary">Genereer downloadbaar bestand</a>
             <br/>
 
             {% if downloadable is not empty %}

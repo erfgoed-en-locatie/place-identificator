@@ -114,6 +114,17 @@ class DatasetService
         return $stmt->fetch();
     }
 
+    public function fetchRecordByRowId($rowId)
+    {
+        $sql = 'SELECT * FROM records WHERE row_id = :row';
+        $params = array(
+            'row' => $rowId
+        );
+        $stmt = $this->db->executeQuery($sql, $params);
+
+        return $stmt->fetch();
+    }
+
     public function fetchRecs($setid)
     {
         $sql = 'SELECT * FROM records WHERE dataset_id = :id';
@@ -205,8 +216,9 @@ class DatasetService
         }
 
         $rows = $this->csvService->getRows($dataset);
-        foreach ($rows as $row) {
+        foreach ($rows as $rowId => $row) {
             $data['dataset_id'] = $dataset['id'];
+            $data['row_id'] = $rowId;
 
             $data['original_name'] = $row[$dataset['placename_column']];
             if (isset($dataset['liesin_column'])) {
@@ -352,6 +364,10 @@ class DatasetService
      */
     public function clearRecordsForDataset($datasetId)
     {
+        $this->db->update('datasets', array('status' => DatasetStatus::STATUS_NEW), array(
+            'id' => $datasetId
+        ));
+
         return $this->db->delete('records', array('dataset_id' => $datasetId));
     }
 

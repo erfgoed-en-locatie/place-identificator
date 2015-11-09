@@ -26,7 +26,7 @@
                         <tr>
                             <td>{{ set.id }}</td>
                             <td>{{ set.name }}</td>
-                            <td><a title="Bekijk het csv-bestand" href="{{ path('file-view-csv', {'filename': set.filename, 'id': set.id}) }}">{{ set.original_name }}</a></td>
+                            <td><a title="Bekijk het csv-bestand" href="{{ path('file-view-csv', {'id': set.id}) }}">{{ set.original_name }}</a></td>
                             <td>{{ set.email }}</td>
                             <td>{{ set.created_on|date('d-m-Y') }}</td>
                             <td>

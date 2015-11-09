@@ -51,9 +51,8 @@ class StandardizeCommand extends Command
         $dataService = $app['dataset_service'];
 
         $dataset = $dataService->fetchDataset($datasetId);
-        $fieldMapping = $dataService->getFieldMappingForDataset($datasetId);
 
-        return $this->createDownloadableCsvFile($dataset, $fieldMapping);
+        return $this->createDownloadableCsvFile($dataset);
     }
 
     /**
@@ -62,38 +61,12 @@ class StandardizeCommand extends Command
      * @param $dataset
      * @return bool
      */
-    protected function createDownloadableCsvFile($dataset, $fieldMapping)
+    protected function createDownloadableCsvFile($dataset)
     {
         $app = $this->getSilexApplication();
 
-        $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
-        $csv = \League\Csv\Reader::createFromPath($file);
-        if (0 < mb_strlen($dataset['delimiter'])) {
-            $csv->setDelimiter($dataset['delimiter']);
-        } else {
-            $csv->setDelimiter(current($csv->detectDelimiterList(2)));
-        }
-        if (0 < mb_strlen($dataset['enclosure_character'])) {
-            $csv->setEnclosure($dataset['enclosure_character']);
-        }
-        if (0 < mb_strlen($dataset['escape_character'])) {
-            $csv->setEscape($dataset['escape_character']);
-        }
-
-        $rows =
-            $csv->setOffset(0)
-                // skipping empty rows
-                ->addFilter(function ($row) {
-                    if (!empty($row[0])) {
-                        return $row;
-                    }
-                })
-                ->fetchAll();
-        if ($dataset['skip_first_row']) {
-            $headerRow = $rows[0];
-            array_shift($rows);
-        }
-
+        $rows = $app['csv_service']->getRows($dataset);
+        $headerRow = $app['csv_service']->getColumns($dataset);
         if ($headerRow) {
             $data = array('hg_id','hg_uri', 'hg_name', 'hg_geometry', 'hg_type', 'hg_dataset');
             foreach ($data as $ding) {
@@ -101,14 +74,14 @@ class StandardizeCommand extends Command
             }
         }
 
-        // fetch matching records, one by one?
-        $placeColumn = (int)$fieldMapping['placename'];
-        foreach ($rows as &$row) {
-            $originalName = $row[(int)($fieldMapping['placename'])];
+        // fetch matching records, one by one
+        foreach ($rows as $rowId => &$row) {
+            $originalName = $row[(int) $dataset['placename_column']];
 
             /** @var DatasetService $dataService */
             $dataService = $app['dataset_service'];
-            $record = $dataService->fetchRecordByName($originalName);
+            // fetching by rowId to prevent accidental fetching of Same Place, liesIn somewhere else
+            $record = $dataService->fetchRecordByRowId($rowId);
 
             // add db data to th csv file to Write
             array_push($row, $record['hg_id']);
@@ -120,10 +93,10 @@ class StandardizeCommand extends Command
         }
 
         // create a new file
-        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['id'];
+        $newfile = $app['upload_dir'] . DIRECTORY_SEPARATOR . 'download_' . $dataset['filename'];
 
         $writer = Writer::createFromFileObject(new SplTempFileObject());
-        $writer->setDelimiter(",");
+        $writer->setDelimiter($dataset['delimiter']);
         //$writer->setNewline("\r\n");
         $writer->setEncodingFrom("utf-8");
         if ($headerRow) {
@@ -160,7 +133,7 @@ class StandardizeCommand extends Command
             $dataService->setMappingFailed($datasetId);
             return $app['monolog']->addError('No field mapping was provided, so could not standardize.');
         }
-
+//var_dump($rows); die;
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
 
@@ -193,7 +166,7 @@ http://standaardiseren.erfgeo.nl/datasets/{$dataset['id']}
 
             $app['mailer']->send($message);
 
-            //$this->createDownloadableCsvFile($dataset);
+            $this->createDownloadableCsvFile($dataset);
 
         } catch (\Exception $e) {
             $dataService->setMappingFailed($dataset['id']);

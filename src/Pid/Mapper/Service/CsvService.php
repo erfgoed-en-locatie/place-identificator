@@ -100,7 +100,7 @@ class CsvService
         $testFile = $this->uploadDir . DIRECTORY_SEPARATOR . $this->testPrefix . $dataset['filename'];
 
         $writer = Writer::createFromFileObject(new SplTempFileObject());
-        $writer->setDelimiter(",");
+        $writer->setDelimiter($dataset['delimiter']);
         $headerRow = array(
             'naam',
             'ligt in',
@@ -123,10 +123,21 @@ class CsvService
         file_put_contents($testFile, $writer);
     }
 
-    public function readTestFile($dataset)
+    /**
+     * Converts the csv file to html table
+     *
+     * @param integer $dataset
+     * @param string $version original|test
+     * @return string
+     */
+    public function convertCsv2Html($dataset, $version = 'original')
     {
-        $testFile = $this->uploadDir . DIRECTORY_SEPARATOR . $this->testPrefix . $dataset['filename'];
-        $csv = Reader::createFromPath($testFile);
+        if ($version == 'test') {
+            $file = $this->uploadDir . DIRECTORY_SEPARATOR . $this->testPrefix . $dataset['filename'];
+        } else {
+            $file = $this->uploadDir . DIRECTORY_SEPARATOR . $dataset['filename'];
+        }
+        $csv = Reader::createFromPath($file);
         if (0 < mb_strlen($dataset['delimiter'])) {
             $csv->setDelimiter($dataset['delimiter']);
         } else {
