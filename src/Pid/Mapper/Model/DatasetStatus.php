@@ -22,7 +22,7 @@ class DatasetStatus {
      */
     protected static $statusOptions = array(
         self::STATUS_NEW            => 'nieuw',
-        self::STATUS_FIELDS_MAPPED  => 'velden benoemd en test gedaan',
+        self::STATUS_FIELDS_MAPPED  => 'velden benoemd',
         self::STATUS_BEING_MAPPED   => 'mapping begonnen',
         self::STATUS_MAPPED         => 'mapping afgerond',
         self::STATUS_MAPPING_FAILED => 'mapping mislukt',

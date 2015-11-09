@@ -1,6 +1,7 @@
 <?php
 
 namespace Pid\Mapper\Service;
+
 use Pid\Mapper\Model\DatasetStatus;
 use Pid\Mapper\Model\Status;
 
@@ -10,7 +11,8 @@ use Pid\Mapper\Model\Status;
  *
  * @package Pid\Mapper\Service
  */
-class DatasetService {
+class DatasetService
+{
 
     /**
      * @var \Doctrine\DBAL\Connection
@@ -46,9 +48,11 @@ class DatasetService {
             $sql = 'SELECT * FROM datasets WHERE id = :id AND user_id = :userId';
             $params = array(
                 'id' => (int)$id,
-                'userId' => (int)$userId);
+                'userId' => (int)$userId
+            );
             $stmt = $this->db->executeQuery($sql, $params);
         }
+
         return $stmt->fetch();
     }
 
@@ -85,30 +89,33 @@ class DatasetService {
           SELECT COUNT(*) AS aantal
           FROM records
           WHERE dataset_id = :id
-          AND status IN (' . implode(",",$status) . ')
+          AND status IN (' . implode(",", $status) . ')
           ';
         $params = array(
-            'id' => (int) $id
+            'id' => (int)$id
         );
         $stmt = $this->db->executeQuery($sql, $params);
+
         return $stmt->fetchColumn(0);
     }
 
     public function fetchFieldmappingForDataset($id)
     {
-            $stmt = $this->db->executeQuery('SELECT * FROM field_mapping WHERE dataset_id = :id', array(
-                'id' => (int) $id
-            ));
+        $stmt = $this->db->executeQuery('SELECT * FROM field_mapping WHERE dataset_id = :id', array(
+            'id' => (int)$id
+        ));
+
         return $stmt->fetch();
     }
 
-    public function fetchRecsWithStatus($id,$status)
+    public function fetchRecsWithStatus($id, $status)
     {
-        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status IN (' . implode(",",$status) . ')';
+        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status IN (' . implode(",", $status) . ')';
         $params = array(
-            'id' => (int)$id);
+            'id' => (int)$id
+        );
         $stmt = $this->db->executeQuery($sql, $params);
-        
+
         return $stmt->fetchAll();
     }
 
@@ -116,7 +123,8 @@ class DatasetService {
     {
         $sql = 'SELECT * FROM records WHERE id = :id';
         $params = array(
-            'id' => (int)$recid);
+            'id' => (int)$recid
+        );
         $stmt = $this->db->executeQuery($sql, $params);
 
         return $stmt->fetchAll();
@@ -137,9 +145,10 @@ class DatasetService {
     {
         $sql = 'SELECT * FROM records WHERE dataset_id = :id';
         $params = array(
-            'id' => (int)$setid);
+            'id' => (int)$setid
+        );
         $stmt = $this->db->executeQuery($sql, $params);
-        
+
         return $stmt->fetchAll();
     }
 
@@ -179,7 +188,7 @@ class DatasetService {
 
         // fetch original name, so we can update all records with the same name
         $stmt = $this->db->executeQuery('SELECT original_name as name, dataset_id FROM records WHERE id = :id', array(
-            'id' => (int) $id
+            'id' => (int)$id
         ));
         $stored = $stmt->fetch();
 
@@ -188,6 +197,7 @@ class DatasetService {
         $ids = $statement->fetchAll();
 
         $this->db->update('records', $data, array('original_name' => $stored['name']));
+
         return $ids;
     }
 
@@ -221,7 +231,7 @@ class DatasetService {
             return true;
         }
 
-        $rows = $this->csvService->getAllRows($dataset);
+        $rows = $this->csvService->getRows($dataset);
         foreach ($rows as $row) {
             $data['dataset_id'] = $dataset['id'];
 
@@ -238,6 +248,26 @@ class DatasetService {
     }
 
     /**
+     * Fetches all records that have not been standardized already
+     *
+     * @param $datasetId
+     * @return array
+     * @throws \Doctrine\DBAL\DBALException
+     * @internal param $setid
+     */
+    public function fetchRecordsToStandardize($datasetId)
+    {
+        $sql = 'SELECT * FROM records WHERE dataset_id = :id AND status = :status';
+        $params = array(
+            'id'        => (int) $datasetId,
+            'status'    => Status::UNMAPPED
+        );
+        $stmt = $this->db->executeQuery($sql, $params);
+
+        return $stmt->fetchAll();
+    }
+
+    /**
      * Store the csv properties for which reading the csv is not necessary
      *
      * @param $data
@@ -247,6 +277,7 @@ class DatasetService {
     {
         $date = new \DateTime('now');
         $data['updated_on'] = $date->format('Y-m-d H:i:s');
+
         return $this->db->update('datasets', $data, array(
             'id' => $data['id']
         ));
@@ -279,6 +310,7 @@ class DatasetService {
         $stmt = $this->db->executeQuery('SELECT name, email FROM users WHERE id = :id', array(
             'id' => (int)$id
         ));
+
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
@@ -315,7 +347,7 @@ class DatasetService {
 
         // fetch original name, so we can update all records with the same name
         $stmt = $this->db->executeQuery('SELECT original_name as name, dataset_id FROM records WHERE id = :id', array(
-            'id' => (int) $id
+            'id' => (int)$id
         ));
         $stored = $stmt->fetch();
 
@@ -331,6 +363,7 @@ class DatasetService {
         $ids = $statement->fetchAll();
 
         $this->db->update('records', $data, array('original_name' => $stored['name']));
+
         return $ids;
     }
 
@@ -349,17 +382,24 @@ class DatasetService {
     /**
      * Store the geocoded result
      *
-     * If the data set was standardized before, als delete all old mappings
      * @param array $data
      * @return bool
      */
     public function storeGeocodedRecords($data)
     {
-        foreach($data as $row) {
-            $this->storeMappedRecord($row);
+        foreach ($data as $row) {
+            $this->updateRecord($row);
         }
 
         return true;
+    }
+
+    public function updateRecord($data)
+    {
+        $date = new \DateTime('now');
+        $data['updated_on'] = $date->format('Y-m-d H:i:s');
+        // todo enhance record update with where liesIn, if applicable
+        $this->db->update('records', $data, array('original_name' => $data['name']));
     }
 
 

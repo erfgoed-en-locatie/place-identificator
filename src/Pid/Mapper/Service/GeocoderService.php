@@ -75,35 +75,111 @@ class GeocoderService
     }
 
     /**
-     * Maps an array of rows with at least aone placename against the geocoder
+     * Test a few rows against the Geocoder
      *
-     * @param array $rows
-     * @param array $fieldMapping
-     * @param integer $datasetId
+     * @param $rows
+     * @param $dataset
      * @return bool
      */
-    public function map($rows, $fieldMapping, $datasetId)
+    public function mapTest($rows, $dataset)
     {
         if (empty($rows)) {
             throw new RuntimeException('No rows to process.');
         }
 
         // client settings valid for all rows
-        $this->searchClient->setGeometry($fieldMapping['geometry'])
+        $this->searchClient->setGeometry(false)
             ->setExact(true)
             ->setQuoted(true)
-            ->setSearchType($fieldMapping['hg_type']);
+            ->setSearchType($dataset['hg_type']);
+
+        $output = [];
 
         // settings for each row
         foreach ($rows as $row) {
-            $originalName = $this->searchClient->cleanupSearchString($row[(int)($fieldMapping['placename'])]);
+            $originalName = $this->searchClient->cleanupSearchString($row[(int)($dataset['placename_column'])]);
             if (empty($originalName)) {
                 continue;
             }
 
             // set bounding param if one was given
-            if (!empty($fieldMapping['liesin'])) {
-                $within = $this->searchClient->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
+            $within = null;
+            if (!empty($dataset['liesin_column'])) {
+                $within = $this->searchClient->cleanupSearchString($row[(int)($dataset['liesin_column'])]);
+                $this->searchClient->setLiesIn($within);
+            }
+
+            /** @var GeoJsonResponse $histographResponse */
+            $histographResponse = $this->searchClient->search($originalName);
+            if (!$histographResponse) {
+                return false;
+            }
+            $data = [];
+
+            if ($this->hits = $histographResponse->getHits() > 0) {
+                $features = $histographResponse
+                    // fetch only results of a certain type:
+                    ->setPitSourceFilter(array($dataset['hg_dataset']))
+                    ->getFilteredResponse();
+                $hits = count($features);
+
+                if ($hits == 1) {
+                    $data = $this->transformPiTs2Rows($originalName, $dataset, $features, $within);
+                    $output[] = $data[0];
+                } elseif ($hits > 1) {
+                    // eigenlijk meerdere records opslaan?
+                    $data = $this->transformPiTs2Rows($originalName, $dataset, $features, $within, Status::getFormattedOption(Status::MAPPED_EXACT_MULTIPLE));
+                    foreach ($data as $foundPit) {
+                        $output[] = $foundPit;
+                    }
+                }
+
+            } else {
+                $data['original_name'] = $originalName;
+                $data['liesin_name'] = $within;
+                $data['dataset_id'] = $dataset['id'];
+                $data['hg_dataset'] = $dataset['hg_dataset'];
+                $data['status'] = Status::getFormattedOption(Status::MAPPED_EXACT_NOT_FOUND);
+                $data['hits'] = 0;
+                $output[] = $data;
+            }
+        }
+
+        return $output;
+    }
+
+
+    /**
+     * Maps an array of rows with at least a placename against the geocoder
+     * Also stores the result in the database
+     *
+     * @param array $rows
+     * @param $dataset
+     * @return bool
+     */
+    public function map($rows, $dataset)
+    {
+        if (empty($rows)) {
+            throw new RuntimeException('No rows to process.');
+        }
+
+        // client settings valid for all rows
+        $this->searchClient->setGeometry($dataset['geometry'])
+            ->setExact(true)
+            ->setQuoted(true)
+            ->setSearchType($dataset['hg_type']);
+
+        // settings for each row
+        foreach ($rows as $row) {
+            $originalName = $this->searchClient->cleanupSearchString($row[(int)($dataset['placename_column'])]);
+            if (empty($originalName)) {
+                continue;
+            }
+
+            // set bounding param if one was given
+            $within = null;
+            if (!empty($dataset['liesin_column'])) {
+                $within = $this->searchClient->cleanupSearchString($row[(int)($dataset['liesin_column'])]);
                 $this->searchClient->setLiesIn($within);
             }
 
@@ -119,36 +195,39 @@ class GeocoderService
 
                 $features = $histographResponse
                     // fetch only results of a certain type:
-                    ->setPitSourceFilter(array($fieldMapping['hg_dataset']))
+                    ->setPitSourceFilter(array($dataset['hg_dataset']))
                     ->getFilteredResponse();
 
                 $hits = count($features);
 
                 if ($hits == 1) {
-                    $data = $this->transformPiTs2Rows($originalName, $datasetId, $features, $fieldMapping['hg_dataset']);
+                    $data = $this->transformPiTs2Rows($originalName, $dataset, $features, $within);
                     $this->datasetService->storeGeocodedRecords($data);
                 } elseif ($hits > 1) {
                     $data['hits'] =  $hits;
                     $data['status'] = Status::MAPPED_EXACT_MULTIPLE;
                     $data['original_name'] = $originalName;
-                    $data['dataset_id'] = $datasetId;
-                    $data['hg_dataset'] = $fieldMapping['hg_dataset'];
-                    $this->datasetService->storeMappedRecord($data);
+                    $data['liesin_name'] = $within;
+                    $data['dataset_id'] = $dataset['id'];
+                    $data['hg_dataset'] = $dataset['hg_dataset'];
+                    $this->datasetService->updateRecord($data);
                 } else {
                     $data['original_name'] = $originalName;
-                    $data['dataset_id'] = $datasetId;
-                    $data['hg_dataset'] = $fieldMapping['hg_dataset'];
+                    $data['liesin_name'] = $within;
+                    $data['dataset_id'] = $dataset['id'];
+                    $data['hg_dataset'] = $dataset['hg_dataset'];
                     $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
                     $data['hits'] = 0;
-                    $this->datasetService->storeMappedRecord($data);
+                    $this->datasetService->updateRecord($data);
                 }
             } else {
                 $data['original_name'] = $originalName;
-                $data['dataset_id'] = $datasetId;
-                $data['hg_dataset'] = $fieldMapping['hg_dataset'];
+                $data['liesin_name'] = $within;
+                $data['dataset_id'] = $dataset['id'];
+                $data['hg_dataset'] = $dataset['hg_dataset'];
                 $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
                 $data['hits'] = 0;
-                $this->datasetService->storeMappedRecord($data);
+                $this->datasetService->updateRecord($data);
             }
         }
 
@@ -159,42 +238,50 @@ class GeocoderService
      * Transform the result from the API into storable data
      *
      * @param string $originalName The search string
-     * @param int $datasetId Id of the dataset
+     * @param int $dataset
      * @param array $features Response GeoJson Features
-     * @param string $hgSource The HG source (or dataset) the response was filtered on
+     * @param $within
+     * @param int $status
      * @return array
+     * @internal param string $hgSource The HG source (or dataset) the response was filtered on
      */
     protected function transformPiTs2Rows(
         $originalName,
-        $datasetId,
+        $dataset,
         $features,
-        $hgSource,
+        $within,
         $status = Status::MAPPED_EXACT
     ) {
         $data = [];
+        $hits = count($features);
         // pffht this should also be just 1 record... duh
         foreach ($features as $feature) {
 
             foreach ($feature->properties->pits as $pit) {
                 $row = [];
+
+                // hg info
+                $row['original_name'] = $originalName;
+                $row['liesin_name'] = $within;
+                $row['dataset_id'] = $dataset['id'];
+                $row['hg_dataset'] = $dataset['hg_dataset'];
+                $row['status'] = $status;
+                $row['hits'] = $hits;
+                $row['hg_id'] = '';
                 if (property_exists($pit, 'id')) {
                     $row['hg_id'] = $pit->id;
                 }
                 $row['hg_name'] = $pit->name;
                 $row['hg_type'] = $pit->type;
+                $row['hg_uri'] = '';
                 if (property_exists($pit, 'uri')) {
                     $row['hg_uri'] = $pit->uri;
                 }
+                $row['hg_geometry'] = '';
                 if (property_exists($pit, 'geometryIndex') && $pit->geometryIndex > -1) {
                     $row['hg_geometry'] = json_encode($feature->geometry->geometries[$pit->geometryIndex]);
                 }
 
-                // hg info
-                $row['original_name'] = $originalName;
-                $row['dataset_id'] = $datasetId;
-                $row['hg_dataset'] = $hgSource;
-                $row['status'] = $status;
-                $row['hits'] = 1;
                 $data[] = $row;
             };
         }

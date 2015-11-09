@@ -7,6 +7,7 @@ use Histograph\Client\GeoJsonResponse;
 use Histograph\Client\Search;
 use Pid\Mapper\Model\Dataset;
 use Pid\Mapper\Model\Status;
+use Pid\Mapper\Service\CsvService;
 use Pid\Mapper\Service\DatasetService;
 use Pid\Mapper\Service\GeocoderService;
 use Silex\Application;
@@ -46,69 +47,42 @@ class StandardizeControllerProvider implements ControllerProviderInterface
      */
     public function testAction(Application $app, $id, Request $request)
     {
-        $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
+        /** @var DatasetService $dataService */
+        $dataService = $app['dataset_service'];
+
+        $dataset = $dataService->fetchDataset($id, $app['user']->getId());
         if (!$dataset) {
             $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
 
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
 
-        // attempt to make sense of the csv file
-        $file = $app['upload_dir'] . DIRECTORY_SEPARATOR . $dataset['filename'];
-        if (!file_exists($file)) {
-            $app['session']->getFlashBag()->set('error', 'Sorry maar het csv-bestand bestaat niet meer.');
+        // new test action: fetch first x records and save them to a csv file... and display as html
+        /** @var CsvService $csvService */
+        $csvService = $app['csv_service'];
+        $csvRows = $csvService->getRows($dataset, self::NUMBER_TO_TEST);
 
-            return $app->redirect($app['url_generator']->generate('datasets-all'));
-        }
-        $csv = \League\Csv\Reader::createFromPath($file);
-        if (0 < mb_strlen($dataset['delimiter'])) {
-            $csv->setDelimiter($dataset['delimiter']);
-        } else {
-            $csv->setDelimiter(current($csv->detectDelimiterList(2)));
-        }
-        if (0 < mb_strlen($dataset['enclosure_character'])) {
-            $csv->setEnclosure($dataset['enclosure_character']);
-        }
-        if (0 < mb_strlen($dataset['escape_character'])) {
-            $csv->setEscape($dataset['escape_character']);
-        }
-
-        $limit = self::NUMBER_TO_TEST;
-        if ($dataset['skip_first_row']) {
-            $limit++;
-        }
-        $csvRows = $csv->setOffset(0)->setLimit($limit)->fetchAll();
-        if ($dataset['skip_first_row']) {
-            array_shift($csvRows);
-        }
-
-        $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($id);
-        if (!$fieldMapping) {
+        if (empty($dataset['placename_column'])) {
             $app['session']->getFlashBag()->set('error',
-                'Sorry maar er zijn nog geen instellingen voor dat csv-bestand.');
+                'Sorry maar voor de dataset zijn de standaardisatie opties nog niet ingevuld. Dat moet eerst gedaan worden.');
 
-            return $app->redirect($app['url_generator']->generate('datasets-all'));
+            return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
         }
 
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
 
         try {
-            /** @var DatasetService $dataService */
-            $dataService = $app['dataset_service'];
-
-            // todo petra implement deleteOld or different status/match types 'exact" etc
-
-            $dataService->clearRecordsForDataset($id);
-            $geocoder->map($csvRows, $fieldMapping, $id);
+            $output = $geocoder->mapTest($csvRows, $dataset);
+            //var_dump($output); die;
+            $csvService->writeTestFile($dataset, $output);
         } catch (\Exception $e) {
             $app['monolog']->error($e->getMessage());
             $app['session']->getFlashBag()->set('error',
                 'Sorry, maar er is iets mis met de Histograph API. Probeer het svp wat later nog eens.');
-            //$app->abort(404, 'The histograph API returned an error. It might be down.');
         }
 
-        return $app->redirect($app['url_generator']->generate('datasets-show', array('id' => $id)));
+        return $app->redirect($app['url_generator']->generate('dataset-test-result', array('id' => $id)));
     }
 
     /**

@@ -1,7 +1,7 @@
 # TODO for the rewrite
 
 
-- why are all the values stored again and again...?
+- save standardized query, with or without liesIn Where!
 
 - final rewrite:
     - on loading the dataset, see if it is a valid one
