@@ -53,7 +53,7 @@ class Search extends Client
      */
     protected function filterBadCharacters($name)
     {
-        $bad = ':/?#[]@!$&()*+;=';
+        $bad = ':/?#[]@!$&()*,+;=';
         return preg_replace('!\s+!', ' ', str_ireplace(str_split($bad), '', $name));
     }
 
