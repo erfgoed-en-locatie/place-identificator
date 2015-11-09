@@ -32,28 +32,26 @@ class GeocoderService
      * Try to find a HG Concept for which we got multiple answers
      *
      * @param $row
-     * @param $fieldMapping
+     * @param $dataset
      * @return bool
      */
-    public function fetchFeaturesForNamesWithMultipleHits($row, $fieldMapping)
+    public function fetchFeaturesForNamesWithMultipleHits($row, $dataset)
     {
         // client settings valid for all rows
         $this->searchClient->setGeometry(true)
             ->setExact(true)
             ->setQuoted(true)
-            ->setSearchType($fieldMapping['hg_type']);
+            ->setSearchType($dataset['hg_type']);
         $originalName = $this->searchClient->cleanupSearchString($row['original_name']);
         if (empty($originalName)) {
             //print 'No name to search on ' . $row['original_name'];
             return false;
         }
 
-        // todo set liesIn param if one was given
-        // can't do this now since we don not have teh liesIn field copied in here .. will be possible once I fix all of that
-        /*if (!empty($fieldMapping['liesin'])) {
-            $within = $this->searchClient->cleanupSearchString($row[(int)($fieldMapping['liesin'])]);
+        if (!empty($row['liesin_name'])) {
+            $within = $this->searchClient->cleanupSearchString($row['liesin_name']);
             $this->searchClient->setLiesIn($within);
-        }*/
+        }
 
         /** @var GeoJsonResponse $histographResponse */
         $histographResponse = $this->searchClient->search($originalName);
@@ -65,7 +63,7 @@ class GeocoderService
 
             $features = $histographResponse
                 // fetch only results of a certain type:
-                ->setPitSourceFilter(array($fieldMapping['hg_dataset']))
+                ->setPitSourceFilter(array($dataset['hg_dataset']))
                 ->getFilteredResponse();
 
             return $features;

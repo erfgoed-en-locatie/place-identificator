@@ -299,8 +299,7 @@ class DataSetControllerProvider implements ControllerProviderInterface
 
         $recs = $app['dataset_service']->fetchRec($recid);
 
-        $fieldMapping = $app['dataset_service']->getFieldMappingForDataset($id);
-        $possibilities = $app['geocoder_service']->fetchFeaturesForNamesWithMultipleHits($recs[0], $fieldMapping);
+        $possibilities = $app['geocoder_service']->fetchFeaturesForNamesWithMultipleHits($recs[0], $dataset);
 
         return $app['twig']->render('datasets/multiple.twig', array(
             'dataset'       => $dataset,
