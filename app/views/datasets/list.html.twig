@@ -42,11 +42,11 @@
                                 {#<a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="Details van deze set"><i class="fa fa-search-plus"></i> </a>#}
                                 <a href="{{ path('import-editcsv', {'id': set.id }) }}" title="Wijzig de csv configuratie" class="btn btn-xs btn-default"><i class="fa fa-pencil-square-o"></i> </a>
                                 <a href="{{ path('import-mapcsv', {'id': set.id }) }}" title="Wijzig de standaardisatie opties" class="btn btn-xs btn-success"><i class="fa fa-pencil"></i> </a>
-                                <a href="{{ path('standardize-test', {'id': set.id }) }}" title="Test de instellingen met 20 records" class="btn btn-xs btn-primary"> test </a>
+                                <a href="{{ path('standardize-test', {'id': set.id }) }}" title="Test de instellingen met 20 records" class="btn btn-xs btn-primary"> test </a><a href="{{ path('standardize', {'id': set.id }) }}" class="btn btn-xs btn-warning" title="Standaardiseer opnieuw">standaardiseer </a>
                                 <a href="{{ path('dataset-standardized', {'id': set.id }) }}" class="btn btn-xs btn-info" title="Bekijk de resultaten van de standaardisatie">resultaten! </a>
                                 </div>
                                 <div class="btn-group action pull-right">
-                                <a href="{{ path('dataset-clear', {'id': set.id }) }}" class="btn btn-xs btn-warning" title="Verwijder data van eerdere standaardisaties en begin opnieuw">opnieuw </a>
+                                <a href="{{ path('dataset-clear', {'id': set.id }) }}" class="btn btn-xs btn-danger" title="Verwijder data van eerdere standaardisaties en begin opnieuw">maak leeg </a>
                                 <a href="{{ path('dataset-delete', {'id': set.id }) }}" title="Verwijder de gehele dataset" class="btn btn-xs btn-danger delete"><i class="fa fa-trash"></i> </a>
                                 </div>
                             </td>

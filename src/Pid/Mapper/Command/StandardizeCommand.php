@@ -81,7 +81,7 @@ class StandardizeCommand extends Command
             /** @var DatasetService $dataService */
             $dataService = $app['dataset_service'];
             // fetching by rowId to prevent accidental fetching of Same Place, liesIn somewhere else
-            $record = $dataService->fetchRecordByRowId($rowId);
+            $record = $dataService->fetchRecordByRowId($rowId, $dataset['id']);
 
             // add db data to th csv file to Write
             array_push($row, $record['hg_id']);

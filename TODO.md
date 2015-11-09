@@ -1,8 +1,11 @@
 # TODO for the rewrite
 
+- ALL update queries should of course be PER DATASET!!
 
+
+- setRecordAsUnmappable should also handle liesIn
 - save standardized query, with or without liesIn Where!
-- svae the query in the db
+- svae the q= query in the db!
 
 - final rewrite:
     - on loading the dataset, see if it is a valid one

@@ -103,22 +103,12 @@ class DatasetService
         return $stmt->fetchAll();
     }
 
-    public function fetchRecordByName($name)
+    public function fetchRecordByRowId($rowId, $datasetId)
     {
-        $sql = 'SELECT * FROM records WHERE original_name = :name';
+        $sql = 'SELECT * FROM records WHERE row_id = :row AND dataset_id = :id';
         $params = array(
-            'name' => $name
-        );
-        $stmt = $this->db->executeQuery($sql, $params);
-
-        return $stmt->fetch();
-    }
-
-    public function fetchRecordByRowId($rowId)
-    {
-        $sql = 'SELECT * FROM records WHERE row_id = :row';
-        $params = array(
-            'row' => $rowId
+            ':row' => $rowId,
+            ':id'  => $datasetId
         );
         $stmt = $this->db->executeQuery($sql, $params);
 
@@ -180,10 +170,17 @@ class DatasetService
         $stored = $stmt->fetch();
 
         // also fetch ids with the same original name, in order to be able to delete the rows in the ajaxy interface
-        $statement = $this->db->executeQuery('SELECT id FROM records WHERE original_name = ?', array($stored['name']));
+        $statement = $this->db->executeQuery(
+            'SELECT id FROM records WHERE original_name = :name AND dataset_id = :id', array(
+            ':name' => $stored['name'],
+            ':id'   => $stored['dataset_id'],
+        ));
         $ids = $statement->fetchAll();
 
-        $this->db->update('records', $data, array('original_name' => $stored['name']));
+        $this->db->update('records', $data, array(
+            'original_name' => $stored['name'],
+            'dataset_id'    => $statement['dataset_id']
+        ));
 
         return $ids;
     }
@@ -230,8 +227,12 @@ class DatasetService
             }
             $data['status'] = Status::UNMAPPED;
 
+            // Todo pdr; potential problem here cause not all records get stored this way
             if (!empty($data['original_name'])) {
-                $this->storeRecord($data);
+                $date = new \DateTime('now');
+                $data['created_on'] = $date->format('Y-m-d H:i:s');
+
+                $this->db->insert('records', $data);
             }
         }
 
@@ -251,7 +252,7 @@ class DatasetService
           WHERE dataset_id = :id AND (status != :status1 AND status != :status2 AND status != :status3)
           ';
         $params = array(
-            ':id'     => (int) $datasetId,
+            ':id'      => (int)$datasetId,
             ':status1' => Status::MAPPED_EXACT,
             ':status2' => Status::MAPPED_MANUALLY,
             ':status3' => Status::UNMAPPABLE,
@@ -259,6 +260,7 @@ class DatasetService
 
         //print str_replace(array_keys($params), array_values($params), $sql);
         $stmt = $this->db->executeQuery($sql, $params);
+
         return $stmt->fetchAll();
     }
 
@@ -309,19 +311,6 @@ class DatasetService
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Store a standardized record
-     *
-     * @param array $data
-     * @return int
-     */
-    public function storeRecord($data)
-    {
-        $date = new \DateTime('now');
-        $data['created_on'] = $date->format('Y-m-d H:i:s');
-
-        return $this->db->insert('records', $data);
-    }
 
     /**
      * Save the manually mapped record
@@ -357,7 +346,10 @@ class DatasetService
         $statement = $this->db->executeQuery('SELECT id FROM records WHERE original_name = ?', array($stored['name']));
         $ids = $statement->fetchAll();
 
-        $this->db->update('records', $data, array('original_name' => $stored['name']));
+        $this->db->update('records', $data, array(
+            'original_name' => $stored['name'],
+            'dataset_id'    => $stored['dataset_id'],
+        ));
 
         return $ids;
     }
@@ -401,14 +393,15 @@ class DatasetService
         if (strlen($data['liesin_name']) > 0) {
             $this->db->update('records', $data, array(
                 'original_name' => $data['original_name'],
-                'liesin_name' => $data['liesin_name']
+                'liesin_name'   => $data['liesin_name'],
+                'dataset_id'    => $data['dataset_id']
             ));
         } else {
             $this->db->update('records', $data, array(
-                'original_name' => $data['original_name']
+                'original_name' => $data['original_name'],
+                'dataset_id'    => $data['dataset_id']
             ));
         }
     }
-
 
 }
