@@ -297,7 +297,7 @@ class ImportControllerProvider implements ControllerProviderInterface
                 $data = $form->getData();
 
                 // save the mapping
-                if ($app['dataset_service']->storeFieldMapping($data)) { // ok
+                if ($dataset = $app['dataset_service']->updateDataset($data)) { // ok
 
                     // also copy the records to db
                     $app['dataset_service']->copyRecordsFromCsv($dataset);

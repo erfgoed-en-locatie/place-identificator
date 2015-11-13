@@ -189,17 +189,19 @@ class DatasetService
      * Store the provided mapping for the csv
      *
      * @param array $data
-     * @return int
+     * @return array The updated set
      */
-    public function storeFieldMapping($data)
+    public function updateDataset($data)
     {
         $date = new \DateTime('now');
         $data['updated_on'] = $date->format('Y-m-d H:i:s');
         $data['status'] = DatasetStatus::STATUS_FIELDS_MAPPED;
 
-        return $this->db->update('datasets', $data, array(
+        $this->db->update('datasets', $data, array(
             'id' => $data['id']
         ));
+
+        return $this->fetchDataset($data['id']);
     }
 
     /**
