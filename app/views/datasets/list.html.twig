@@ -6,9 +6,9 @@
 
             <h1>Mijn datasets</h1>
 
-            {%  if datasets is empty %}
+            {% if datasets is empty %}
                 <p>Er zijn (nog) geen datasets.</p>
-            {% else  %}
+            {% else %}
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
                     <tr>
@@ -19,14 +19,17 @@
                         <th>Aangemaakt</th>
                         <th>Status</th>
                         <th>Opties</th>
+                        <th></th>
                     </tr>
                     </thead>
+
                     <tbody>
                     {% for set in datasets %}
                         <tr>
                             <td>{{ set.id }}</td>
                             <td>{{ set.name }}</td>
-                            <td><a title="Bekijk het csv-bestand" href="{{ path('file-view-csv', {'id': set.id}) }}">{{ set.original_name }}</a></td>
+                            <td><a title="Bekijk het csv-bestand"
+                                   href="{{ path('file-view-csv', {'id': set.id}) }}">{{ set.original_name }}</a></td>
                             <td>{{ set.email }}</td>
                             <td>{{ set.created_on|date('d-m-Y') }}</td>
                             <td>
@@ -39,15 +42,30 @@
                             </td>
                             <td>
                                 <div class="btn-group action">
-                                {#<a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="Details van deze set"><i class="fa fa-search-plus"></i> </a>#}
-                                <a href="{{ path('import-editcsv', {'id': set.id }) }}" title="Wijzig de csv configuratie" class="btn btn-xs btn-default"><i class="fa fa-pencil-square-o"></i> </a>
-                                <a href="{{ path('import-mapcsv', {'id': set.id }) }}" title="Wijzig de standaardisatie opties" class="btn btn-xs btn-success"><i class="fa fa-pencil"></i> </a>
-                                <a href="{{ path('standardize-test', {'id': set.id }) }}" title="Test de instellingen met 20 records" class="btn btn-xs btn-primary"> test </a><a href="{{ path('standardize', {'id': set.id }) }}" class="btn btn-xs btn-warning" title="Standaardiseer opnieuw">standaardiseer </a>
-                                <a href="{{ path('dataset-standardized', {'id': set.id }) }}" class="btn btn-xs btn-info" title="Bekijk de resultaten van de standaardisatie">resultaten! </a>
+                                    {#<a href="{{ path('datasets-show', {'id': set.id }) }}" class="btn btn-xs btn-success" title="Details van deze set"><i class="fa fa-search-plus"></i> </a>#}
+                                    <a href="{{ path('import-editcsv', {'id': set.id }) }}"
+                                       title="Wijzig de csv configuratie" class="btn btn-xs btn-default"><i
+                                                class="fa fa-pencil-square-o"></i> </a>
+                                    <a href="{{ path('import-mapcsv', {'id': set.id }) }}"
+                                       title="Wijzig de standaardisatie opties" class="btn btn-xs btn-success"><i
+                                                class="fa fa-pencil"></i> </a>
+                                    <a href="{{ path('standardize-test', {'id': set.id }) }}"
+                                       title="Test de instellingen met 20 records" class="btn btn-xs btn-primary">
+                                        test </a><a href="{{ path('standardize', {'id': set.id }) }}"
+                                                    class="btn btn-xs btn-warning" title="Standaardiseer opnieuw">standaardiseer </a>
+                                    <a href="{{ path('dataset-standardized', {'id': set.id }) }}"
+                                       class="btn btn-xs btn-info" title="Bekijk de resultaten van de standaardisatie">resultaten! </a>
                                 </div>
-                                <div class="btn-group action pull-right">
-                                <a href="{{ path('dataset-clear', {'id': set.id }) }}" class="btn btn-xs btn-danger" title="Verwijder data van eerdere standaardisaties en begin opnieuw">maak leeg </a>
-                                <a href="{{ path('dataset-delete', {'id': set.id }) }}" title="Verwijder de gehele dataset" class="btn btn-xs btn-danger delete"><i class="fa fa-trash"></i> </a>
+                            </td>
+                            <td>
+                                <div class="pull-right">
+                                    <a href="{{ path('dataset-clear', {'id': set.id }) }}"
+                                       class="btn btn-xs btn-danger"
+                                       title="Verwijder data van eerdere standaardisaties en begin opnieuw">maak
+                                        leeg </a>
+                                    <a href="{{ path('dataset-delete', {'id': set.id }) }}"
+                                       title="Verwijder de gehele dataset" class="btn btn-xs btn-danger delete"><i
+                                                class="fa fa-trash"></i> </a>
                                 </div>
                             </td>
                         </tr>
@@ -60,18 +78,18 @@
         </div>
     </div>
 
-<script type="text/javascript">
-    jQuery(function () {
+    <script type="text/javascript">
+        jQuery(function () {
 
-        $('.delete').on('click', function(e) {
-            if(confirm('Let op! De dataset en ALLE gestandaardiseerde namen worden verwijderd...')){
-                // The user pressed OK
-            } else {
-                e.preventDefault();
-            }
+            $('.delete').on('click', function (e) {
+                if (confirm('Let op! De dataset en ALLE gestandaardiseerde namen worden verwijderd...')) {
+                    // The user pressed OK
+                } else {
+                    e.preventDefault();
+                }
+            });
+
         });
-
-    });
-</script>
+    </script>
 
 {% endblock %}
