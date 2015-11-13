@@ -209,7 +209,7 @@ class GeocoderService
                     $data['liesin_name'] = $within;
                     $data['dataset_id'] = $dataset['id'];
                     $data['hg_dataset'] = $dataset['hg_dataset'];
-                    $this->datasetService->updateRecord($data);
+                    $this->datasetService->storeStandardizedRecord($data);
                 } else {
                     $data['original_name'] = $originalName;
                     $data['liesin_name'] = $within;
@@ -217,7 +217,7 @@ class GeocoderService
                     $data['hg_dataset'] = $dataset['hg_dataset'];
                     $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
                     $data['hits'] = 0;
-                    $this->datasetService->updateRecord($data);
+                    $this->datasetService->storeStandardizedRecord($data);
                 }
             } else {
                 $data['original_name'] = $originalName;
@@ -226,7 +226,7 @@ class GeocoderService
                 $data['hg_dataset'] = $dataset['hg_dataset'];
                 $data['status'] = Status::MAPPED_EXACT_NOT_FOUND;
                 $data['hits'] = 0;
-                $this->datasetService->updateRecord($data);
+                $this->datasetService->storeStandardizedRecord($data);
             }
         }
 

@@ -15,7 +15,7 @@
                         <th>#</th>
                         <th>Naam</th>
                         <th>Dataset</th>
-                        <th>Gebruiker</th>
+                        <th>Ongestandaardiseerd</th>
                         <th>Aangemaakt</th>
                         <th>Status</th>
                         <th>Opties</th>
@@ -30,7 +30,7 @@
                             <td>{{ set.name }}</td>
                             <td><a title="Bekijk het csv-bestand"
                                    href="{{ path('file-view-csv', {'id': set.id}) }}">{{ set.original_name }}</a></td>
-                            <td>{{ set.email }}</td>
+                            <td>{{ set.countToStandardize }}</td>
                             <td>{{ set.created_on|date('d-m-Y') }}</td>
                             <td>
                                 {% if set.status == 2 %}

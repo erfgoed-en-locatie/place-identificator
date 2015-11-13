@@ -90,7 +90,14 @@ class DataSetControllerProvider implements ControllerProviderInterface
             \PDO::FETCH_ASSOC
         );
 
-        return $app['twig']->render('datasets/list.html.twig', array('datasets' => $datasets));
+        foreach($datasets as &$dataset) {
+            $dataset['countToStandardize'] = $app['dataset_service']->fetchCountForDatasetWithStatus($dataset['id'],
+                array(Status::UNMAPPED));
+        }
+
+        return $app['twig']->render('datasets/list.html.twig', array(
+            'datasets' => $datasets)
+        );
     }
 
     /**

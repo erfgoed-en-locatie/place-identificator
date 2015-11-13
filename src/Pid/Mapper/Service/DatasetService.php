@@ -251,7 +251,8 @@ class DatasetService
     public function fetchRecordsToStandardize($datasetId)
     {
         $sql = 'SELECT * FROM records
-          WHERE dataset_id = :id AND (status != :status1 AND status != :status2 AND status != :status3)
+          WHERE dataset_id = :id
+          AND (status != :status1 AND status != :status2 AND status != :status3)
           ';
         $params = array(
             ':id'      => (int)$datasetId,
@@ -380,17 +381,24 @@ class DatasetService
     public function storeGeocodedRecords($data)
     {
         foreach ($data as $row) {
-            $this->updateRecord($row);
+            $this->storeStandardizedRecord($row);
         }
 
         return true;
     }
 
-    public function updateRecord($data)
+    /**
+     * Store the standardized record(s)
+     * Will now update all records with the same original name (and / or liesIn)
+     *
+     * @param $data
+     */
+    public function storeStandardizedRecord($data, $liesIn = null)
     {
         $date = new \DateTime('now');
         $data['updated_on'] = $date->format('Y-m-d H:i:s');
 
+        // todo add liesIn to where, if needed
         // if search was with liesIn, the update should be more specific
         if (strlen($data['liesin_name']) > 0) {
             $this->db->update('records', $data, array(

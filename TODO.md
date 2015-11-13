@@ -1,8 +1,14 @@
 # TODO for the rewrite
 
 - ALL update queries should of course be PER DATASET!!
+- use DISTINCT queries for fetchRecordsToStandardize (with and without liesIn)
+so we don't update all rows per cached item again and again....
+ OR skipt the update result table when a record was found in the cache
+
+- show count of rows to standardze on list page
 
 - clear all datasets online!
+
 
 - setRecordAsUnmappable should also handle liesIn
 - save standardized query, with or without liesIn Where!
