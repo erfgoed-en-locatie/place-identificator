@@ -5,7 +5,7 @@
 
 - setRecordAsUnmappable should also handle liesIn
 - save standardized query, with or without liesIn Where!
-- svae the q= query in the db!
+- save the q= query in the db!
 
 - final rewrite:
     - on loading the dataset, see if it is a valid one
