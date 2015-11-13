@@ -22,6 +22,7 @@ $app->mount('/import', new \Pid\Mapper\Provider\ImportControllerProvider());
 $app->mount('/standardize', new \Pid\Mapper\Provider\StandardizeControllerProvider());
 $app->mount('/api', new \Pid\Mapper\Provider\ApiControllerProvider());
 $app->mount('/file', new \Pid\Mapper\Provider\FileControllerProvider());
+$app->mount('/crowd', new \Pid\Mapper\Provider\CrowdControllerProvider());
 
 // Mount the user controller routes:
 $app->mount('/user', $simpleUserProvider);

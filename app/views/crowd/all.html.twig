@@ -1,0 +1,15 @@
+{% extends "layout.html.twig" %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Door de crowd gemapte locaties</h1>
+            <p>Bekijk alle data die door gebruikers van de diverse datasets is ingevoerd</p>
+
+            {{ table|raw }}
+        </div>
+
+    </div>
+
+{% endblock %}
