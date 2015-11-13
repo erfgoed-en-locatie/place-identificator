@@ -34,7 +34,7 @@ $app->error(function (\Exception $e, $code) use ($app) {
             $message = $app['twig']->render('404.html.twig');
             break;
         default:
-            $message = 'We are sorry, but something went terribly wrong.';
+            $message = 'Oops sorry, but something went wrong.';
     }
 
     if ($app['debug']) {
