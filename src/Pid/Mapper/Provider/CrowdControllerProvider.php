@@ -43,7 +43,10 @@ class CrowdControllerProvider implements ControllerProviderInterface
 
         $records = $stmt->fetchAll();
 
-        $table = htmlTable::createTable($records, 'ding', 'table table-striped table-bordered table-hover');
+        $table = null;
+        if (count($records) > 0) {
+            $table = htmlTable::createTable($records, 'ding', 'table table-striped table-bordered table-hover');
+        }
         return $app['twig']->render('crowd/all.html.twig', array(
             'table'   => $table
 

@@ -2,6 +2,7 @@
 
 - ALL update queries should of course be PER DATASET!!
 
+- clear all datasets online!
 
 - setRecordAsUnmappable should also handle liesIn
 - save standardized query, with or without liesIn Where!
@@ -15,7 +16,3 @@
 
 - this also makes it possible to do less precise searches ....
 
-
-- create page for displaying manually mapped crowd source data
-
-- batches?
