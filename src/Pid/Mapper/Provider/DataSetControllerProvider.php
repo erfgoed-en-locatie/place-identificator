@@ -101,28 +101,6 @@ class DataSetControllerProvider implements ControllerProviderInterface
     }
 
     /**
-     * List only active datasets
-     *
-     * @param Application $app
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function showActive(Application $app)
-    {
-        /** @var \Doctrine\DBAL\Connection $db */
-        $db = $app['db'];
-
-        $stmt = $db->prepare("
-          SELECT d.*, u.email
-          FROM datasets d
-          LEFT JOIN user u ON u.id = d.user_id
-          where status != :status");
-        $stmt->execute(array('status' => DatasetStatus::STATUS_FINISHED));
-        $datasets = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        return $app['twig']->render('datasets/list.html.twig', array('datasets' => $datasets));
-    }
-
-    /**
      *
      * @param Application $app
      * @param $id

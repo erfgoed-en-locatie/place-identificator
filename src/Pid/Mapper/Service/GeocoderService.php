@@ -201,7 +201,8 @@ class GeocoderService
                 if ($hits == 1) {
                     $data = $this->transformPiTs2Rows($originalName, $dataset, $features, $within);
 
-                    $this->datasetService->storeGeocodedRecords($data);
+                    //$this->datasetService->storeGeocodedRecords($data);
+                    $this->datasetService->storeStandardizedRecord($data[0]);
                 } elseif ($hits > 1) {
                     $data['hits'] =  $hits;
                     $data['status'] = Status::MAPPED_EXACT_MULTIPLE;

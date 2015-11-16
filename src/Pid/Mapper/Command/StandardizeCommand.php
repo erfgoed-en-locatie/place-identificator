@@ -129,7 +129,12 @@ class StandardizeCommand extends Command
         $dataService = $app['dataset_service'];
 
         $dataset = $dataService->fetchDataset($datasetId);
-        $rows = $dataService->fetchRecordsToStandardize($datasetId);
+        $liesIn = false;
+        if (strlen($dataset['liesin_column']) > 0) {
+            $liesIn = true;
+        }
+
+        $rows = $dataService->fetchRecordsToStandardize($datasetId, $liesIn);
 
         $app['monolog']->addInfo('Found ' . count($rows) . ' locations to process.');
 

@@ -179,7 +179,7 @@ class DatasetService
 
         $this->db->update('records', $data, array(
             'original_name' => $stored['name'],
-            'dataset_id'    => $statement['dataset_id']
+            'dataset_id'    => $stored['dataset_id']
         ));
 
         return $ids;
@@ -242,18 +242,29 @@ class DatasetService
     }
 
     /**
-     * Fetches all records that have not been standardized already
+     * Fetches all DISTINCT records that have not been standardized already
+     * If liesIn is set, will use the combination of place and liesin to differentiate
      *
      * @param $datasetId
+     * @param bool $liesIn
      * @return array
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function fetchRecordsToStandardize($datasetId)
+    public function fetchRecordsToStandardize($datasetId, $liesIn = false)
     {
-        $sql = 'SELECT * FROM records
-          WHERE dataset_id = :id
-          AND (status != :status1 AND status != :status2 AND status != :status3)
+        if ($liesIn) {
+            $sql = "SELECT DISTINCT(CONCAT(original_name, ', ', liesin_name)), original_name, liesin_name
+          FROM records r
+          WHERE r.dataset_id = :id
+          AND (r.status != :status1 AND r.status != :status2 AND r.status != :status3)
+          ";
+        } else {
+            $sql = 'SELECT DISTINCT(original_name)
+            FROM records r
+            WHERE r.dataset_id = :id
+            AND (r.status != :status1 AND r.status != :status2 AND r.status != :status3)
           ';
+        }
         $params = array(
             ':id'      => (int)$datasetId,
             ':status1' => Status::MAPPED_EXACT,
