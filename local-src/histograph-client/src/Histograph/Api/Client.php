@@ -2,6 +2,7 @@
 
 namespace Histograph\Api;
 
+
 use Monolog\Logger;
 use GuzzleHttp\Client as GuzzleClient;
 
@@ -33,11 +34,12 @@ class Client extends GuzzleClient
      */
     public function __construct($config = array(), Logger $logger = null)
     {
-        $settings =[
+        $settings = [
             'defaults' => [
-                'timeout' => self::API_TIMEOUT,
+                'timeout'         => self::API_TIMEOUT,
                 'connect_timeout' => self::API_CONNECT_TIMEOUT,
-                'allow_redirects' => false
+                'allow_redirects' => false,
+                'verify'          => false
             ]
         ];
 
@@ -73,6 +75,7 @@ class Client extends GuzzleClient
 
     /**
      * Clean up the search string
+     *
      * @param $name
      * @return string
      */
