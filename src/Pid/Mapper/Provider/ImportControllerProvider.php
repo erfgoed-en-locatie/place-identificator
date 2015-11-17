@@ -257,8 +257,8 @@ class ImportControllerProvider implements ControllerProviderInterface
                 'attr' => array('class' => 'btn btn-primary'),
             ))
             ->add('mapall', 'submit', array(
-                'label' => 'bewaar en standaardiseer alle records',
-                'attr' => array('class' => 'btn btn-danger'),
+                'label' => 'bewaar en standaardiseer',
+                'attr' => array('class' => 'btn btn-primary'),
             ))
 
             ->getForm();
