@@ -3,21 +3,21 @@
 {% block content %}
     <div class="row">
         <div class="col-md-12 jumbotron">
-            <h1>Plaatsnamen standaardiseren</h1>
+            <h1>Toponiemen standaardiseren</h1>
             <div class="row">
                 <div class="col-md-6">
                     <ul>
-                        <li>Standaardiseert (historische) plaatsnamen batchgewijs</li>
-                        <li>Zoekt Geonames, Getty Thesaurus of Geographic Names en Gemeentegeschiedenis URI's</li>
-                        <li>Geeft coördinaten</li>
-                        <li>Kent alle voormalige gemeentes</li>
-                        <li>Gebruikt de Histograph API</li>
-                        <li>Maakt bewerken en verfijnen data mogelijk</li>
+                        <li>Standaardiseer plaatsen naar GeoNames of TGN</li>
+                        <li>Standaardiseer gemeentes naar Gemeentegeschiedenis of GeoNames</li>
+                        <li>Standaardiseer straten naar Nationaal Wegenbestand of BAG</li>
+                        <li>Standaardiseer adressen en gebouwen naar BAG</li>
+                        <li>Vind geometrieën</li>
+                        <li>Help mee de Geocoder beter te maken</li>
                     </ul>
                     
                 </div>
                 <div class="col-md-6">
-                    <a href="{{ path('dataset-upload-form') }}" class="btn btn-primary">Plaatsnamenlijst<br /> uploaden</a>
+                    <a href="{{ path('dataset-upload-form') }}" class="btn btn-primary">CSV met namen<br /> uploaden</a>
                     
                 </div>
             </div>
@@ -29,8 +29,8 @@
             <h2>Waarom standaardiseren?</h2>
 
             <ul>
-                <li>Benoem plaatsen op een eenduidige manier</li>
-                <li>Koppel makkelijker met data elders</li>
+                <li>Benoem toponiemen op een eenduidige manier</li>
+                <li>Maak Linked Data mogelijk</li>
                 <li>Haal eenvoudig meer informatie over een plaats op (coördinaten, alternatieve namen, etc.)</li>
             </ul>
         </div>
@@ -39,21 +39,22 @@
             <h2>Hoe werkt het?</h2>
 
             <ul>
-                <li>Stap 1: maak een csv-bestand met de te standaardiseren plaatsnamen</li>
-                <li>Stap 2: upload het bestand en geef aan welk veld de plaatsnamen bevat, of gezocht moet worden naar gemeentes, plaatsen of beide, etc.</li>
+                <li>Stap 1: maak een csv-bestand met de te standaardiseren plaatsaanduidingen</li>
+                <li>Stap 2: upload het bestand en geef aan welke velden welke informatie bevatten</li>
                 <li>Stap 3: laat de tool standaardiseren</li>
-                <li>Stap 4: bekijk en bewerk de resultaten (verwijder onterechte koppelingen, maak keuzes uit meerdere mogelijkheden, voer handmatig koppelingen in)</li>
+                <li>Stap 4: bekijk en bewerk de resultaten</li>
+                <li>Stap 5: download de verrijkte csv</li>
             </ul> 
 
             <p>
         </div>
 
         <div class="col-md-4">
-            <h2>Let op: tool in ontwikkeling</h2>
+            <h2>Meer weten?</h2>
 
             <ul>
-                <li>Zowel deze tool, api en data bevinden zich nog in een pril stadium</li>
-                <li>Er vinden regelmatig updates plaats en de service kan tijdelijk uit de lucht zijn.</li>
+                <li>Lees de handleiding op ErfGeo.nl</li>
+                <li>Andere manieren om te standaardiseren</li>
                 <li>Suggesties? Bugs? Mail ons via erfgoedenlocatie@den.nl</li>
             </ul> 
         </div>
