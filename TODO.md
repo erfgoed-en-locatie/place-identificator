@@ -1,9 +1,22 @@
 # TODO for the rewrite
 
 - ALL update queries should of course be PER DATASET!!
-- use DISTINCT queries for fetchRecordsToStandardize (with and without liesIn)
-so we don't update all rows per cached item again and again....
- OR skip the update result table when a record was found in the cache
++ use DISTINCT queries for fetchRecordsToStandardize (with and without liesIn)
+
+- setRecordAsUnmappable should also handle liesIn, number count for doing this on no-results page is still wrong
+- I would like to have a field to do an easy search on a different name on the no-results page that just calls the api for one term:
+    and with all the dataset liesIn etch taken into account so when the term was "Amisvoirt" I can map still it
+
+- we need a button that displays the row_id form the csv with all the data in it in some sort of a popu or something.
+
+
+
+
+- need to catch the error for standardiz when no csv-records could be found!
+- need to find a way to read CR newLines (windows)
+
+
+
 
 ## DEPLOYMENT
 
@@ -12,7 +25,7 @@ so we don't update all rows per cached item again and again....
 
 
 
-- setRecordAsUnmappable should also handle liesIn
+
 - save standardized query, with or without liesIn Where!
 - save the q= query in the db!
 

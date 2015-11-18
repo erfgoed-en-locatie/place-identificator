@@ -3,6 +3,7 @@
 
 namespace Pid\Mapper\Provider;
 
+
 use Pid\Mapper\Model\DatasetStatus;
 use Pid\Mapper\Service\DatasetService;
 use Pid\Mapper\Service\GeocoderService;
@@ -54,28 +55,28 @@ class ImportControllerProvider implements ControllerProviderInterface
         $form = $app['form.factory']
             ->createBuilder('form', $data)
             ->add('name', 'text', array(
-                'label' => 'Geef uw dataset een herkenbare naam',
-                'required' => true,
+                'label'       => 'Geef uw dataset een herkenbare naam',
+                'required'    => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
                     new Assert\Regex(array(
-                        'pattern' => '/^[a-z0-9-\s]+$/i',
+                        'pattern'     => '/^[a-z0-9-\s]+$/i',
                         'htmlPattern' => '^[a-z0-9-\s]+$',
-                        'match' => true,
-                        'message' => 'Voer alleen letters of cijfers in',
+                        'match'       => true,
+                        'message'     => 'Voer alleen letters of cijfers in',
                     )),
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
             ->add('delimiter', 'text', array(
-                'label' => 'Wat is het scheidingsteken van de kolommen in uw dataset?',
-                'required' => false,
+                'label'       => 'Wat is het scheidingsteken van de kolommen in uw dataset?',
+                'required'    => false,
                 'constraints' => array(
                     new Assert\Length(array('min' => 1, 'max' => 2))
                 ),
-                'attr' => array(
+                'attr'        => array(
                     'placeholder' => 'bv , of ; ',
-                    'class'     => 'narrow'
+                    'class'       => 'narrow'
                 )
             ))
             /*->add('enclosure_character', 'text', array(
@@ -99,20 +100,20 @@ class ImportControllerProvider implements ControllerProviderInterface
                 )
             ))*/
             ->add('skip_first_row', 'choice', array(
-                'label' => 'Bevat de eerste rij de kolomnamen?',
-                'required' => true,
-                'choices' => array(1 => 'Ja', 0 => 'Nee'),
+                'label'       => 'Bevat de eerste rij de kolomnamen?',
+                'required'    => true,
+                'choices'     => array(1 => 'Ja', 0 => 'Nee'),
                 'constraints' => array(
                     new Assert\Type('integer')
                 )
             ))
             ->add('csvFile', 'file', array(
-                'label' => 'Kies een csv-bestand op uw computer',
-                'required' => true,
+                'label'       => 'Kies een csv-bestand op uw computer',
+                'required'    => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
                     new Assert\File(array(
-                        'maxSize' => '40M',
+                        'maxSize'   => '40M',
                         'mimeTypes' => array('text/csv', 'text/plain'),
                     )),
                     new Assert\Type('file')
@@ -161,13 +162,14 @@ class ImportControllerProvider implements ControllerProviderInterface
             /** @var \Doctrine\DBAL\Connection $db */
             $db = $app['db'];
             $db->insert('datasets', array(
-                'name' => $data['name'],
+                'name'           => $data['name'],
                 'skip_first_row' => $data['skip_first_row'],
-                'filename' => $filename,
-                'original_name' => $originalName,
-                'created_on' => $date->format('Y-m-d H:i:s'),
-                'status' => DatasetStatus::STATUS_NEW,
-                'user_id' => (int)$app['user']->getId()
+                'delimiter'      => $data['delimiter'],
+                'filename'       => $filename,
+                'original_name'  => $originalName,
+                'created_on'     => $date->format('Y-m-d H:i:s'),
+                'status'         => DatasetStatus::STATUS_NEW,
+                'user_id'        => (int)$app['user']->getId()
             ));
             $datasetId = $db->lastInsertId();
             if (!$datasetId) {
@@ -194,73 +196,72 @@ class ImportControllerProvider implements ControllerProviderInterface
      */
     private function getFieldMapForm(Application $app, $fieldChoices, $mapping = false)
     {
-       /* if (!$mapping) {
-            $mapping = array(
-                'geometry' => false,
-            );
-        }*/
+        /* if (!$mapping) {
+             $mapping = array(
+                 'geometry' => false,
+             );
+         }*/
 
         /** @var FormFactory $form */
         $form = $app['form.factory']
             ->createBuilder('form', $mapping)
             ->add('placename_column', 'choice', array(
-                'label' => 'Toponiem in veld ',
-                'choices' => $fieldChoices,
+                'label'       => 'Toponiem in veld ',
+                'choices'     => $fieldChoices,
                 'empty_value' => 'selecteer een veld',
-                'required' => true,
+                'required'    => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
             ->add('liesin_column', 'choice', array(
-                'label' => 'Dit toponiem ligt in ...(provincie, plaats, etc.)',
-                'required' => false,
-                'choices' => $fieldChoices,
+                'label'       => 'Dit toponiem ligt in ...(provincie, plaats, etc.)',
+                'required'    => false,
+                'choices'     => $fieldChoices,
                 'empty_value' => 'selecteer een veld',
                 'constraints' => array(
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
             ->add('hg_type', 'choice', array(
-                'label' => 'Dit toponiem is van het type ',
-                'required' => true,
-                'choices' => PitTypes::getTypes(),
+                'label'       => 'Dit toponiem is van het type ',
+                'required'    => true,
+                'choices'     => PitTypes::getTypes(),
                 'empty_value' => 'selecteer een veld',
                 'constraints' => array(
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
             ->add('hg_dataset', 'choice', array(
-                'label' => 'Standaardiseer naar ',
-                'required' => true,
-                'choices' => Sources::getTypes(),
+                'label'       => 'Standaardiseer naar ',
+                'required'    => true,
+                'choices'     => Sources::getTypes(),
                 'empty_value' => 'kies standaard',
                 'constraints' => array(
                     new Assert\Length(array('min' => 1, 'max' => 123))
                 )
             ))
             ->add('geometry', 'choice', array(
-                'label' => 'Geïnteresseerd in de geometrie?',
-                'required' => true,
-                'choices' => array(1 => 'Ja', 0 => 'Nee'),
+                'label'       => 'Geïnteresseerd in de geometrie?',
+                'required'    => true,
+                'choices'     => array(1 => 'Ja', 0 => 'Nee'),
                 'constraints' => array(
                     new Assert\Type('integer')
                 )
             ))
             ->add('save', 'submit', array(
                 'label' => 'bewaar deze instellingen',
-                'attr' => array('class' => 'btn btn-success'),
+                'attr'  => array('class' => 'btn btn-success'),
             ))
             ->add('map', 'submit', array(
                 'label' => 'bewaar deze instellingen en test 20 records',
-                'attr' => array('class' => 'btn btn-primary'),
+                'attr'  => array('class' => 'btn btn-primary'),
             ))
             ->add('mapall', 'submit', array(
                 'label' => 'bewaar en standaardiseer',
-                'attr' => array('class' => 'btn btn-primary'),
+                'attr'  => array('class' => 'btn btn-primary'),
             ))
-
             ->getForm();
 
         return $form;
@@ -312,7 +313,8 @@ class ImportControllerProvider implements ControllerProviderInterface
                         return $app->redirect($app['url_generator']->generate('standardize-test', array('id' => $id)));
                     }
                 } else {
-                    $app['session']->getFlashBag()->set('error', 'Sorry maar de instellingen konden niet opgeslagen worden.');
+                    $app['session']->getFlashBag()->set('error',
+                        'Sorry maar de instellingen konden niet opgeslagen worden.');
 
                     return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
                 }
@@ -322,8 +324,8 @@ class ImportControllerProvider implements ControllerProviderInterface
         // form or form errors
         return $app['twig']->render('import/field-mapper.twig', array(
             'columnNames' => $columnNames,
-            'form' => $form->createView(),
-            'dataset' => $dataset
+            'form'        => $form->createView(),
+            'dataset'     => $dataset
         ));
     }
 
@@ -340,6 +342,7 @@ class ImportControllerProvider implements ControllerProviderInterface
         $dataset = $app['dataset_service']->fetchDataset($id, $app['user']->getId());
         if (!$dataset) {
             $app['session']->getFlashBag()->set('alert', 'Sorry maar die dataset bestaat niet.');
+
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
 
@@ -355,10 +358,12 @@ class ImportControllerProvider implements ControllerProviderInterface
                 // save the mapping
                 if ($app['dataset_service']->storeCSVConfig($data)) { // ok
                     $app['session']->getFlashBag()->set('alert', 'De instellingen zijn aangepast en opgeslagen.');
+
                     return $app->redirect($app['url_generator']->generate('datasets-all'));
 
                 } else {
-                    $app['session']->getFlashBag()->set('error', 'Sorry maar de instellingen konden niet opgeslagen worden.');
+                    $app['session']->getFlashBag()->set('error',
+                        'Sorry maar de instellingen konden niet opgeslagen worden.');
 
                     return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
                 }
@@ -367,7 +372,7 @@ class ImportControllerProvider implements ControllerProviderInterface
 
         // form or form errors
         return $app['twig']->render('import/editform.html.twig', array(
-            'form' => $form->createView(),
+            'form'    => $form->createView(),
             'dataset' => $dataset
         ));
     }
