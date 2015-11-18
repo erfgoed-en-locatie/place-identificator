@@ -84,7 +84,9 @@ class DataSetControllerProvider implements ControllerProviderInterface
             SELECT d.*, u.email
             FROM datasets d
             INNER JOIN users u ON u.id = d.user_id
-            WHERE user_id = :user_id");
+            WHERE user_id = :user_id
+            ORDER BY d.id desc
+            ");
         $stmt->execute(array('user_id' => $user->getId()));
         $datasets = $stmt->fetchAll(
             \PDO::FETCH_ASSOC
