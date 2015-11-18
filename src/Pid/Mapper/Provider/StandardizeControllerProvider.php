@@ -57,11 +57,6 @@ class StandardizeControllerProvider implements ControllerProviderInterface
             return $app->redirect($app['url_generator']->generate('datasets-all'));
         }
 
-        // new test action: fetch first x records and save them to a csv file... and display as html
-        /** @var CsvService $csvService */
-        $csvService = $app['csv_service'];
-        $csvRows = $csvService->getRows($dataset, self::NUMBER_TO_TEST);
-
         if (strlen($dataset['placename_column']) < 1) {
             $app['session']->getFlashBag()->set('error',
                 'Sorry maar voor de dataset zijn de standaardisatie opties nog niet ingevuld. Dat moet eerst gedaan worden.');
@@ -69,8 +64,21 @@ class StandardizeControllerProvider implements ControllerProviderInterface
             return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
         }
 
+        // new test action: fetch first x records and save them to a csv file... and display as html
+        /** @var CsvService $csvService */
+        $csvService = $app['csv_service'];
+        $csvRows = $csvService->getRows($dataset, self::NUMBER_TO_TEST);
+        if (count($csvRows) < 1) {
+            $app['session']->getFlashBag()->set('error',
+                'Sorry maar in het csv-bestand konden geen records gevonden worden. Heeft u het correcte scheidingsteken opgegeven? Pas s.v.p. de configuratie aan.');
+
+            return $app->redirect($app['url_generator']->generate('import-mapcsv', array('id' => $id)));
+        }
+
+
         /** @var GeocoderService $geocoder */
         $geocoder = $app['geocoder_service'];
+
 
         try {
             $output = $geocoder->mapTest($csvRows, $dataset);
