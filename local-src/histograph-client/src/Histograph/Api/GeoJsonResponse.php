@@ -131,12 +131,25 @@ class GeoJsonResponse
                             if (in_array($pit->dataset, $this->filters['source']) &&
                                 in_array($pit->type, $this->filters['type'])
                             ) {
+                                // special tgn filter to disregard "/tgn/term"
+                                if (in_array('tgn', $this->filters['source'])) {
+                                    if (strpos($pit->uri, "/tgn/term/")) {
+                                        continue;
+                                    }
+                                }
                                 $filteredPits[] = $pit;
                             }
                         }
                         // or just one
                         elseif ($this->filters['source'] && !$this->filters['type']) {
                             if (in_array($pit->dataset, $this->filters['source'])) {
+
+                                // special tgn filter to disregard "/tgn/term"
+                                if (in_array('tgn', $this->filters['source'])) {
+                                    if (strpos($pit->uri, "/tgn/term/")) {
+                                        continue;
+                                    }
+                                }
                                 $filteredPits[] = $pit;
                             }
                         }
