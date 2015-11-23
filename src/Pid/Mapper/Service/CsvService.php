@@ -6,8 +6,6 @@ namespace Pid\Mapper\Service;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use SplTempFileObject;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 
 
 /**
@@ -45,7 +43,15 @@ class CsvService
     {
         $file = $this->uploadDir . DIRECTORY_SEPARATOR . $dataset['filename'];
 
-        $csv = Reader::createFromPath($file);
+        $fileContent = file_get_contents($file);
+        // fix for weird CR characters that some people seem to use:
+        if (strpos($fileContent, "\r")) {
+            $converted = preg_replace('~\r\n?~', "\n", $fileContent);
+            $csv = Reader::createFromString($converted);
+        } else {
+            $csv = Reader::createFromString($fileContent);
+        }
+
         if (0 < mb_strlen($dataset['delimiter'])) {
             $csv->setDelimiter($dataset['delimiter']);
         } else {
@@ -95,6 +101,12 @@ class CsvService
         return $csvRows;
     }
 
+    /**
+     * Write a test file
+     *
+     * @param $dataset
+     * @param $rows
+     */
     public function writeTestFile($dataset, $rows)
     {
         $testFile = $this->uploadDir . DIRECTORY_SEPARATOR . $this->testPrefix . $dataset['filename'];
@@ -143,7 +155,16 @@ class CsvService
         } else {
             $file = $this->uploadDir . DIRECTORY_SEPARATOR . $dataset['filename'];
         }
-        $csv = Reader::createFromPath($file);
+
+        $fileContent = file_get_contents($file);
+        // fix for weird CR characters that some people seem to use:
+        if (strpos($fileContent, "\r")) {
+            $converted = preg_replace('~\r\n?~', "\n", $fileContent);
+            $csv = Reader::createFromString($converted);
+        } else {
+            $csv = Reader::createFromString($fileContent);
+        }
+
         if (0 < mb_strlen($dataset['delimiter'])) {
             $csv->setDelimiter($dataset['delimiter']);
         } else {
