@@ -1,7 +1,7 @@
 # TODO for the rewrite
 
 - ALL update queries should of course be PER DATASET!!
-+ use DISTINCT queries for fetchRecordsToStandardize (with and without liesIn)
+
 
 - setRecordAsUnmappable should also handle liesIn, number count for doing this on no-results page is still wrong
 - I would like to have a field to do an easy search on a different name on the no-results page that just calls the api for one term:
@@ -9,11 +9,8 @@
 
 - we need a button that displays the row_id form the csv with all the data in it in some sort of a popu or something.
 
-
-
-
-- need to catch the error for standardiz when no csv-records could be found!
-- need to find a way to read CR newLines (windows)
++ need to catch the error for standardize when no csv-records could be found!
++ need to find a way to read CR newLines (windows)
 
 
 
@@ -22,8 +19,6 @@
 
 - clear all datasets online
 - send users an email to configure dataset again
-
-
 
 
 - save standardized query, with or without liesIn Where!
