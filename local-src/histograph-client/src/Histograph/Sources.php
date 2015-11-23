@@ -49,7 +49,7 @@ class Sources
         self::TYPE_NWB,
         self::TYPE_BAG,
         self::TYPE_KLOEKE,
-        'cbsbuurt'
+        self::TYPE_CBS_NEIGHBOURHOOD,
     );
 
     public static function getAllSets()
