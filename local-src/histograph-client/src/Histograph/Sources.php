@@ -20,7 +20,8 @@ class Sources
     const TYPE_BAG = 'bag';
     const TYPE_KLOEKE = 'kloeke';
     const TYPE_HG = 'hg';
-    const TYPE_CBS_NEIGHBOURHOOD = 'cbsbuurt';
+    const TYPE_CBS_BOROUGH = 'cbsbuurt';
+    const TYPE_CBS_NEIGHBOURHOOD = 'cbswijk';
 
     private static $allSets = array(
         self::TYPE_TGN,
@@ -30,6 +31,7 @@ class Sources
         self::TYPE_BAG,
         self::TYPE_KLOEKE,
         self::TYPE_CBS_NEIGHBOURHOOD,
+        self::TYPE_CBS_BOROUGH,
 
         'geonames-tgn',
         'militieregisters',
@@ -50,6 +52,7 @@ class Sources
         self::TYPE_BAG,
         self::TYPE_KLOEKE,
         self::TYPE_CBS_NEIGHBOURHOOD,
+        self::TYPE_CBS_BOROUGH,
     );
 
     public static function getAllSets()
